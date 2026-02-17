@@ -283,15 +283,12 @@ Individual servers can be toggled on/off per session using the dropdown in the c
 
 ## SDK / CLI Version Compatibility
 
-Copilot Agent Console uses the [GitHub Copilot Python SDK](https://github.com/github/copilot-sdk-python) to communicate with the Copilot CLI. These two components use internal flags that change between versions, so **they must be version-compatible**:
+Copilot Agent Console uses the [GitHub Copilot Python SDK](https://github.com/github/copilot-sdk) to communicate with the Copilot CLI. Both are installed automatically — no manual version management needed.
 
-| CLI Version | Compatible SDK Versions |
-|---|---|
-| 0.0.410+ | 0.1.15+ |
-
-**Common errors and fixes:**
-- `error: unknown option '--headless'` → SDK/CLI version mismatch. Reinstall Agent Console to get compatible versions.
-- `SDK protocol version mismatch` → SDK is too old. Reinstall Agent Console.
+If you encounter errors like `unknown option '--headless'` or `protocol version mismatch`, reinstall Agent Console to get compatible versions:
+```powershell
+pipx install --force https://github.com/sanchar10/copilot-agent-console/releases/download/v0.1.0/copilot_agent_console-0.1.0-py3-none-any.whl
+```
 
 ---
 
@@ -308,10 +305,11 @@ The SDK should be installed automatically as a dependency. If it's missing:
 pipx inject copilot-agent-console github-copilot-sdk
 ```
 
-### "Failed to authenticate" on first run
+### Agent not responding to messages
+The Copilot CLI must be authenticated before Agent Console can use it:
 1. Ensure an active [GitHub Copilot subscription](https://github.com/settings/copilot) is in place
-2. Run `copilot login` to authenticate before launching Agent Console
-3. Restart Agent Console after authenticating
+2. Run `copilot login` in a terminal and complete the device code flow
+3. Restart Agent Console
 
 ### Scheduled tasks don't run when PC is sleeping
 Use the `--no-sleep` flag to prevent Windows from going to sleep:
