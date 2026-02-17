@@ -1,0 +1,70 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install frontend dependencies
+        run: npm install --prefix frontend
+
+      - name: Build frontend
+        run: npm run build --prefix frontend
+
+      - name: Install Python build tools
+        run: pip install build
+
+      - name: Build Python wheel
+        run: python -m build --wheel
+
+      - name: Get version from tag
+        id: version
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION_NUMBER="${TAG#v}"
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "VERSION_NUMBER=$VERSION_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.TAG }}
+          name: Copilot Agent Console ${{ steps.version.outputs.TAG }}
+          body: |
+            ## Installation
+
+            ```powershell
+            # Recommended (using pipx)
+            pip install pipx
+            pipx ensurepath
+            pipx install https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.TAG }}/copilot_agent_console-${{ steps.version.outputs.VERSION_NUMBER }}-py3-none-any.whl
+
+            # Alternative (using pip)
+            pip install https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.TAG }}/copilot_agent_console-${{ steps.version.outputs.VERSION_NUMBER }}-py3-none-any.whl
+            ```
+
+            See [README](https://github.com/${{ github.repository }}#readme) for full setup instructions.
+          files: dist/*.whl
+          draft: false
+          prerelease: false

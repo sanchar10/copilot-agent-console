@@ -1,0 +1,478 @@
+import { useState, useRef, useEffect, useCallback } from 'react';
+import type { KeyboardEvent, DragEvent, ClipboardEvent } from 'react';
+import { useChatStore } from '../../stores/chatStore';
+import { useSessionStore } from '../../stores/sessionStore';
+import { useUIStore } from '../../stores/uiStore';
+import { useViewedStore } from '../../stores/viewedStore';
+import { useTabStore, tabId } from '../../stores/tabStore';
+import { sendMessage, createSession, connectSession, enqueueMessage, abortSession, uploadFile } from '../../api/sessions';
+import type { AttachmentRef, UploadedFile } from '../../api/sessions';
+import { Button } from '../common/Button';
+
+// Sessions whose backend SessionClient is confirmed ready.
+// Resets on page refresh — correct since backend clients are also destroyed.
+const readySessions = new Set<string>();
+
+/**
+ * Remove a session from the ready set.
+ * Call when the backend destroys the SessionClient (e.g. CWD / MCP / tools change)
+ * so the next message triggers the activation lock again.
+ */
+export function clearReadySession(sessionId: string) {
+  readySessions.delete(sessionId);
+}
+
+/** @internal — test-only: check if a session is in the ready set. */
+export function isSessionReady(sessionId: string): boolean {
+  return readySessions.has(sessionId);
+}
+
+/** @internal — test-only: add a session to the ready set. */
+export function markSessionReady(sessionId: string): void {
+  readySessions.add(sessionId);
+}
+
+interface InputBoxProps {
+  sessionId?: string;
+}
+
+function fileIcon(filename: string): string {
+  const ext = filename.split('.').pop()?.toLowerCase() || '';
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico'].includes(ext)) return '🖼️';
+  if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(ext)) return '🎬';
+  if (['mp3', 'wav', 'ogg', 'flac', 'aac'].includes(ext)) return '🎵';
+  if (['pdf'].includes(ext)) return '📑';
+  if (['xls', 'xlsx', 'csv', 'tsv'].includes(ext)) return '📊';
+  if (['doc', 'docx', 'rtf', 'odt'].includes(ext)) return '📝';
+  if (['ppt', 'pptx'].includes(ext)) return '📽️';
+  if (['zip', 'tar', 'gz', 'rar', '7z'].includes(ext)) return '📦';
+  if (['js', 'ts', 'py', 'java', 'cpp', 'c', 'rs', 'go', 'rb', 'cs', 'sh', 'json', 'yaml', 'yml', 'xml', 'html', 'css'].includes(ext)) return '💻';
+  if (['md', 'txt', 'log'].includes(ext)) return '📃';
+  return '📄';
+}
+
+export function InputBox({ sessionId }: InputBoxProps) {
+  const [input, setInput] = useState('');
+  const [attachments, setAttachments] = useState<(UploadedFile & { attachmentRef: AttachmentRef })[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isNewSession, newSessionSettings, addSession, moveSessionToTop, updateSessionTimestamp, updateSessionName } = useSessionStore();
+  const { defaultModel, defaultCwd } = useUIStore();
+  const { setAgentActive, markViewed } = useViewedStore();
+  const { openTab: openGenericTab } = useTabStore();
+  const {
+    sendingSessionId,
+    getStreamingState,
+    setSending,
+    setStreaming,
+    addMessage,
+    appendStreamingContent,
+    addStreamingStep,
+    setTokenUsage,
+    finalizeTurn,
+  } = useChatStore();
+
+  // Check if streaming is happening for the current session
+  const { isStreaming } = getStreamingState(sessionId || null);
+  // Only disable this input if THIS session is currently activating
+  const isSending = sendingSessionId === sessionId;
+  const isDisabled = isSending;
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+    }
+  }, [input]);
+
+  // Upload files and add to attachments
+  const handleFiles = useCallback(async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+
+    // No session yet (new session tab) — store raw files for upload at submit time
+    if (!sessionId) {
+      setPendingFiles((prev) => [...prev, ...fileArray]);
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const results = await Promise.all(
+        fileArray.map(async (file) => {
+          const uploaded = await uploadFile(file, sessionId);
+          return {
+            ...uploaded,
+            attachmentRef: { type: 'file' as const, path: uploaded.path, displayName: uploaded.originalName },
+          };
+        })
+      );
+      setAttachments((prev) => [...prev, ...results]);
+    } catch (err) {
+      console.error('Failed to upload files:', err);
+    } finally {
+      setIsUploading(false);
+    }
+  }, [sessionId]);
+
+  const removeAttachment = useCallback((index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  // Drag and drop handlers
+  const handleDragOver = useCallback((e: DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+  const handleDragLeave = useCallback((e: DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
+  const handleDrop = useCallback((e: DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    if (e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  }, [handleFiles]);
+
+  // Paste handler for images
+  const handlePaste = useCallback((e: ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const files: File[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        if (file) files.push(file);
+      }
+    }
+    if (files.length > 0) {
+      e.preventDefault();
+      handleFiles(files);
+    }
+  }, [handleFiles]);
+
+  const handleAbort = async () => {
+    if (!sessionId) return;
+    try {
+      await abortSession(sessionId);
+    } catch (err) {
+      console.error('Failed to abort:', err);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const trimmedInput = input.trim();
+    if ((!trimmedInput && attachments.length === 0 && pendingFiles.length === 0) || isDisabled) return;
+
+    // If agent is already running, enqueue the follow-up message.
+    // Read currentSessionId from store directly (not the prop) to avoid
+    // the race where the prop hasn't updated yet after session creation.
+    const currentId = sessionId || useTabStore.getState().getActiveSessionId();
+    if (isStreaming && currentId) {
+      const enqueueAttachments = attachments.map((a) => a.attachmentRef);
+      const userMessage = {
+        id: `temp-${Date.now()}`,
+        role: 'user' as const,
+        content: trimmedInput || '',
+        timestamp: new Date().toISOString(),
+        mode: 'enqueue' as const,
+        attachments: enqueueAttachments.length > 0 ? enqueueAttachments.map((a) => ({ type: a.type, path: a.path, displayName: a.displayName })) : undefined,
+      };
+      addMessage(currentId, userMessage);
+      updateSessionTimestamp(currentId);
+      setInput('');
+      setAttachments([]);
+
+      try {
+        await enqueueMessage(currentId, trimmedInput || '(see attached files)', enqueueAttachments.length > 0 ? enqueueAttachments : undefined);
+      } catch (err) {
+        console.error('Failed to enqueue message:', err);
+      }
+      return;
+    }
+
+    let activeSessionId = sessionId;
+    // Track if this is a brand new session being created
+    let isCreatingNewSession = isNewSession || !sessionId;
+
+    setInput('');
+    const pendingAttachments = attachments.map((a) => a.attachmentRef);
+    setAttachments([]);
+
+    // If this is a new session, create it first with the pending settings
+    if (isNewSession || !sessionId) {
+      try {
+        // Use newSessionSettings if available, otherwise use defaults
+        const sessionModel = newSessionSettings?.model || defaultModel;
+        const sessionCwd = newSessionSettings?.cwd || defaultCwd;
+        const sessionName = newSessionSettings?.name || 'New Session';
+        const sessionMcpServers = newSessionSettings?.mcpServers;
+        const sessionTools = newSessionSettings?.tools;
+        
+        const session = await createSession({ 
+          model: sessionModel,
+          name: sessionName,
+          cwd: sessionCwd,
+          mcp_servers: sessionMcpServers,
+          tools: sessionTools,
+          system_message: newSessionSettings?.systemMessage,
+          agent_id: newSessionSettings?.agentId,
+        });
+        addSession(session);
+        openGenericTab({ id: tabId.session(session.session_id), type: 'session', label: session.session_name, sessionId: session.session_id });
+        await connectSession(session.session_id);
+        activeSessionId = session.session_id;
+      } catch (err) {
+        console.error('Failed to create session:', err);
+        setSending(null);
+        return;
+      }
+    } else {
+      // Move existing session to top
+      moveSessionToTop(sessionId);
+    }
+
+    if (!activeSessionId) {
+      console.error('No session ID');
+      return;
+    }
+
+    // Upload any pending files now that we have a session ID
+    if (pendingFiles.length > 0) {
+      try {
+        const uploadResults = await Promise.all(
+          pendingFiles.map(async (file) => {
+            const uploaded = await uploadFile(file, activeSessionId!);
+            return {
+              type: 'file' as const,
+              path: uploaded.path,
+              displayName: uploaded.originalName,
+            };
+          })
+        );
+        pendingAttachments.push(...uploadResults);
+      } catch (err) {
+        console.error('Failed to upload pending files:', err);
+      }
+      setPendingFiles([]);
+    }
+
+    // For sessions not yet confirmed ready on the backend, lock input
+    // until the first SSE event arrives (proves SessionClient is alive).
+    // Once confirmed, subsequent messages skip the lock.
+    // Placed here so we always have the real session ID (even for new sessions).
+    const needsLock = !readySessions.has(activeSessionId);
+    if (needsLock) {
+      setSending(activeSessionId);
+    }
+
+    // Add user message to UI immediately and update timestamp
+    const resolvedPrompt = trimmedInput || (pendingAttachments.length > 0 ? 'See attached file(s).' : '');
+    const userMessage = {
+      id: `temp-${Date.now()}`,
+      role: 'user' as const,
+      content: resolvedPrompt,
+      timestamp: new Date().toISOString(),
+      attachments: pendingAttachments.length > 0 ? pendingAttachments.map((a) => ({ type: a.type, path: a.path, displayName: a.displayName })) : undefined,
+    };
+    addMessage(activeSessionId, userMessage);
+    updateSessionTimestamp(activeSessionId);
+    setStreaming(activeSessionId, true);
+    
+    // Mark as viewed NOW so we have a baseline timestamp for unread detection
+    // This ensures that when agent completes, updated_at > lastViewed
+    markViewed(activeSessionId);
+    
+    // Track that this session has an active agent
+    setAgentActive(activeSessionId, true);
+
+    // sendingCleared tracks whether we've re-enabled input on first SSE event.
+    let sendingCleared = !needsLock; // already unlocked if session was ready
+    const clearSendingOnce = () => {
+      if (!sendingCleared) {
+        readySessions.add(activeSessionId!);
+        setSending(null);
+        sendingCleared = true;
+      }
+    };
+
+    try {
+      await sendMessage(
+        activeSessionId,
+        resolvedPrompt,
+        (delta) => {
+          clearSendingOnce();
+          appendStreamingContent(activeSessionId!, delta);
+        },
+        (step) => {
+          clearSendingOnce();
+          // Compaction notifications → system message (they arrive after finalizeTurn and would be lost)
+          if (step.title?.startsWith('⟳ Compacting') || step.title?.startsWith('✓ Context compacted') || step.title?.startsWith('✗ Compaction')) {
+            const detail = step.detail ? ` — ${step.detail}` : '';
+            addMessage(activeSessionId!, {
+              id: `system-${Date.now()}`,
+              role: 'system',
+              content: `${step.title}${detail}`,
+              timestamp: new Date().toISOString(),
+            });
+          } else {
+            addStreamingStep(activeSessionId!, step);
+          }
+        },
+        (usage) => {
+          setTokenUsage(activeSessionId!, usage);
+        },
+        (_messageId, sessionName) => {
+          // All responses already finalized by turn_done / finalizeTurn().
+          // Just clean up streaming & agent state.
+          setStreaming(activeSessionId!, false);
+          setSending(null);
+          setAgentActive(activeSessionId!, false);
+          // Auto-name: update session name if server sent an auto-generated name
+          if (sessionName && activeSessionId) {
+            updateSessionName(activeSessionId, sessionName);
+          }
+          // Update the session's timestamp so the sidebar shows it was modified
+          updateSessionTimestamp(activeSessionId!);
+          // If user is still viewing this session, mark as viewed
+          const currentSession = useTabStore.getState().getActiveSessionId();
+          if (currentSession === activeSessionId) {
+            markViewed(activeSessionId!);
+          }
+        },
+        (error) => {
+          console.error('Message error:', error);
+          setStreaming(activeSessionId!, false);
+          setSending(null);
+          setAgentActive(activeSessionId!, false);
+        },
+        isCreatingNewSession,  // Skip resume attempt for brand new sessions
+        undefined,  // onPendingMessages — not needed, finalizeTurn handles mode clearing
+        () => {
+          // turn_done — agent finished responding to one message, more queued.
+          // Insert the assistant response before the next queued user message.
+          finalizeTurn(activeSessionId!);
+        },
+        pendingAttachments.length > 0 ? pendingAttachments : undefined
+      );
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      if (activeSessionId) {
+        setStreaming(activeSessionId, false);
+        setAgentActive(activeSessionId, false);
+      }
+      setSending(null);
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  return (
+    <div
+      className={`border-t bg-white p-4 ${isDragOver ? 'ring-2 ring-blue-400 bg-blue-50' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      <div className="max-w-4xl mx-auto">
+        {/* Attachment chips */}
+        {(attachments.length > 0 || pendingFiles.length > 0) && (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {attachments.map((att, idx) => {
+              return (
+                <div key={`uploaded-${idx}`} className="flex items-center gap-1.5 bg-gray-100 border border-gray-200 rounded-lg px-2.5 py-1 text-sm">
+                  <span className="text-gray-500">{fileIcon(att.originalName)}</span>
+                  <span className="text-gray-700 max-w-[200px] truncate">{att.originalName}</span>
+                  <span className="text-gray-400 text-xs">({(att.size / 1024).toFixed(0)}KB)</span>
+                  <button onClick={() => removeAttachment(idx)} className="text-gray-400 hover:text-red-500 ml-0.5" title="Remove">×</button>
+                </div>
+              );
+            })}
+            {pendingFiles.map((file, idx) => (
+              <div key={`pending-${idx}`} className="flex items-center gap-1.5 bg-gray-100 border border-gray-200 rounded-lg px-2.5 py-1 text-sm">
+                <span className="text-gray-500">{fileIcon(file.name)}</span>
+                <span className="text-gray-700 max-w-[200px] truncate">{file.name}</span>
+                <span className="text-gray-400 text-xs">({(file.size / 1024).toFixed(0)}KB)</span>
+                <button onClick={() => setPendingFiles((prev) => prev.filter((_, i) => i !== idx))} className="text-gray-400 hover:text-red-500 ml-0.5" title="Remove">×</button>
+              </div>
+            ))}
+          </div>
+        )}
+        {isUploading && (
+          <div className="text-xs text-gray-400 mb-1">Uploading...</div>
+        )}
+        <div className="flex items-end gap-2">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={(e) => { if (e.target.files) handleFiles(e.target.files); e.target.value = ''; }}
+          />
+          {/* Attach button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isDisabled}
+            className="flex-shrink-0 h-12 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            title="Attach files"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            </svg>
+          </button>
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            placeholder={isSending
+              ? "Activating session, please wait..."
+              : isStreaming 
+                ? "Type a follow-up... (will be queued for the agent)" 
+                : "Type a message... (Enter to send, Shift+Enter for new line)"}
+            className={`flex-1 resize-none rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[48px] max-h-[200px] ${
+              isDragOver ? 'border-blue-400' : isStreaming ? 'border-amber-300 bg-amber-50' : 'border-gray-300'
+            }`}
+            rows={1}
+            disabled={isDisabled}
+          />
+          {isStreaming ? (
+            <Button
+              onClick={handleAbort}
+              className="h-12 w-12 p-0 bg-red-500 hover:bg-red-600"
+              title="Stop the agent"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="6" y="6" width="12" height="12" rx="1" />
+              </svg>
+            </Button>
+          ) : null}
+          <Button
+            onClick={handleSubmit}
+            disabled={(!input.trim() && attachments.length === 0 && pendingFiles.length === 0) || isDisabled}
+            className="h-12 w-12 p-0"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

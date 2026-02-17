@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "weather-server": {
+      "type": "local",
+      "command": "python",
+      "args": ["{{APP_HOME}}/local-mcp-servers/weather_server.py"],
+      "tools": ["*"]
+    }
+  }
+}

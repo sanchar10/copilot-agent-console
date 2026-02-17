@@ -1,0 +1,111 @@
+import { create } from 'zustand';
+import { getViewedTimestamps, markSessionViewed as apiMarkViewed } from '../api/viewed';
+import { getActiveAgents } from '../api/activeAgents';
+
+interface ViewedState {
+  // Map of sessionId -> Unix timestamp (seconds) when last viewed
+  lastViewed: Record<string, number>;
+  // Set of session IDs with actively running agents
+  activeAgents: Set<string>;
+  // Loading state
+  isLoaded: boolean;
+
+  // Load timestamps from backend (called on app init)
+  loadViewedTimestamps: () => Promise<void>;
+  
+  // Load active agents from backend (called on app init)
+  loadActiveAgents: () => Promise<void>;
+  
+  // Mark a session as viewed (updates memory + calls API)
+  markViewed: (sessionId: string) => void;
+  
+  // Check if session has unread content
+  hasUnread: (sessionId: string, sessionUpdatedAt: string) => boolean;
+  
+  // Track active agents
+  setAgentActive: (sessionId: string, active: boolean) => void;
+  isAgentActive: (sessionId: string) => boolean;
+}
+
+export const useViewedStore = create<ViewedState>((set, get) => ({
+  lastViewed: {},
+  activeAgents: new Set(),
+  isLoaded: false,
+
+  loadViewedTimestamps: async () => {
+    console.log(`[ViewedStore] loadViewedTimestamps() called`);
+    try {
+      const timestamps = await getViewedTimestamps();
+      console.log(`[ViewedStore] Setting lastViewed:`, timestamps);
+      set({ lastViewed: timestamps, isLoaded: true });
+    } catch (error) {
+      console.error('[ViewedStore] Failed to load viewed timestamps:', error);
+      set({ isLoaded: true }); // Still mark as loaded so UI doesn't wait forever
+    }
+  },
+
+  loadActiveAgents: async () => {
+    console.log(`[ViewedStore] loadActiveAgents() called`);
+    try {
+      const data = await getActiveAgents();
+      const activeIds = new Set(data.sessions.map(s => s.session_id));
+      console.log(`[ViewedStore] Found ${activeIds.size} active agents:`, [...activeIds]);
+      set({ activeAgents: activeIds });
+    } catch (error) {
+      console.error('[ViewedStore] Failed to load active agents:', error);
+    }
+  },
+
+  markViewed: (sessionId: string) => {
+    const now = Date.now() / 1000; // Convert to Unix timestamp (seconds)
+    console.log(`[ViewedStore] markViewed(${sessionId}) at ${now}`);
+    set((state) => ({
+      lastViewed: { ...state.lastViewed, [sessionId]: now },
+    }));
+    // Fire-and-forget API call
+    apiMarkViewed(sessionId);
+  },
+
+  hasUnread: (sessionId: string, sessionUpdatedAt: string) => {
+    const state = get();
+    
+    // Don't show unread indicators until we've loaded the persisted timestamps
+    // This prevents false positives during the initial load race condition
+    if (!state.isLoaded) {
+      return false;
+    }
+    
+    const lastViewed = state.lastViewed[sessionId];
+    
+    // If never viewed, it has unread content (unless it's a new session we just created)
+    if (!lastViewed) {
+      return false; // New sessions are considered "viewed" until they have agent responses
+    }
+    
+    // Parse ISO timestamp to Unix seconds
+    const updatedAtSeconds = new Date(sessionUpdatedAt).getTime() / 1000;
+    
+    // Has unread if updated after last viewed
+    const result = updatedAtSeconds > lastViewed;
+    if (result) {
+      console.log(`[ViewedStore] hasUnread(${sessionId.slice(0,8)}): updatedAt=${updatedAtSeconds} > lastViewed=${lastViewed} = ${result}`);
+    }
+    return result;
+  },
+
+  setAgentActive: (sessionId: string, active: boolean) => {
+    set((state) => {
+      const newActiveAgents = new Set(state.activeAgents);
+      if (active) {
+        newActiveAgents.add(sessionId);
+      } else {
+        newActiveAgents.delete(sessionId);
+      }
+      return { activeAgents: newActiveAgents };
+    });
+  },
+
+  isAgentActive: (sessionId: string) => {
+    return get().activeAgents.has(sessionId);
+  },
+}));

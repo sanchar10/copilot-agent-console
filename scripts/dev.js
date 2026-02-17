@@ -1,0 +1,130 @@
+const { execSync, spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.dirname(__dirname);
+const FRONTEND = path.join(ROOT, 'frontend');
+const BACKEND_MODULE = 'copilot_agent_console.app.main';
+
+function run(cmd, cwd = ROOT) {
+  console.log(`\x1b[36m> ${cmd}\x1b[0m`);
+  execSync(cmd, { cwd, stdio: 'inherit', shell: true });
+}
+
+function tryRun(cmd, cwd = ROOT) {
+  try {
+    execSync(cmd, { cwd, stdio: 'ignore', shell: true });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function checkPythonPackage(pkg) {
+  return tryRun(`python -c "import ${pkg}"`);
+}
+
+function checkCommand(cmd) {
+  return tryRun(process.platform === 'win32' ? `where ${cmd}` : `which ${cmd}`);
+}
+
+async function main() {
+  console.log('\x1b[33m=== Agent Console - Checking Prerequisites ===\x1b[0m\n');
+
+  // Check Python
+  if (!checkCommand('python')) {
+    console.error('\x1b[31mError: Python not found. Please install Python 3.11+\x1b[0m');
+    process.exit(1);
+  }
+  console.log('\x1b[32m✓ Python found\x1b[0m');
+
+  // Check Node
+  if (!checkCommand('node')) {
+    console.error('\x1b[31mError: Node.js not found. Please install Node.js 18+\x1b[0m');
+    process.exit(1);
+  }
+  console.log('\x1b[32m✓ Node.js found\x1b[0m');
+
+  // Check Copilot CLI executable
+  if (!checkCommand('copilot')) {
+    console.error('\x1b[31mError: GitHub Copilot CLI not found.\x1b[0m');
+    console.error('\x1b[33mThe Copilot CLI must be installed and on your PATH.\x1b[0m');
+    console.error('');
+    console.error('Install instructions: https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-in-the-command-line');
+    console.error('');
+    console.error('After installing, authenticate with:');
+    console.error('  copilot auth login');
+    process.exit(1);
+  }
+  console.log('\x1b[32m✓ Copilot CLI found\x1b[0m');
+
+  // Check Copilot SDK (required prerequisite)
+  if (!checkPythonPackage('copilot')) {
+    console.error('\x1b[31mError: copilot-sdk not installed.\x1b[0m');
+    console.error('\x1b[33mInstall from GitHub:\x1b[0m');
+    console.error('  pip install "copilot-sdk @ git+https://github.com/github/copilot-sdk.git#subdirectory=python"');
+    process.exit(1);
+  }
+  console.log('\x1b[32m✓ Copilot SDK found\x1b[0m');
+
+  console.log('\n\x1b[33m=== Checking Dependencies ===\x1b[0m\n');
+
+  // Check frontend node_modules
+  const frontendModules = path.join(FRONTEND, 'node_modules');
+  if (!fs.existsSync(frontendModules)) {
+    console.log('Installing frontend dependencies...');
+    run('npm install', FRONTEND);
+    console.log('');
+  } else {
+    console.log('\x1b[32m✓ Frontend dependencies OK\x1b[0m');
+  }
+
+  // Check backend Python dependencies
+  const backendDeps = ['fastapi', 'uvicorn', 'pydantic', 'sse_starlette', 'copilot_agent_console'];
+  const missingDeps = backendDeps.filter(dep => !checkPythonPackage(dep));
+  
+  if (missingDeps.length > 0) {
+    console.log(`Installing backend dependencies (missing: ${missingDeps.join(', ')})...`);
+    run('pip install -e .', ROOT);
+    console.log('');
+  } else {
+    console.log('\x1b[32m✓ Backend dependencies OK\x1b[0m');
+  }
+
+  console.log('\n\x1b[32m=== Starting Servers ===\x1b[0m\n');
+  console.log('Frontend: \x1b[36mhttp://localhost:5173\x1b[0m');
+  console.log('Backend:  \x1b[36mhttp://localhost:8765\x1b[0m');
+  console.log('\nPress \x1b[33mCtrl+C\x1b[0m to stop both servers.\n');
+
+  // Check for --no-sleep flag
+  const noSleep = process.argv.includes('--no-sleep');
+  const env = noSleep ? { ...process.env, COPILOT_NO_SLEEP: '1' } : process.env;
+  if (noSleep) {
+    console.log('\x1b[33m🔋 Sleep prevention enabled (--no-sleep)\x1b[0m');
+  }
+
+  // Build commands that work on Windows
+  const isWin = process.platform === 'win32';
+  const backendCmd = `"python -m uvicorn ${BACKEND_MODULE}:app --reload --port 8765"`;
+  const frontendCmd = `"npm --prefix ${FRONTEND} run dev"`;
+
+  const proc = spawn('npx', [
+    'concurrently', '-k',
+    '-n', 'backend,frontend',
+    '-c', 'yellow,cyan',
+    backendCmd,
+    frontendCmd
+  ], {
+    cwd: ROOT,
+    stdio: 'inherit',
+    shell: true,
+    env,
+  });
+
+  proc.on('exit', (code) => process.exit(code || 0));
+}
+
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
