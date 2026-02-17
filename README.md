@@ -54,8 +54,8 @@ Agents run on a cron schedule — configurable prompt, agent, and timing. The Ru
 ### 🔔 Unread Indicators
 Blue dot indicators highlight sessions with unread responses — no activity is missed across multiple parallel sessions.
 
-### 🔌 MCP Server Integration
-Model Context Protocol servers extend Copilot's capabilities. Servers can be defined globally (shared with CLI via `~/.copilot/mcp-config.json`) or app-only (in `~/.copilot-agent-console/mcp-config.json`, not visible to the CLI). Individual servers and tools can be toggled on/off at both agent and session level — keeping context focused and avoiding bloat.
+### 🔌 MCP Server Selection
+MCP servers can be defined globally (shared with CLI via `~/.copilot/mcp-config.json`) or app-only (`~/.copilot-agent-console/mcp-config.json`). Individual servers and tools can be toggled on/off at both agent and session level — keeping context focused and avoiding bloat.
 
 ### 🔧 Custom Tools
 Python tools dropped into `~/.copilot-agent-console/tools/` become available to all agents. Each tool is defined with a `TOOL_SPECS` list containing name, description, JSON schema, and handler function. Tools auto-reload when files change — no restart needed. The built-in **Tool Builder** agent can generate custom tools from a natural language description — just describe what the tool should do.
@@ -270,14 +270,6 @@ TOOL_SPECS = [
 ```
 
 Tools auto-reload when files change — new sessions pick them up without restarting.
-
-### MCP Servers
-
-MCP server configurations are read from two locations:
-- `~/.copilot/mcp-config.json` — global, shared with the Copilot CLI
-- `~/.copilot-agent-console/mcp-config.json` — app-only, not visible to the CLI
-
-Individual servers can be toggled on/off per session using the dropdown in the chat header.
 
 ---
 
