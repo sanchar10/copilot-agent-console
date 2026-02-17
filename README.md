@@ -17,7 +17,7 @@ A desktop application providing a rich web interface for running, managing, and 
 
 Copilot Agent Console is a rich experience built on top of the [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli) and [Copilot Python SDK](https://github.com/github/copilot-sdk) that adds multi-session management, reusable agent personalities, scheduled automations, and external tool integration — all through a ChatGPT-style browser interface running locally on any machine.
 
-It leverages Copilot's agentic capabilities — orchestration, context management, built-in tools — and provides a platform to extend them for any use case through custom tools, MCP servers, and agent personalities.
+It leverages Copilot's agentic capabilities — orchestration, context management, built-in tools — and provides a platform to extend them for different use cases through custom tools, MCP servers, and agent personalities.
 
 > **Platform:** Windows only (tested and developed on Windows 10/11). macOS/Linux are untested.
 
