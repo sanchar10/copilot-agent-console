@@ -273,11 +273,11 @@ Tools auto-reload when files change — new sessions pick them up without restar
 
 ### MCP Servers
 
-Copilot Agent Console reads MCP server configurations from:
-- `~/.copilot/mcp-config.json` (global)
-- Project-level `.mcp.json` files
+MCP server configurations are read from two locations:
+- `~/.copilot/mcp-config.json` — global, shared with the Copilot CLI
+- `~/.copilot-agent-console/mcp-config.json` — app-only, not visible to the CLI
 
-Individual MCP servers can be toggled on/off per session using the dropdown in the chat header.
+Individual servers can be toggled on/off per session using the dropdown in the chat header.
 
 ---
 
@@ -285,16 +285,13 @@ Individual MCP servers can be toggled on/off per session using the dropdown in t
 
 Copilot Agent Console uses the [GitHub Copilot Python SDK](https://github.com/github/copilot-sdk-python) to communicate with the Copilot CLI. These two components use internal flags that change between versions, so **they must be version-compatible**:
 
-| CLI Version | Compatible SDK Versions | Notes |
-|---|---|---|
-| 0.0.410 | 0.1.15 – 0.1.20 | SDK uses `--server` flag |
-| Future (with `--headless`) | 0.1.21+ | SDK switches to `--headless` flag |
-
-The `pyproject.toml` pins `github-copilot-sdk>=0.1.15,<=0.1.20` for CLI 0.0.410 compatibility.
+| CLI Version | Compatible SDK Versions |
+|---|---|
+| 0.0.410+ | 0.1.15+ |
 
 **Common errors and fixes:**
-- `error: unknown option '--headless'` → SDK is too new for the installed CLI. Downgrade: `pip install "github-copilot-sdk<=0.1.20"`
-- `SDK protocol version mismatch` → SDK is too old. Upgrade: `pip install "github-copilot-sdk>=0.1.15"`
+- `error: unknown option '--headless'` → SDK/CLI version mismatch. Reinstall Agent Console to get compatible versions.
+- `SDK protocol version mismatch` → SDK is too old. Reinstall Agent Console.
 
 ---
 
@@ -308,12 +305,12 @@ The `pyproject.toml` pins `github-copilot-sdk>=0.1.15,<=0.1.20` for CLI 0.0.410 
 ### "github-copilot-sdk not found"
 The SDK should be installed automatically as a dependency. If it's missing:
 ```powershell
-pip install "github-copilot-sdk>=0.1.15,<=0.1.20"
+pipx inject copilot-agent-console github-copilot-sdk
 ```
 
 ### "Failed to authenticate" on first run
 1. Ensure an active [GitHub Copilot subscription](https://github.com/settings/copilot) is in place
-2. The Copilot CLI will open a browser for OAuth — complete the authentication flow
+2. Run `copilot login` to authenticate before launching Agent Console
 3. Restart Agent Console after authenticating
 
 ### Scheduled tasks don't run when PC is sleeping
