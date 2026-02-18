@@ -52,7 +52,7 @@ def main():
     """Main entry point for Agent Console."""
     parser = argparse.ArgumentParser(
         prog="AgentConsole",
-        description="Agent Console - A beautiful web UI for GitHub Copilot",
+        description="Agent Console - A feature-rich console for GitHub Copilot agents",
     )
     parser.add_argument(
         "--port", "-p",
@@ -105,7 +105,7 @@ def main():
     print(f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║                   Agent Console                              ║
-║          A beautiful web UI for GitHub Copilot               ║
+║      A feature-rich console for GitHub Copilot agents        ║
 ╚══════════════════════════════════════════════════════════════╝
 
   App data:  {app_home}
