@@ -104,7 +104,7 @@ if ($pipx) {
 }
 if (-not $installed) {
     try {
-        $pipOutput = pip install --user --force-reinstall --no-cache-dir $WHL_URL 2>&1
+        $pipOutput = pip install --user --no-cache-dir --ignore-installed $WHL_URL 2>&1
         if ($LASTEXITCODE -eq 0) { $installed = $true }
         else { Write-Host "  ❌ pip install failed:" -ForegroundColor Red; Write-Host "     $pipOutput" -ForegroundColor Red }
     } catch {
