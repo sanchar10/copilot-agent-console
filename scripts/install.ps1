@@ -93,19 +93,19 @@ Write-Host ""
 Write-Host "  📦 Installing Copilot Agent Console..." -ForegroundColor Yellow
 
 if ($pipx) {
-    $ErrorActionPreference = "Continue"
-    pipx install --force $WHL_URL 2>&1 | Out-Null
-    $ErrorActionPreference = "Stop"
+    try {
+        pipx install --force $WHL_URL *>&1 | Out-Null
+    } catch { }
     if ($LASTEXITCODE -ne 0) {
         Write-Host "  ⚠️  pipx install failed, trying pip..." -ForegroundColor Yellow
-        $ErrorActionPreference = "Continue"
-        pip install --force-reinstall --no-cache-dir $WHL_URL 2>&1 | Out-Null
-        $ErrorActionPreference = "Stop"
+        try {
+            pip install --force-reinstall --no-cache-dir $WHL_URL *>&1 | Out-Null
+        } catch { }
     }
 } else {
-    $ErrorActionPreference = "Continue"
-    pip install --force-reinstall --no-cache-dir $WHL_URL 2>&1 | Out-Null
-    $ErrorActionPreference = "Stop"
+    try {
+        pip install --force-reinstall --no-cache-dir $WHL_URL *>&1 | Out-Null
+    } catch { }
 }
 
 # --- Verify ---
