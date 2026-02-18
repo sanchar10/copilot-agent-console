@@ -73,8 +73,8 @@ export function MCPSelector({
           flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md
           transition-colors duration-150
           ${disabled 
-            ? 'bg-white/50 text-gray-400 cursor-not-allowed' 
-            : 'bg-blue-50/80 text-blue-700 hover:bg-blue-100/80 cursor-pointer'
+            ? 'bg-gray-100/80 text-gray-400 border border-gray-200/60 cursor-not-allowed' 
+            : 'bg-blue-100 text-blue-700 border border-blue-200/60 hover:bg-blue-200/80 cursor-pointer'
           }
         `}
         title={`${enabledCount}/${availableServers.length} MCP servers enabled`}

@@ -152,8 +152,8 @@ function CompactVariant({
         }}
         className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 cursor-pointer ${
           disabled
-            ? 'bg-white/50 text-gray-600 cursor-default'
-            : 'bg-blue-50/80 text-blue-700 hover:bg-blue-100/80'
+            ? 'bg-gray-100/80 text-gray-600 border border-gray-200/60 cursor-default'
+            : 'bg-blue-100 text-blue-700 border border-blue-200/60 hover:bg-blue-200/80'
         }`}
         title={hasContent ? `System prompt (${value?.mode || 'replace'})` : 'No custom system prompt — using SDK default'}
       >

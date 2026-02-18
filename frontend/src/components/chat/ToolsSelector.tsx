@@ -149,8 +149,8 @@ export function ToolsSelector({
           h-[30px] flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md
           transition-colors duration-150
           ${disabled 
-            ? 'bg-white/50 text-gray-400 cursor-not-allowed' 
-            : 'bg-amber-50/80 text-amber-700 hover:bg-amber-100/80 cursor-pointer'
+            ? 'bg-gray-100/80 text-gray-400 border border-gray-200/60 cursor-not-allowed' 
+            : 'bg-amber-100 text-amber-700 border border-amber-200/60 hover:bg-amber-200/80 cursor-pointer'
           }
         `}
         title={`${enabledCount}/${availableTools.length} custom tools${builtinSummary ? `, built-in: ${draftMode}${builtinSummary}` : ''}`}

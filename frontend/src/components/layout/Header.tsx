@@ -197,6 +197,9 @@ export function Header({
               </h2>
             )}
 
+            {/* Separator */}
+            <div className="h-5 w-px bg-gray-300/60 mx-0.5" />
+
             {/* Model badge - clickable dropdown for new sessions, static for existing */}
             {model && (
               <div className="relative">
@@ -204,8 +207,8 @@ export function Header({
                   onClick={handleModelClick}
                   className={`min-w-[80px] h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 ${
                     isNewSession 
-                      ? 'bg-blue-50/80 text-blue-700 hover:bg-blue-100 cursor-pointer' 
-                      : 'bg-white/50 backdrop-blur text-gray-600 cursor-default'
+                      ? 'bg-blue-100 text-blue-700 border border-blue-200/60 hover:bg-blue-200/80 cursor-pointer' 
+                      : 'bg-gray-100/80 text-gray-600 border border-gray-200/60 cursor-default'
                   }`}
                   title={isNewSession ? 'Click to change model' : 'Model cannot be changed after session starts'}
                 >
@@ -274,7 +277,7 @@ export function Header({
               <div className="flex items-center gap-0.5 max-w-[200px] h-[30px]">
                 <button
                   onClick={handleCwdClick}
-                  className="h-[30px] px-2.5 py-1 text-xs font-medium bg-blue-50/80 text-blue-700 rounded-l-md hover:bg-blue-100 flex items-center gap-1.5 transition-colors duration-150 min-w-0"
+                  className="h-[30px] px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200/60 rounded-l-md hover:bg-blue-200/80 flex items-center gap-1.5 transition-colors duration-150 min-w-0"
                   title={`Working directory: ${cwd}\nClick to change`}
                 >
                   <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,7 +289,7 @@ export function Header({
                   <button
                     onClick={() => !hasActiveResponse && setShowFolderBrowser(true)}
                     className={`h-[30px] px-1.5 py-1 text-xs rounded-r-md border-l border-blue-200 transition-colors duration-150 flex items-center ${
-                      hasActiveResponse ? 'bg-white/50 text-gray-400 cursor-not-allowed' : 'bg-blue-50/80 text-blue-700 hover:bg-blue-100'
+                      hasActiveResponse ? 'bg-gray-100/80 text-gray-400 border border-gray-200/60 cursor-not-allowed' : 'bg-blue-100 text-blue-700 border border-blue-200/60 hover:bg-blue-200/80'
                     }`}
                     title={hasActiveResponse ? 'Cannot change folder while response is active' : 'Browse for folder'}
                     disabled={hasActiveResponse}
