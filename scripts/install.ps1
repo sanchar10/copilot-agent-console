@@ -1,7 +1,7 @@
 # Copilot Agent Console — One-click installer for Windows
 # Usage: irm https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1 | iex
 
-$ErrorActionPreference = "Stop"
+# $ErrorActionPreference handled per-command
 $WHL_URL = "https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl"
 
 Write-Host ""
@@ -82,8 +82,8 @@ $pipx = Get-Command pipx -ErrorAction SilentlyContinue
 if (-not $pipx) {
     Write-Host ""
     Write-Host "  📦 Installing pipx..." -ForegroundColor Yellow
-    pip install --user pipx 2>&1 | Out-Null
-    python -m pipx ensurepath 2>&1 | Out-Null
+    & cmd /c "pip install --user pipx 2>NUL 1>NUL"
+    & cmd /c "python -m pipx ensurepath 2>NUL 1>NUL"
     # Try to find pipx after install
     $pipx = Get-Command pipx -ErrorAction SilentlyContinue
 }
