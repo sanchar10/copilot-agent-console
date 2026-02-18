@@ -198,7 +198,7 @@ export function Header({
             )}
 
             {/* Separator */}
-            <div className="h-5 w-px bg-gray-300/60 mx-0.5" />
+            <div className="h-5 w-[2px] bg-gray-300 mx-0.5" />
 
             {/* Model badge - clickable dropdown for new sessions, static for existing */}
             {model && (
