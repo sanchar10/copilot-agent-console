@@ -54,9 +54,28 @@ if (-not $copilot) {
 $copilotVer = ((copilot --version 2>&1) | Select-Object -First 1) -replace '.*?(\d+\.\d+\.\d+[-\d]*).*', '$1'
 Write-Host "  ✅ Copilot CLI $copilotVer" -ForegroundColor Green
 
-# --- Copilot auth reminder ---
+# --- Check Copilot auth ---
 Write-Host ""
-Write-Host "  ℹ️  If not already authenticated, run 'copilot login' before starting." -ForegroundColor DarkGray
+$copilotConfig = "$env:USERPROFILE\.copilot\config.json"
+$needsLogin = $true
+if (Test-Path $copilotConfig) {
+    try {
+        $config = Get-Content $copilotConfig -Raw | ConvertFrom-Json
+        if ($config.logged_in_users -and $config.logged_in_users.Count -gt 0) {
+            $needsLogin = $false
+            Write-Host "  ✅ Copilot authenticated ($($config.logged_in_users[0].login))" -ForegroundColor Green
+        }
+    } catch { }
+}
+if ($needsLogin) {
+    Write-Host "  🔐 Copilot login required. Opening browser..." -ForegroundColor Yellow
+    copilot login
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  ❌ Copilot login failed. Run 'copilot login' manually." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "  ✅ Copilot authenticated" -ForegroundColor Green
+}
 
 # --- Install/Upgrade pipx ---
 $pipx = Get-Command pipx -ErrorAction SilentlyContinue
