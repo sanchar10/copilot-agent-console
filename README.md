@@ -318,10 +318,14 @@ pipx inject copilot-agent-console github-copilot-sdk
 ```
 
 ### Agent not responding to messages
-The Copilot CLI must be authenticated before Agent Console can use it:
+The Copilot CLI must be authenticated with an account that has Copilot access:
 1. Ensure an active [GitHub Copilot subscription](https://github.com/settings/copilot) is in place
 2. Run `copilot login` in a terminal and complete the device code flow
-3. Restart Agent Console
+3. **Sign in with the GitHub account that has the Copilot subscription** — if you have multiple accounts, the wrong one may not have access
+4. Restart Agent Console
+
+### "Not authorized" or "requires an enterprise or organization policy"
+This means the logged-in GitHub account doesn't have Copilot access. Run `copilot login` and authenticate with an account that has an active [Copilot subscription](https://github.com/settings/copilot) (individual, organization, or enterprise).
 
 ### Scheduled tasks don't run when PC is sleeping
 Use the `--no-sleep` flag to prevent Windows from going to sleep:
