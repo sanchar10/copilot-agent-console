@@ -202,8 +202,10 @@ export function SessionItem({ session }: SessionItemProps) {
     } catch (err) {
       console.error('Failed to load session:', err);
       setMessages(sessionId, [{
+        id: 'error',
         role: 'assistant',
         content: `⚠️ Could not load this session.\n\nError: ${err instanceof Error ? err.message : String(err)}`,
+        timestamp: new Date().toISOString(),
       }]);
     }
   };
