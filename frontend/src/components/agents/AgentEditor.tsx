@@ -164,7 +164,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+    <div className="flex-1 overflow-y-auto p-6">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -175,7 +175,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             {!isNew && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 hover:bg-red-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300/60 hover:bg-red-50/60 rounded-lg transition-colors"
               >
                 Delete
               </button>
@@ -188,7 +188,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                   ? 'bg-green-600 text-white'
                   : saveStatus === 'error'
                   ? 'bg-red-600 text-white'
-                  : 'bg-purple-600 text-white hover:bg-purple-700'
+                  : 'bg-violet-600 text-white hover:bg-violet-700'
               }`}
             >
               {saving ? 'Saving...' : saveStatus === 'success' ? '✓ Saved' : saveStatus === 'error' ? '✗ Failed' : 'Save'}
@@ -199,7 +199,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
         {/* Form */}
         <div className="space-y-6">
           {/* Basic Info */}
-          <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+          <section className="bg-white/50 backdrop-blur rounded-xl border border-white/40 p-5 space-y-4">
             <h2 className="font-semibold text-gray-700">Basic Info</h2>
             <div className="grid grid-cols-[1fr_80px] gap-4">
               <div>
@@ -209,7 +209,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="My Agent"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-violet-500/50 focus:border-transparent"
                 />
               </div>
               <div>
@@ -224,7 +224,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What does this agent do?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-violet-500/50 focus:border-transparent"
               />
             </div>
             <div>
@@ -232,7 +232,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
               <select
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-violet-500/50 focus:border-transparent"
               >
                 {availableModels.map((m) => (
                   <option key={m.id} value={m.id}>{m.name}</option>
@@ -249,7 +249,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           />
 
           {/* Tools */}
-          <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+          <section className="bg-white/50 backdrop-blur rounded-xl border border-white/40 p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-gray-700">Tools</h2>
               <span className="text-xs text-gray-400">
@@ -283,7 +283,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           </section>
 
           {/* MCP Servers */}
-          <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+          <section className="bg-white/50 backdrop-blur rounded-xl border border-white/40 p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-gray-700">MCP Servers</h2>
               <span className="text-xs text-gray-400">

@@ -382,7 +382,7 @@ export function InputBox({ sessionId }: InputBoxProps) {
 
   return (
     <div
-      className={`border-t bg-white p-4 ${isDragOver ? 'ring-2 ring-blue-400 bg-blue-50' : ''}`}
+      className={`border-t border-white/30 bg-white/60 backdrop-blur-xl p-4 ${isDragOver ? 'ring-2 ring-violet-400 bg-violet-50/50' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -393,7 +393,7 @@ export function InputBox({ sessionId }: InputBoxProps) {
           <div className="flex flex-wrap gap-2 mb-2">
             {attachments.map((att, idx) => {
               return (
-                <div key={`uploaded-${idx}`} className="flex items-center gap-1.5 bg-gray-100 border border-gray-200 rounded-lg px-2.5 py-1 text-sm">
+                <div key={`uploaded-${idx}`} className="flex items-center gap-1.5 bg-white/50 backdrop-blur border border-white/40 rounded-lg px-2.5 py-1 text-sm">
                   <span className="text-gray-500">{fileIcon(att.originalName)}</span>
                   <span className="text-gray-700 max-w-[200px] truncate">{att.originalName}</span>
                   <span className="text-gray-400 text-xs">({(att.size / 1024).toFixed(0)}KB)</span>
@@ -402,7 +402,7 @@ export function InputBox({ sessionId }: InputBoxProps) {
               );
             })}
             {pendingFiles.map((file, idx) => (
-              <div key={`pending-${idx}`} className="flex items-center gap-1.5 bg-gray-100 border border-gray-200 rounded-lg px-2.5 py-1 text-sm">
+              <div key={`pending-${idx}`} className="flex items-center gap-1.5 bg-white/50 backdrop-blur border border-white/40 rounded-lg px-2.5 py-1 text-sm">
                 <span className="text-gray-500">{fileIcon(file.name)}</span>
                 <span className="text-gray-700 max-w-[200px] truncate">{file.name}</span>
                 <span className="text-gray-400 text-xs">({(file.size / 1024).toFixed(0)}KB)</span>
@@ -445,8 +445,8 @@ export function InputBox({ sessionId }: InputBoxProps) {
               : isStreaming 
                 ? "Type a follow-up... (will be queued for the agent)" 
                 : "Type a message... (Enter to send, Shift+Enter for new line)"}
-            className={`flex-1 resize-none rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[48px] max-h-[200px] ${
-              isDragOver ? 'border-blue-400' : isStreaming ? 'border-amber-300 bg-amber-50' : 'border-gray-300'
+            className={`flex-1 resize-none rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent min-h-[48px] max-h-[200px] ${
+              isDragOver ? 'border-violet-400' : isStreaming ? 'border-amber-300 bg-amber-50/80' : 'border-white/40 bg-white/50 backdrop-blur'
             }`}
             rows={1}
             disabled={isDisabled}

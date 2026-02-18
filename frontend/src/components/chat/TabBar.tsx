@@ -59,7 +59,7 @@ export function TabBar() {
   }
 
   return (
-    <div className="flex items-center bg-gray-100 border-b border-gray-200 overflow-x-auto">
+    <div className="flex items-center bg-white/30 backdrop-blur border-b border-white/30 overflow-x-auto">
       {/* New session tab */}
       {isNewSession && (
         <div
@@ -67,8 +67,8 @@ export function TabBar() {
             // Deactivate all tabs to show new-session view
             useTabStore.setState({ activeTabId: null });
           }}
-          className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
-            ${activeTabId === null ? 'bg-white border-b-2 border-b-blue-500' : 'hover:bg-gray-50'}`}
+          className={`group flex items-center gap-2 px-4 py-2 border-r border-white/30 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
+            ${activeTabId === null ? 'bg-white/70 backdrop-blur border-b-2 border-b-violet-500' : 'hover:bg-white/40'}`}
         >
           <span className="text-sm font-medium text-gray-700">New Session</span>
           <button
@@ -81,7 +81,7 @@ export function TabBar() {
                 useTabStore.setState({ activeTabId: currentTabs[currentTabs.length - 1].id });
               }
             }}
-            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 transition-opacity flex-shrink-0"
+            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/60 transition-opacity flex-shrink-0"
             title="Cancel new session"
           >
             <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,17 +101,17 @@ export function TabBar() {
           <div
             key={tab.id}
             onClick={() => handleTabClick(tab)}
-            className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
+            className={`group flex items-center gap-2 px-4 py-2 border-r border-white/30 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
               ${activeTabId === tab.id
-                ? 'bg-white border-b-2 border-b-blue-500' 
-                : 'hover:bg-gray-50'}`}
+                ? 'bg-white/70 backdrop-blur border-b-2 border-b-violet-500' 
+                : 'hover:bg-white/40'}`}
           >
             <span className="text-sm font-medium text-gray-700 truncate flex-1">
               {label}
             </span>
             <button
               onClick={(e) => handleTabClose(e, tab)}
-              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 transition-opacity flex-shrink-0"
+              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/60 transition-opacity flex-shrink-0"
               title="Close tab"
             >
               <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

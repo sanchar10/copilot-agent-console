@@ -16,13 +16,13 @@ function UpdateBanner({ info, onDismiss }: { info: UpdateInfo; onDismiss: () => 
     : '';
 
   return (
-    <div className="bg-blue-600 text-white px-4 py-2 text-sm flex items-center justify-between">
+    <div className="bg-violet-600 text-white px-4 py-2 text-sm flex items-center justify-between">
       <div className="flex items-center gap-2">
         <span>🎉</span>
         <span>
           Version <strong>{info.latest_version}</strong> is available (current: {info.current_version}).
           {pipxCmd && (
-            <> Run: <code className="bg-blue-700 px-1.5 py-0.5 rounded text-xs font-mono">{pipxCmd}</code></>
+            <> Run: <code className="bg-violet-700 px-1.5 py-0.5 rounded text-xs font-mono">{pipxCmd}</code></>
           )}
         </span>
         {info.release_url && (
@@ -30,13 +30,13 @@ function UpdateBanner({ info, onDismiss }: { info: UpdateInfo; onDismiss: () => 
             href={info.release_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-blue-200"
+            className="underline hover:text-violet-200"
           >
             Release notes
           </a>
         )}
       </div>
-      <button onClick={onDismiss} className="text-blue-200 hover:text-white ml-4" title="Dismiss">✕</button>
+      <button onClick={onDismiss} className="text-violet-200 hover:text-white ml-4" title="Dismiss">✕</button>
     </div>
   );
 }
@@ -58,7 +58,7 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-[#e8eaf6] via-[#f3e5f5] to-[#e0f2f1]">
       {updateInfo && !dismissed && (
         <UpdateBanner info={updateInfo} onDismiss={() => setDismissed(true)} />
       )}

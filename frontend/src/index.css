@@ -12,10 +12,12 @@ html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
+  background: linear-gradient(to bottom right, #e8eaf6, #f3e5f5, #e0f2f1);
 }
 
 body {
   min-width: 320px;
+  color: #1e293b;
 }
 
 #root {
@@ -29,17 +31,17 @@ body {
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
   border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: rgba(148, 163, 184, 0.3);
   border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: rgba(148, 163, 184, 0.5);
 }
 
 /* Mermaid fullscreen: constrain SVG to fit within the modal viewport */
@@ -68,10 +70,10 @@ body {
 }
 
 .dark-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(148, 163, 184, 0.3);
   border-radius: 3px;
 }
 
 .dark-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(148, 163, 184, 0.5);
 }

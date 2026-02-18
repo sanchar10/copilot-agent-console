@@ -11,7 +11,8 @@ export default {
           css: {
             maxWidth: 'none',
             code: {
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'rgba(139, 92, 246, 0.1)',
+              color: '#7c3aed',
               padding: '0.125rem 0.25rem',
               borderRadius: '0.25rem',
               fontWeight: '400',

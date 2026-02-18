@@ -108,8 +108,8 @@ function ScheduleDialog({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
+      <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+        <form onSubmit={handleSubmit} className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
           <h2 className="text-lg font-semibold">{isEdit ? 'Edit Schedule' : 'New Schedule'}</h2>
 
           {!isEdit && (
@@ -185,7 +185,7 @@ function ScheduleDialog({
               <button
                 type="button"
                 onClick={() => setShowFolderPicker(true)}
-                className="px-3 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors shrink-0"
+                className="px-3 py-2 border border-white/40 rounded-lg text-sm text-gray-600 hover:bg-white/40 transition-colors shrink-0"
                 title="Browse folders"
               >
                 📁
@@ -211,7 +211,7 @@ function ScheduleDialog({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              className="px-4 py-2 text-sm bg-violet-600 text-white rounded-lg hover:bg-violet-700"
             >
               {isEdit ? 'Save Changes' : 'Create Schedule'}
             </button>
@@ -250,7 +250,7 @@ function ScheduleCard({
   return (
     <div
       onClick={onEdit}
-      className="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer"
+      className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5 hover:border-violet-300/60 hover:shadow-md transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between mb-3">
         <div>
@@ -271,31 +271,31 @@ function ScheduleCard({
       )}
 
       {schedule.next_run && schedule.enabled && (
-        <p className="text-xs text-indigo-600 mb-3">
+        <p className="text-xs text-violet-600 mb-3">
           Next run: {new Date(schedule.next_run).toLocaleString()}
         </p>
       )}
 
-      <div className="flex items-center gap-2 pt-2 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-2 pt-2 border-t border-white/40" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onToggle}
           className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
             schedule.enabled
-              ? 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-              : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+              ? 'bg-amber-50/80 text-amber-700 hover:bg-amber-100/80'
+              : 'bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100/80'
           }`}
         >
           {schedule.enabled ? '⏸ Pause' : '▶ Enable'}
         </button>
         <button
           onClick={onRunNow}
-          className="text-xs px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
+          className="text-xs px-3 py-1.5 rounded-lg bg-violet-50/80 text-violet-700 hover:bg-violet-100/80 transition-colors"
         >
           🚀 Run Now
         </button>
         <button
           onClick={onViewRuns}
-          className="text-xs px-3 py-1.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
+          className="text-xs px-3 py-1.5 rounded-lg bg-white/40 text-gray-600 hover:bg-white/60 transition-colors"
         >
           📋 Runs
         </button>
@@ -425,7 +425,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-50">
+    <div className="flex-1 overflow-y-auto">
       <div className="max-w-4xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -437,7 +437,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
           <button
             onClick={() => { setEditingSchedule(undefined); setDialogMode('create'); }}
             disabled={agents.length === 0}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium disabled:opacity-50"
+            className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium disabled:opacity-50"
           >
             + New Schedule
           </button>
@@ -450,7 +450,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
             <select
               value={filterAgentId}
               onChange={(e) => setFilterAgentId(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white"
+              className="border border-white/40 rounded-lg px-3 py-1.5 text-sm bg-white/50"
             >
               <option value="">All Agents</option>
               {agents.map((a) => (

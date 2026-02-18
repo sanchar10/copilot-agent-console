@@ -15,9 +15,9 @@ export function TokenUsageSlider({
   // Keep colored bar after streaming ends to show final usage
   if (!tokenLimit || currentTokens === undefined) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="flex items-center gap-2 px-3 py-1.5 bg-white/50 backdrop-blur rounded-lg border border-white/40">
         <span className="text-xs font-medium text-gray-400">Tokens</span>
-        <div className="w-32 h-2 bg-gray-200 rounded-full" />
+        <div className="w-32 h-2 bg-white/60 rounded-full" />
         <span className="text-xs text-gray-400">-</span>
       </div>
     );
@@ -30,11 +30,11 @@ export function TokenUsageSlider({
 
   return (
     <div 
-      className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+      className="flex items-center gap-2 px-3 py-1.5 bg-white/50 backdrop-blur rounded-lg border border-white/40 hover:border-white/60 transition-colors"
       title={`Token usage: ${currentTokens.toLocaleString()} / ${tokenLimit.toLocaleString()}\nMessages: ${messagesLength || 0}`}
     >
       <span className="text-xs font-medium text-gray-600">Tokens</span>
-      <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-32 h-2 bg-white/60 rounded-full overflow-hidden">
         <div 
           className={`h-full ${barColor} transition-all duration-300 ease-out`}
           style={{ width: `${Math.min(percentage, 100)}%` }}

@@ -33,7 +33,7 @@ function AgentCard({ session, onNavigate }: { session: ActiveAgentSession; onNav
   }, [session.started_at]);
   
   return (
-    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+    <div className="bg-white/70 backdrop-blur rounded-lg p-4 border border-white/40">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -42,11 +42,11 @@ function AgentCard({ session, onNavigate }: { session: ActiveAgentSession; onNav
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
           </span>
-          <span className="text-sm font-medium text-slate-200">
+          <span className="text-sm font-medium text-gray-800">
             {session.session_id.slice(0, 8)}...
           </span>
         </div>
-        <div className="flex items-center gap-3 text-xs text-slate-400">
+        <div className="flex items-center gap-3 text-xs text-gray-500">
           <span title="Elapsed time">⏱️ {elapsed}</span>
           <span title="Chunks received">📦 {session.chunks_count}</span>
           <span title="Steps completed">🔧 {session.steps_count}</span>
@@ -55,27 +55,27 @@ function AgentCard({ session, onNavigate }: { session: ActiveAgentSession; onNav
       
       {/* Current step */}
       {session.current_step && (
-        <div className="mb-3 px-2 py-1 bg-slate-900 rounded text-xs">
-          <span className="text-emerald-400">▶</span>{' '}
-          <span className="text-slate-300">{session.current_step.title}</span>
+        <div className="mb-3 px-2 py-1 bg-white/40 rounded text-xs">
+          <span className="text-emerald-500">▶</span>{' '}
+          <span className="text-gray-700">{session.current_step.title}</span>
         </div>
       )}
       
       {/* Content tail - live output */}
-      <div className="bg-slate-900 rounded p-3 font-mono text-xs text-slate-300 max-h-40 overflow-y-auto whitespace-pre-wrap break-words">
+      <div className="bg-gray-900 rounded p-3 font-mono text-xs text-gray-300 max-h-40 overflow-y-auto whitespace-pre-wrap break-words">
         {session.content_tail || (
-          <span className="text-slate-500 italic">Waiting for output...</span>
+          <span className="text-gray-500 italic">Waiting for output...</span>
         )}
       </div>
       
       {/* Footer */}
-      <div className="flex justify-between items-center mt-3 pt-2 border-t border-slate-700">
-        <span className="text-xs text-slate-500">
+      <div className="flex justify-between items-center mt-3 pt-2 border-t border-white/40">
+        <span className="text-xs text-gray-500">
           {session.content_length ? `${session.content_length.toLocaleString()} chars` : ''}
         </span>
         <button
           onClick={() => onNavigate(session.session_id)}
-          className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+          className="text-xs text-violet-600 hover:text-violet-500 transition-colors"
         >
           Open Session →
         </button>
@@ -122,19 +122,19 @@ export function AgentMonitor({ onClose }: AgentMonitorProps) {
   };
   
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-900 rounded-xl shadow-2xl w-full max-w-4xl max-h-[80vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-700">
+        <div className="flex items-center justify-between p-4 border-b border-white/30">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-white">Active Agents Monitor</h2>
-            <span className="px-2 py-0.5 bg-emerald-600 text-white text-sm rounded-full">
+            <h2 className="text-lg font-semibold text-gray-900">Active Agents Monitor</h2>
+            <span className="px-2 py-0.5 bg-emerald-500 text-white text-sm rounded-full">
               {data.count} active
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -145,15 +145,15 @@ export function AgentMonitor({ onClose }: AgentMonitorProps) {
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
           {error && (
-            <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+            <div className="mb-4 p-3 bg-red-50/80 border border-red-200/60 rounded-lg text-red-700 text-sm">
               {error}
             </div>
           )}
           
           {/* Recently completed */}
           {recentlyCompleted.length > 0 && (
-            <div className="mb-4 p-3 bg-emerald-900/30 border border-emerald-700 rounded-lg">
-              <span className="text-emerald-400 text-sm">
+            <div className="mb-4 p-3 bg-emerald-50/80 border border-emerald-200/60 rounded-lg">
+              <span className="text-emerald-600 text-sm">
                 ✅ Completed: {recentlyCompleted.map(id => id.slice(0, 8)).join(', ')}
               </span>
             </div>
@@ -161,13 +161,13 @@ export function AgentMonitor({ onClose }: AgentMonitorProps) {
           
           {data.count === 0 ? (
             <div className="text-center py-12">
-              <div className="text-slate-500 mb-2">
+              <div className="text-gray-400 mb-2">
                 <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <p className="text-slate-400">No agents currently running</p>
-              <p className="text-slate-500 text-sm mt-1">
+              <p className="text-gray-500">No agents currently running</p>
+              <p className="text-gray-400 text-sm mt-1">
                 Send a message to start an agent session
               </p>
             </div>
@@ -185,7 +185,7 @@ export function AgentMonitor({ onClose }: AgentMonitorProps) {
         </div>
         
         {/* Footer */}
-        <div className="p-3 border-t border-slate-700 text-center text-xs text-slate-500">
+        <div className="p-3 border-t border-white/30 text-center text-xs text-gray-500">
           Live updates every second • Content shows last 500 characters
         </div>
       </div>

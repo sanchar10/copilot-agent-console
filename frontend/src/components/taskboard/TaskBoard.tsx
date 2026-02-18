@@ -80,7 +80,7 @@ function TaskRunCard({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-indigo-300 hover:shadow-md transition-all"
+      className="w-full bg-white/50 backdrop-blur border border-white/40 rounded-xl p-4 text-left hover:border-violet-300/60 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
@@ -100,17 +100,17 @@ function TaskRunCard({
         <p className="text-xs text-red-600 mt-2 line-clamp-2">{run.error}</p>
       )}
 
-      <div className="mt-3 pt-2 border-t border-gray-100 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="mt-3 pt-2 border-t border-white/40 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
         {run.status === 'running' && (
           <button
             onClick={onAbort}
-            className="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+            className="text-xs px-3 py-1.5 rounded-lg bg-red-50/80 text-red-700 hover:bg-red-100/80 transition-colors"
           >
             ⛔ Abort
           </button>
         )}
         {run.session_id && run.status !== 'pending' && run.status !== 'running' && (
-          <span className="text-xs text-indigo-500">💬 Click to open chat</span>
+          <span className="text-xs text-violet-500">💬 Click to open chat</span>
         )}
         <div className="flex-1" />
         {confirmDelete ? (
@@ -239,7 +239,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
   const pendingCount = runs.filter((r) => r.status === 'pending').length;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-50">
+    <div className="flex-1 overflow-y-auto">
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -258,7 +258,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
             {scheduleId && (
               <button
                 onClick={() => openTab({ id: tabId.taskBoard(), type: 'task-board', label: 'Runs' })}
-                className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors"
+                className="text-sm text-violet-600 hover:text-violet-800 transition-colors"
               >
                 ← All Runs
               </button>
@@ -279,7 +279,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
             <select
               value={agentFilter}
               onChange={(e) => setAgentFilter(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white"
+              className="border border-white/40 rounded-lg px-3 py-1.5 text-sm bg-white/50"
             >
               <option value="">All Agents</option>
               {agents.map((a) => (
@@ -290,14 +290,14 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
         )}
 
         {/* Filter Tabs */}
-        <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-lg w-fit">
+        <div className="flex gap-1 mb-6 bg-white/40 backdrop-blur p-1 rounded-lg w-fit">
           {['all', 'running', 'completed', 'failed'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 filter === f
-                  ? 'bg-white text-gray-900 shadow-sm'
+                  ? 'bg-white/70 text-gray-900 shadow-sm'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >

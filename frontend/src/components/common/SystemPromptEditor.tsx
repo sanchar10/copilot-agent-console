@@ -50,7 +50,7 @@ function FullVariant({
   };
 
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+    <section className="bg-white/50 backdrop-blur rounded-xl border border-white/40 p-5 space-y-4">
       <h2 className="font-semibold text-gray-700">System Prompt</h2>
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2 text-sm">
@@ -75,7 +75,7 @@ function FullVariant({
         onChange={(e) => handleContentChange(e.target.value)}
         placeholder="Enter the system prompt..."
         rows={6}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        className="w-full px-3 py-2 border border-white/40 bg-white/50 backdrop-blur rounded-lg text-sm font-mono focus:ring-2 focus:ring-violet-500/50 focus:border-transparent"
       />
     </section>
   );
@@ -152,8 +152,8 @@ function CompactVariant({
         }}
         className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 cursor-pointer ${
           disabled
-            ? 'bg-gray-100 text-gray-600 cursor-default'
-            : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+            ? 'bg-white/50 text-gray-600 cursor-default'
+            : 'bg-violet-50/80 text-violet-700 hover:bg-violet-100/80'
         }`}
         title={hasContent ? `System prompt (${value?.mode || 'replace'})` : 'No custom system prompt — using SDK default'}
       >
@@ -172,9 +172,9 @@ function CompactVariant({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1 w-96 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute left-0 top-full mt-1 w-96 bg-white/80 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg z-50">
           {/* Mode toggle */}
-          <div className="flex items-center gap-4 px-3 py-2 border-b border-gray-100">
+          <div className="flex items-center gap-4 px-3 py-2 border-b border-white/40">
             <span className="text-xs font-medium text-gray-600">Mode:{disabled && <span className="text-gray-400 ml-1">(locked)</span>}</span>
             <label className={`flex items-center gap-1.5 text-xs ${disabled ? 'opacity-50' : ''}`}>
               <input
@@ -205,7 +205,7 @@ function CompactVariant({
               onChange={(e) => setDraftContent(e.target.value)}
               placeholder="Enter system prompt... (empty = SDK default)"
               rows={5}
-              className={`w-full px-2 py-1.5 border border-gray-300 rounded text-xs font-mono resize-y ${disabled ? 'bg-gray-50 text-gray-500 cursor-default' : 'focus:ring-2 focus:ring-indigo-500 focus:border-transparent'}`}
+              className={`w-full px-2 py-1.5 border border-white/40 rounded text-xs font-mono resize-y ${disabled ? 'bg-white/30 text-gray-500 cursor-default' : 'bg-white/50 focus:ring-2 focus:ring-violet-500/50 focus:border-transparent'}`}
               autoFocus={!disabled}
               readOnly={disabled}
               disabled={disabled}
@@ -213,7 +213,7 @@ function CompactVariant({
           </div>
 
           {/* Footer */}
-          <div className="px-3 py-2 border-t border-gray-100 bg-gray-50 rounded-b-lg flex items-center justify-between">
+          <div className="px-3 py-2 border-t border-white/40 bg-white/30 rounded-b-lg flex items-center justify-between">
             <div className="text-[10px] text-gray-500">
               {disabled
                 ? 'Cannot be changed after session starts'
@@ -222,7 +222,7 @@ function CompactVariant({
             {!disabled && (
               <button
                 onClick={commitAndClose}
-                className="px-2.5 py-1 text-xs font-medium bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                className="px-2.5 py-1 text-xs font-medium bg-violet-600 text-white rounded hover:bg-violet-700 transition-colors"
               >
                 Apply
               </button>

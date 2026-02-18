@@ -195,9 +195,9 @@ export function RalphMonitor() {
   const historyRuns = runs.filter(r => ['completed', 'cancelled', 'failed'].includes(r.status));
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
+      <div className="bg-white/60 backdrop-blur-xl border-b border-white/30 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -213,7 +213,7 @@ export function RalphMonitor() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Run List */}
-        <div className="w-64 border-r bg-white overflow-y-auto">
+        <div className="w-64 border-r border-white/30 bg-white/40 backdrop-blur overflow-y-auto">
           {/* Active Runs */}
           {activeRuns.length > 0 && (
             <div className="p-3">
@@ -225,8 +225,8 @@ export function RalphMonitor() {
                     onClick={() => selectRun(run.id)}
                     className={`w-full text-left p-2 rounded-lg border transition-colors ${
                       selectedRunId === run.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:bg-gray-50'
+                        ? 'border-violet-400/60 bg-violet-50/60' 
+                        : 'border-white/40 hover:bg-white/40'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -253,7 +253,7 @@ export function RalphMonitor() {
 
           {/* History */}
           {historyRuns.length > 0 && (
-            <div className="p-3 border-t">
+            <div className="p-3 border-t border-white/30">
               <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">History</h3>
               <div className="space-y-2">
                 {historyRuns.slice(0, 10).map(run => (
@@ -262,8 +262,8 @@ export function RalphMonitor() {
                     onClick={() => selectRun(run.id)}
                     className={`w-full text-left p-2 rounded-lg border transition-colors ${
                       selectedRunId === run.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:bg-gray-50'
+                        ? 'border-violet-400/60 bg-violet-50/60' 
+                        : 'border-white/40 hover:bg-white/40'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -295,7 +295,7 @@ export function RalphMonitor() {
           {selectedRun && selectedBatch ? (
             <div className="max-w-3xl mx-auto space-y-4">
               {/* Run Header */}
-              <div className="bg-white rounded-lg border p-4">
+              <div className="bg-white/50 backdrop-blur rounded-lg border border-white/40 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <h3 className="font-semibold text-gray-900">
@@ -314,9 +314,9 @@ export function RalphMonitor() {
                     <span>Progress</span>
                     <span>{selectedRun.current_job_index}/{selectedBatch.jobs.length} jobs</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-white/40 rounded-full h-2">
                     <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all"
+                      className="bg-violet-500 h-2 rounded-full transition-all"
                       style={{ width: `${(selectedRun.current_job_index / selectedBatch.jobs.length) * 100}%` }}
                     />
                   </div>
@@ -389,7 +389,7 @@ export function RalphMonitor() {
 
               {/* Current Job */}
               {currentJob && (
-                <div className="bg-white rounded-lg border p-4">
+                <div className="bg-white/50 backdrop-blur rounded-lg border border-white/40 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-medium text-gray-900">
                       Current Job ({selectedRun.current_job_index + 1}/{selectedBatch.jobs.length})
@@ -461,7 +461,7 @@ export function RalphMonitor() {
                           value={feedbackText}
                           onChange={(e) => setFeedbackText(e.target.value)}
                           placeholder="Feedback (what should be fixed)..."
-                          className="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="flex-1 px-3 py-2 border border-white/40 bg-white/50 rounded focus:outline-none focus:ring-2 focus:ring-violet-500/50"
                           onKeyDown={(e) => e.key === 'Enter' && handleFeedbackSubmit()}
                         />
                         <button
@@ -478,7 +478,7 @@ export function RalphMonitor() {
               )}
 
               {/* Job List - Expandable */}
-              <div className="bg-white rounded-lg border p-4">
+              <div className="bg-white/50 backdrop-blur rounded-lg border border-white/40 p-4">
                 <h4 className="font-medium text-gray-900 mb-3">All Jobs</h4>
                 <div className="space-y-2">
                   {selectedBatch.jobs.map((job, index) => {
@@ -493,14 +493,14 @@ export function RalphMonitor() {
                         key={job.id}
                         className={`rounded border ${
                           index === selectedRun.current_job_index 
-                            ? 'border-blue-300 bg-blue-50' 
-                            : 'border-gray-100'
+                            ? 'border-violet-300/60 bg-violet-50/40' 
+                            : 'border-white/40'
                         }`}
                       >
                         {/* Job Header - Clickable */}
                         <button
                           onClick={() => toggleJobExpanded(selectedRun.id, job)}
-                          className="w-full p-2 flex items-center justify-between hover:bg-gray-50 rounded-t"
+                          className="w-full p-2 flex items-center justify-between hover:bg-white/40 rounded-t"
                         >
                           <div className="flex items-center gap-2">
                             <span className="text-gray-400">
@@ -524,10 +524,10 @@ export function RalphMonitor() {
                         
                         {/* Expanded Content */}
                         {isExpanded && (
-                          <div className="border-t p-3 bg-gray-50">
+                          <div className="border-t border-white/40 p-3 bg-white/30">
                             {/* Context if any */}
                             {job.context && (
-                              <div className="text-xs text-gray-500 mb-2 p-2 bg-white rounded">
+                              <div className="text-xs text-gray-500 mb-2 p-2 bg-white/50 rounded">
                                 {job.context}
                               </div>
                             )}

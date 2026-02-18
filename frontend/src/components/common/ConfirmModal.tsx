@@ -79,13 +79,13 @@ export function ConfirmModal({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
         onClick={onCancel}
       />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 transform transition-all">
+        <div className="relative bg-white/80 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
           <div className="flex items-start gap-4">
             {/* Icon */}
             <div className={`flex-shrink-0 w-10 h-10 rounded-full ${styles.iconBg} flex items-center justify-center`}>
@@ -107,7 +107,7 @@ export function ConfirmModal({
           <div className="mt-6 flex justify-end gap-3">
             <button
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white/50 backdrop-blur border border-white/40 rounded-lg hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
             >
               {cancelLabel}
             </button>

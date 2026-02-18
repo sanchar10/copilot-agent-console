@@ -73,8 +73,8 @@ export function MCPSelector({
           flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md
           transition-colors duration-150
           ${disabled 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-            : 'bg-purple-50 text-purple-700 hover:bg-purple-100 cursor-pointer'
+            ? 'bg-white/50 text-gray-400 cursor-not-allowed' 
+            : 'bg-violet-50/80 text-violet-700 hover:bg-violet-100/80 cursor-pointer'
           }
         `}
         title={`${enabledCount}/${availableServers.length} MCP servers enabled`}
@@ -93,7 +93,7 @@ export function MCPSelector({
           />
         </svg>
         <span>MCP</span>
-        <span className="bg-purple-200 text-purple-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+        <span className="bg-violet-200/80 text-violet-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">
           {enabledCount}/{availableServers.length}
         </span>
         <svg
@@ -107,22 +107,22 @@ export function MCPSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-          <div className="p-2 border-b border-gray-100">
+        <div className="absolute top-full left-0 mt-1 w-72 bg-white/80 backdrop-blur-xl rounded-lg shadow-lg border border-white/40 z-50">
+          <div className="p-2 border-b border-white/40">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-gray-500">MCP Servers</span>
               {!readOnly && (
               <div className="flex gap-1">
                 <button
                   onClick={handleSelectAll}
-                  className="text-[10px] text-blue-600 hover:text-blue-800 px-1.5 py-0.5"
+                  className="text-[10px] text-violet-600 hover:text-violet-800 px-1.5 py-0.5"
                 >
                   All
                 </button>
                 <span className="text-gray-300">|</span>
                 <button
                   onClick={handleDeselectAll}
-                  className="text-[10px] text-blue-600 hover:text-blue-800 px-1.5 py-0.5"
+                  className="text-[10px] text-violet-600 hover:text-violet-800 px-1.5 py-0.5"
                 >
                   None
                 </button>
@@ -137,13 +137,13 @@ export function MCPSelector({
               return (
                 <label
                   key={server.name}
-                  className={`flex items-start gap-2 px-3 py-2 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-gray-50 cursor-pointer'}`}
+                  className={`flex items-start gap-2 px-3 py-2 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-white/40 cursor-pointer'}`}
                 >
                   <input
                     type="checkbox"
                     checked={isEnabled}
                     onChange={() => handleToggle(server.name)}
-                    className="mt-0.5 h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                    className="mt-0.5 h-4 w-4 text-violet-600 rounded border-gray-300 focus:ring-violet-500"
                     disabled={readOnly}
                   />
                   <div className="flex-1 min-w-0">
@@ -151,7 +151,7 @@ export function MCPSelector({
                       <span className="text-sm font-medium text-gray-900 truncate">
                         {server.name}
                       </span>
-                      <span className="text-[10px] text-gray-400 bg-gray-100 px-1 py-0.5 rounded">
+                      <span className="text-[10px] text-gray-400 bg-white/50 px-1 py-0.5 rounded">
                         {server.source}
                       </span>
                     </div>

@@ -149,8 +149,8 @@ export function ToolsSelector({
           h-[30px] flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md
           transition-colors duration-150
           ${disabled 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-            : 'bg-amber-50 text-amber-700 hover:bg-amber-100 cursor-pointer'
+            ? 'bg-white/50 text-gray-400 cursor-not-allowed' 
+            : 'bg-amber-50/80 text-amber-700 hover:bg-amber-100/80 cursor-pointer'
           }
         `}
         title={`${enabledCount}/${availableTools.length} custom tools${builtinSummary ? `, built-in: ${draftMode}${builtinSummary}` : ''}`}
@@ -172,11 +172,11 @@ export function ToolsSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute left-0 top-full mt-1 w-80 bg-white/80 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg z-50">
           {/* Custom Tools Header */}
           {availableTools.length > 0 && (
             <>
-              <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-white/40">
                 <span className="text-xs font-medium text-gray-600">Custom Tools</span>
                 {!readOnly && (
                 <div className="flex gap-2">
@@ -190,7 +190,7 @@ export function ToolsSelector({
                 {availableTools.map((tool) => {
                   const isEnabled = selections[tool.name] !== false;
                   return (
-                    <label key={tool.name} className={`flex items-start gap-2 px-3 py-1.5 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-gray-50 cursor-pointer'}`}>
+                    <label key={tool.name} className={`flex items-start gap-2 px-3 py-1.5 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-white/40 cursor-pointer'}`}>
                       <input
                         type="checkbox"
                         checked={isEnabled}
@@ -211,7 +211,7 @@ export function ToolsSelector({
 
           {/* Built-in Tools Section */}
           <>
-            <div className="px-3 py-2 border-t border-gray-100">
+            <div className="px-3 py-2 border-t border-white/40">
               <span className="text-xs font-medium text-gray-600">
                 Built-in Tools
                 {!onBuiltinToolsChange && <span className="text-[10px] text-gray-400 ml-1">(locked)</span>}
@@ -237,7 +237,7 @@ export function ToolsSelector({
                     value={draftText}
                     onChange={(e) => handleBuiltinTextChange(e.target.value)}
                     placeholder={draftMode === 'include' ? 'e.g. web_search, view, edit' : 'e.g. powershell, sql'}
-                    className={`flex-1 px-2 py-1 border border-gray-300 rounded text-xs ${(onBuiltinToolsChange && !readOnly) ? 'focus:ring-2 focus:ring-amber-500 focus:border-transparent' : 'bg-gray-50 text-gray-500 cursor-default'}`}
+                    className={`flex-1 px-2 py-1 border border-white/40 rounded text-xs ${(onBuiltinToolsChange && !readOnly) ? 'focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/50' : 'bg-white/30 text-gray-500 cursor-default'}`}
                     disabled={!onBuiltinToolsChange || readOnly}
                     readOnly={!onBuiltinToolsChange || readOnly}
                   />
@@ -255,7 +255,7 @@ export function ToolsSelector({
           </>
 
           {/* Footer */}
-          <div className="px-3 py-2 border-t border-gray-100 bg-gray-50 rounded-b-lg">
+          <div className="px-3 py-2 border-t border-white/40 bg-white/30 rounded-b-lg">
             <div className="text-[10px] text-gray-500">
               Custom: ~/.copilot-agent-console/tools/ {draftMode !== 'all' && `· Built-in: ${draftMode === 'include' ? 'opt-in' : 'opt-out'}`}
             </div>

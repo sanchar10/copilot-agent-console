@@ -36,17 +36,17 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div
         ref={modalRef}
-        className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden"
+        className="relative bg-white/80 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/30">
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
           <button
             onClick={onClose}
@@ -65,7 +65,7 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
 
         {/* Footer */}
         {footer && (
-          <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/30 bg-white/30">
             {footer}
           </div>
         )}

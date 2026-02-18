@@ -86,7 +86,7 @@ export function TaskRunDetail({ runId }: { runId: string }) {
   const statusConfig = STATUS_CONFIG[run.status] || STATUS_CONFIG.pending;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-50">
+    <div className="flex-1 overflow-y-auto">
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
@@ -111,7 +111,7 @@ export function TaskRunDetail({ runId }: { runId: string }) {
         </div>
 
         {/* Metadata */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5 mb-6 space-y-2">
+        <div className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5 mb-6 space-y-2">
           <MetaRow label="Prompt" value={run.prompt} />
           <MetaRow label="Working Dir" value={run.cwd} />
           <MetaRow label="Started" value={run.started_at ? new Date(run.started_at).toLocaleString() : null} />
@@ -134,11 +134,11 @@ export function TaskRunDetail({ runId }: { runId: string }) {
         )}
 
         {/* Output */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
+        <div className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">Output</h3>
           {run.output ? (
             <div className="prose prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap text-sm text-gray-800 bg-gray-50 p-4 rounded-lg overflow-x-auto">
+              <pre className="whitespace-pre-wrap text-sm text-gray-800 bg-white/40 p-4 rounded-lg overflow-x-auto">
                 {run.output}
               </pre>
             </div>
