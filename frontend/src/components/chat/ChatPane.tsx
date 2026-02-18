@@ -34,9 +34,19 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
   const [cwdError, setCwdError] = useState<string | null>(null);
 
   const session = sessions.find((s) => s.session_id === sessionId);
-  const messages = messagesPerSession[sessionId] || [];
+  const rawMessages = messagesPerSession[sessionId];
+  const isLoadingMessages = rawMessages === undefined;
+  const messages = rawMessages || [];
   const { content: streamingContent, steps: streamingSteps, isStreaming } = getStreamingState(sessionId);
   const tokenUsage = getTokenUsage(sessionId);
+
+  // Show spinner only after 300ms delay to avoid flash on fast loads
+  const [showSpinner, setShowSpinner] = useState(false);
+  useEffect(() => {
+    if (!isLoadingMessages) { setShowSpinner(false); return; }
+    const timer = setTimeout(() => setShowSpinner(true), 300);
+    return () => clearTimeout(timer);
+  }, [isLoadingMessages]);
 
   // Check if scroll container is near bottom (within threshold)
   const isNearBottom = useCallback(() => {
@@ -194,7 +204,15 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
       <div className="relative flex-1 min-h-0">
         <div ref={scrollContainerRef} onScroll={handleScroll} className="absolute inset-0 overflow-y-auto p-4">
           <div className="max-w-4xl mx-auto space-y-6">
-            {messages.length === 0 && !isStreaming ? (
+            {isLoadingMessages && showSpinner ? (
+              <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3">
+                <svg className="w-6 h-6 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                <p className="text-sm">Loading messages...</p>
+              </div>
+            ) : messages.length === 0 && !isStreaming ? (
               <div className="flex items-center justify-center h-full text-gray-400">
                 <p>Start a conversation...</p>
               </div>
@@ -213,7 +231,7 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
         {showScrollButton && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur text-gray-700 px-3 py-1.5 rounded-full shadow-lg border border-white/40 text-sm flex items-center gap-1.5 hover:bg-white/90 transition-colors z-10"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur text-gray-700 px-3 py-1.5 rounded-full shadow-lg border border-white/40 text-sm flex items-center gap-1.5 hover:bg-white/95 transition-colors z-10"
           >
             ↓ New messages
           </button>

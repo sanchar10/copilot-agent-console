@@ -65,7 +65,27 @@ Batch job execution based on the [Ralph Loop pattern](https://ghuntley.com/loop/
 
 ---
 
-## Pre-Requisites
+## Quick Install
+
+The install script checks prerequisites, installs any missing dependencies, and sets up Agent Console — all in one command. Run the same command to upgrade.
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1 | iex
+```
+
+Then start:
+```
+agentconsole
+```
+
+> Need more control? See [Manual Installation](#manual-installation) below.
+
+---
+
+## Manual Installation
+
+### Pre-Requisites
 
 Before installing Copilot Agent Console, ensure the following are available. All commands below can be run in either **PowerShell** or **Command Prompt**.
 
@@ -117,7 +137,7 @@ copilot login
 
 ---
 
-## Installation
+### Installation
 
 ### Option A: pipx (Recommended)
 
@@ -130,13 +150,13 @@ python -m pipx ensurepath
 # ⚠️ Close and reopen the terminal after this
 
 # Install Copilot Agent Console
-pipx install https://github.com/sanchar10/copilot-agent-console/releases/download/v0.1.0/copilot_agent_console-0.1.0-py3-none-any.whl
+pipx install https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl
 ```
 
 ### Option B: pip
 
 ```powershell
-pip install https://github.com/sanchar10/copilot-agent-console/releases/download/v0.1.0/copilot_agent_console-0.1.0-py3-none-any.whl
+pip install https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl
 ```
 
 > If `agentconsole` command is not found after install, run as a module:
@@ -155,7 +175,7 @@ agentconsole --version
 When a new version is available, the app shows a banner with the install command. To update manually:
 
 ```powershell
-pipx install --force https://github.com/sanchar10/copilot-agent-console/releases/download/v0.1.0/copilot_agent_console-0.1.0-py3-none-any.whl
+pipx install --force https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl
 ```
 
 ### Uninstalling
@@ -275,11 +295,11 @@ Tools auto-reload when files change — new sessions pick them up without restar
 
 ## SDK / CLI Version Compatibility
 
-Copilot Agent Console uses the [GitHub Copilot Python SDK](https://github.com/github/copilot-sdk) to communicate with the Copilot CLI. Both are installed automatically — no manual version management needed.
+Copilot Agent Console uses the [GitHub Copilot Python SDK](https://github.com/github/copilot-sdk) (≥0.1.25) which bundles its own Copilot binary. The Copilot CLI installed via npm is only needed for initial authentication (`copilot login`) — the SDK handles all runtime communication independently.
 
-If you encounter errors like `unknown option '--headless'` or `protocol version mismatch`, reinstall Agent Console to get compatible versions:
+If you encounter version-related errors, reinstall Agent Console to get compatible versions:
 ```powershell
-pipx install --force https://github.com/sanchar10/copilot-agent-console/releases/download/v0.1.0/copilot_agent_console-0.1.0-py3-none-any.whl
+pipx install --force https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl
 ```
 
 ---
@@ -354,7 +374,7 @@ npm run build
 pip install build
 python -m build --wheel
 
-# Output: dist\copilot_agent_console-0.1.0-py3-none-any.whl
+# Output: dist\copilot_agent_console-0.2.0-py3-none-any.whl
 ```
 
 ### Running Tests

@@ -172,7 +172,7 @@ function CompactVariant({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1 w-96 bg-white/80 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg z-50">
+        <div className="absolute left-0 top-full mt-1 w-96 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-lg shadow-lg z-50">
           {/* Mode toggle */}
           <div className="flex items-center gap-4 px-3 py-2 border-b border-white/40">
             <span className="text-xs font-medium text-gray-600">Mode:{disabled && <span className="text-gray-400 ml-1">(locked)</span>}</span>

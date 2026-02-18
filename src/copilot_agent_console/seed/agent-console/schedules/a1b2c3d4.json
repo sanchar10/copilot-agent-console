@@ -1,0 +1,12 @@
+{
+  "id": "a1b2c3d4",
+  "agent_id": "morning-tech-brief",
+  "name": "Daily Tech Brief",
+  "cron": "0 8 * * 1-5",
+  "prompt": "Generate today's morning tech brief. Search for the latest news and save the HTML report.",
+  "cwd": null,
+  "enabled": false,
+  "max_runtime_minutes": 10,
+  "created_at": "2026-02-18T00:00:00",
+  "updated_at": "2026-02-18T00:00:00"
+}

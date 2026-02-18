@@ -129,7 +129,10 @@ async def open_file(request: OpenFileRequest) -> dict:
     try:
         system = platform.system()
         if system == "Windows":
-            os.startfile(str(file_path))  # type: ignore[attr-defined]
+            if file_path.is_dir():
+                subprocess.Popen(["explorer", str(file_path)])
+            else:
+                os.startfile(str(file_path))  # type: ignore[attr-defined]
         elif system == "Darwin":
             subprocess.Popen(["open", str(file_path)])
         else:

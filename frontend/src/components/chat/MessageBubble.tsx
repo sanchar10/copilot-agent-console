@@ -6,6 +6,7 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { Message, MessageAttachment } from '../../types/message';
 import type { Components } from 'react-markdown';
 import { MermaidDiagram, isMermaidCode } from './MermaidDiagram';
+import { processFileLinks, isFilePath, handleFilePathClick } from '../../utils/processFileLinks';
 
 interface MessageBubbleProps {
   message: Message;
@@ -49,7 +50,7 @@ function AttachmentChips({ attachments }: { attachments: MessageAttachment[] }) 
             key={idx}
             onClick={hasPath ? () => handleClick(att.path!) : undefined}
             disabled={!hasPath}
-            className={`inline-flex items-center gap-1 bg-white/50 backdrop-blur border border-white/40 rounded px-2 py-0.5 text-xs text-gray-600 ${hasPath ? 'hover:bg-blue-50/80 hover:border-blue-300 hover:text-blue-700 cursor-pointer' : 'cursor-default'}`}
+            className={`inline-flex items-center gap-1 bg-white/70 border border-gray-200 rounded px-2 py-0.5 text-xs text-gray-600 ${hasPath ? 'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 cursor-pointer' : 'cursor-default'}`}
             title={hasPath ? `Open ${name}` : name}
           >
             {fileIcon(name)}
@@ -80,8 +81,19 @@ const markdownComponents: Components = {
     }
     
     if (isInline) {
+      const text = String(children);
+      if (isFilePath(text)) {
+        return (
+          <code
+            data-filepath={text}
+            className="bg-blue-50/80 text-blue-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono cursor-pointer hover:underline"
+          >
+            📄 {children}
+          </code>
+        );
+      }
       return (
-        <code className="bg-blue-50/80 text-blue-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
+        <code className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
           {children}
         </code>
       );
@@ -102,32 +114,32 @@ const markdownComponents: Components = {
   table({ children }) {
     return (
       <div className="overflow-x-auto my-3">
-        <table className="min-w-full border-collapse border border-white/40">
+        <table className="min-w-full border-collapse border border-gray-300">
           {children}
         </table>
       </div>
     );
   },
   thead({ children }) {
-    return <thead className="bg-white/50">{children}</thead>;
+    return <thead className="bg-gray-100">{children}</thead>;
   },
   th({ children }) {
     return (
-      <th className="border border-white/40 px-3 py-2 text-left font-semibold text-sm">
+      <th className="border border-gray-300 px-3 py-2 text-left font-semibold text-sm">
         {children}
       </th>
     );
   },
   td({ children }) {
     return (
-      <td className="border border-white/40 px-3 py-2 text-sm">
+      <td className="border border-gray-300 px-3 py-2 text-sm">
         {children}
       </td>
     );
   },
   a({ href, children }) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 hover:underline">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
         {children}
       </a>
     );
@@ -140,7 +152,7 @@ const markdownComponents: Components = {
   },
   blockquote({ children }) {
     return (
-      <blockquote className="border-l-4 border-blue-300 pl-4 italic text-gray-600 my-3">
+      <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-3">
         {children}
       </blockquote>
     );
@@ -155,7 +167,7 @@ const markdownComponents: Components = {
     return <h3 className="text-base font-bold mt-3 mb-1">{children}</h3>;
   },
   p({ children }) {
-    return <p className="my-2">{children}</p>;
+    return <p className="my-2">{processFileLinks(children)}</p>;
   },
   hr() {
     return <hr className="my-4 border-gray-300" />;
@@ -171,9 +183,9 @@ export const MessageBubble = memo(function MessageBubble({ message }: MessageBub
   if (isSystem) {
     return (
       <div className="flex items-center justify-center gap-2 py-1.5">
-        <div className="h-px flex-1 bg-gray-200/50" />
-        <span className="text-xs text-gray-400 px-2 whitespace-nowrap">{message.content}</span>
-        <div className="h-px flex-1 bg-gray-200/50" />
+        <div className="h-px flex-1 bg-gray-200" />
+        <span className="text-xs text-gray-500 px-2 whitespace-nowrap">{message.content}</span>
+        <div className="h-px flex-1 bg-gray-200" />
       </div>
     );
   }
@@ -182,7 +194,7 @@ export const MessageBubble = memo(function MessageBubble({ message }: MessageBub
     <div className="flex gap-3">
       {/* Avatar */}
       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
-      isUser ? 'bg-blue-600' : 'bg-emerald-500'
+      isUser ? 'bg-blue-600' : 'bg-emerald-600'
       }`}>
         {isUser ? (
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -211,12 +223,12 @@ export const MessageBubble = memo(function MessageBubble({ message }: MessageBub
         </div>
         
         {/* Message body */}
-        <div className={`rounded-lg px-4 py-3 ${
+        <div onClick={handleFilePathClick} className={`rounded-lg px-4 py-3 ${
           isEnqueued
-            ? 'bg-amber-50/80 backdrop-blur border border-amber-200/50'
+            ? 'bg-amber-50 border border-amber-200'
             : isUser 
-              ? 'bg-blue-50/80 backdrop-blur border border-blue-200/50' 
-              : 'bg-white/60 backdrop-blur border border-gray-200/40'
+              ? 'bg-blue-50 border border-blue-100' 
+              : 'bg-white border border-gray-200'
         }`}>
           {!isUser && message.steps && message.steps.length > 0 && (
             <details className="mb-2 text-sm">

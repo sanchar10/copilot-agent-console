@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
@@ -43,7 +44,7 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
       {/* Modal */}
       <div
         ref={modalRef}
-        className="relative bg-white/80 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden"
+        className="relative bg-white/95 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/30">
@@ -70,6 +71,7 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -86,10 +86,9 @@ def find_copilot_cli() -> str | None:
 class SessionClient:
     """Wrapper for a per-session CopilotClient with CWD."""
     
-    def __init__(self, session_id: str, cwd: str, cli_path: str):
+    def __init__(self, session_id: str, cwd: str):
         self.session_id = session_id
         self.cwd = cwd
-        self.cli_path = cli_path
         self.client: CopilotClient | None = None
         self.session: object | None = None  # SDK session object
         self.started = False
@@ -101,7 +100,6 @@ class SessionClient:
             return
         
         self.client = CopilotClient({
-            "cli_path": self.cli_path,
             "cwd": self.cwd,
         })
         await self.client.start()
@@ -234,7 +232,6 @@ class CopilotService:
         self._session_clients: dict[str, SessionClient] = {}
         
         self._lock: asyncio.Lock | None = None  # Created lazily in async context
-        self._cli_path: str | None = None
         self._cleanup_task: asyncio.Task | None = None
         self._idle_timeout_seconds = 600  # 10 minutes
         self._models_cache: list[dict] | None = None
@@ -246,19 +243,6 @@ class CopilotService:
             self._lock = asyncio.Lock()
         return self._lock
 
-    def _ensure_cli_path(self) -> str:
-        """Ensure CLI path is found, raise if not."""
-        if not self._cli_path:
-            self._cli_path = find_copilot_cli()
-            if self._cli_path:
-                logger.info(f"Found Copilot CLI at: {self._cli_path}")
-            else:
-                raise RuntimeError(
-                    "Copilot CLI not found. Please install it and ensure it's in your PATH. "
-                    "See: https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-in-the-command-line"
-                )
-        return self._cli_path
-
     async def _start_main_client(self) -> None:
         """Start the main client (for listing/reading)."""
         if self._main_started:
@@ -268,13 +252,11 @@ class CopilotService:
             if self._main_started:
                 return
             
-            cli_path = self._ensure_cli_path()
-            
             try:
-                self._main_client = CopilotClient({"cli_path": cli_path})
+                self._main_client = CopilotClient({})
                 await self._main_client.start()
                 self._main_started = True
-                logger.info("Main CopilotClient started (for listing/reading)")
+                logger.info(f"Main CopilotClient started (CLI: {self._main_client.options.get('cli_path', 'bundled')})")
                 
                 # Start background cleanup task
                 self._cleanup_task = asyncio.create_task(self._idle_cleanup_loop())
@@ -405,8 +387,6 @@ class CopilotService:
 
     async def get_session_client(self, session_id: str, cwd: str) -> SessionClient:
         """Get or create a per-session client with the given CWD."""
-        cli_path = self._ensure_cli_path()
-        
         async with self._get_lock():
             if session_id in self._session_clients:
                 client = self._session_clients[session_id]
@@ -414,11 +394,11 @@ class CopilotService:
                 if client.cwd != cwd:
                     logger.info(f"[{session_id}] CWD changed from {client.cwd} to {cwd}, recreating client")
                     await client.stop()
-                    client = SessionClient(session_id, cwd, cli_path)
+                    client = SessionClient(session_id, cwd)
                     self._session_clients[session_id] = client
                 return client
             
-            client = SessionClient(session_id, cwd, cli_path)
+            client = SessionClient(session_id, cwd)
             self._session_clients[session_id] = client
             return client
 

@@ -83,7 +83,7 @@ export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onS
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white/80 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg z-20 min-w-[280px] max-h-[300px] overflow-y-auto">
+        <div className="absolute top-full left-0 mt-1 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-lg shadow-lg z-50 min-w-[280px] max-h-[300px] overflow-y-auto">
           <div className="px-3 py-2 border-b border-white/40">
             <span className="text-xs font-medium text-gray-500">Sessions using same folder</span>
           </div>

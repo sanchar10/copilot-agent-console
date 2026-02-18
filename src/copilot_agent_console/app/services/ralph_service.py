@@ -30,7 +30,6 @@ from copilot_agent_console.app.models.ralph import (
 from copilot_agent_console.app.services.ralph_storage import get_ralph_storage
 from copilot_agent_console.app.services.mcp_service import mcp_service
 from copilot_agent_console.app.services.tools_service import get_tools_service
-from copilot_agent_console.app.services.copilot_service import find_copilot_cli
 from copilot_agent_console.app.services.logging_service import get_logger, set_ralph_context
 from copilot_agent_console.app.config import APP_HOME
 
@@ -895,16 +894,7 @@ class RalphService:
             
             # Start client if needed
             if run_id not in self._active_clients:
-                # Find CLI path (same as copilot_service uses)
-                cli_path = find_copilot_cli()
-                if not cli_path:
-                    run.status = RunStatus.FAILED
-                    run.error = "Copilot CLI not found"
-                    self._storage.save_run(run)
-                    logger.error("Copilot CLI not found")
-                    return
-                
-                client = CopilotClient({"cwd": batch.workspace, "cli_path": cli_path})
+                client = CopilotClient({"cwd": batch.workspace})
                 await client.start()
                 self._active_clients[run_id] = client
                 logger.info(f"Started CopilotClient for run {run_id} with cli_path={cli_path}")

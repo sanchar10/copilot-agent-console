@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { ChatStep } from '../../types/message';
 import type { Components } from 'react-markdown';
+import { processFileLinks, isFilePath, handleFilePathClick } from '../../utils/processFileLinks';
 
 interface StreamingMessageProps {
   content: string;
@@ -88,8 +89,19 @@ const streamingMarkdownComponents: Components = {
   },
   code({ children }) {
     // Only inline code reaches here — all fenced blocks are handled by splitSegments
+    const text = String(children);
+    if (isFilePath(text)) {
+      return (
+        <code
+          data-filepath={text}
+          className="bg-blue-50/80 text-blue-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono cursor-pointer hover:underline"
+        >
+          📄 {children}
+        </code>
+      );
+    }
     return (
-      <code className="bg-blue-50/80 text-blue-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
+      <code className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
         {children}
       </code>
     );
@@ -97,32 +109,32 @@ const streamingMarkdownComponents: Components = {
   table({ children }) {
     return (
       <div className="overflow-x-auto my-3">
-        <table className="min-w-full border-collapse border border-white/40">
+        <table className="min-w-full border-collapse border border-gray-300">
           {children}
         </table>
       </div>
     );
   },
   thead({ children }) {
-    return <thead className="bg-white/50">{children}</thead>;
+    return <thead className="bg-gray-100">{children}</thead>;
   },
   th({ children }) {
     return (
-      <th className="border border-white/40 px-3 py-2 text-left font-semibold text-sm">
+      <th className="border border-gray-300 px-3 py-2 text-left font-semibold text-sm">
         {children}
       </th>
     );
   },
   td({ children }) {
     return (
-      <td className="border border-white/40 px-3 py-2 text-sm">
+      <td className="border border-gray-300 px-3 py-2 text-sm">
         {children}
       </td>
     );
   },
   a({ href, children }) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 hover:underline">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
         {children}
       </a>
     );
@@ -135,7 +147,7 @@ const streamingMarkdownComponents: Components = {
   },
   blockquote({ children }) {
     return (
-      <blockquote className="border-l-4 border-blue-300 pl-4 italic text-gray-600 my-3">
+      <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-3">
         {children}
       </blockquote>
     );
@@ -150,7 +162,7 @@ const streamingMarkdownComponents: Components = {
     return <h3 className="text-base font-bold mt-3 mb-1">{children}</h3>;
   },
   p({ children }) {
-    return <p className="my-2">{children}</p>;
+    return <p className="my-2">{processFileLinks(children)}</p>;
   },
   hr() {
     return <hr className="my-4 border-gray-300" />;
@@ -190,7 +202,7 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
   return (
     <div className="flex gap-3">
       {/* Avatar */}
-      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium bg-emerald-500">
+      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium bg-emerald-600">
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z" />
         </svg>
@@ -205,7 +217,7 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
         </div>
 
         {/* Message body */}
-        <div className="rounded-lg px-4 py-3 bg-white/50 backdrop-blur border border-white/40">
+        <div onClick={handleFilePathClick} className="rounded-lg px-4 py-3 bg-white border border-gray-200">
           {steps && steps.length > 0 && (
             <div className="mb-2 text-sm">
               <div className="text-gray-600 font-medium mb-2">

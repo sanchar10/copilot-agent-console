@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "copilot-agent-console"
-version = "0.1.0"
+version = "0.2.0"
 description = "Copilot Agent Console - A beautiful web UI for GitHub Copilot"
 readme = "README.md"
 license = "MIT"
@@ -43,7 +43,7 @@ dependencies = [
     "httpx>=0.26.0",
     "sse-starlette>=2.0.0",
     "aiofiles>=23.0.0",
-    "github-copilot-sdk>=0.1.15",
+    "github-copilot-sdk>=0.1.25",
     "apscheduler>=3.10.0,<4.0.0",
 ]
 

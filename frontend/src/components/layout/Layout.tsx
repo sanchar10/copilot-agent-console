@@ -58,7 +58,7 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-[#e2e8f0] via-[#f1f5f9] to-[#e2e8f0]">
+    <div className="flex flex-col h-screen bg-[#fafafa]">
       {updateInfo && !dismissed && (
         <UpdateBanner info={updateInfo} onDismiss={() => setDismissed(true)} />
       )}

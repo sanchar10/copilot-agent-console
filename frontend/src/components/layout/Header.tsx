@@ -172,7 +172,7 @@ export function Header({
   const modelName = availableModels.find(m => m.id === model)?.name || model;
 
   return (
-    <header className="h-14 border-b border-gray-200/30 bg-white/60 backdrop-blur-xl shadow-sm flex items-center px-6">
+    <header className="h-14 border-b border-gray-100 bg-white shadow-sm flex items-center px-6 relative z-20">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {sessionName ? (
           <>
@@ -207,8 +207,8 @@ export function Header({
                   onClick={handleModelClick}
                   className={`min-w-[80px] h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 ${
                     isNewSession 
-                      ? 'bg-blue-100 text-blue-700 border border-blue-200/60 hover:bg-blue-200/80 cursor-pointer' 
-                      : 'bg-gray-100/80 text-gray-600 border border-gray-200/60 cursor-default'
+                      ? 'bg-purple-50 text-purple-700 hover:bg-purple-100 cursor-pointer' 
+                      : 'bg-gray-100 text-gray-600 cursor-default'
                   }`}
                   title={isNewSession ? 'Click to change model' : 'Model cannot be changed after session starts'}
                 >
@@ -222,13 +222,13 @@ export function Header({
                 
                 {/* Model dropdown */}
                 {showModelDropdown && (
-                  <div className="absolute top-full left-0 mt-1 bg-white/80 backdrop-blur-xl border border-gray-200/40 rounded-xl shadow-xl z-10 min-w-[150px] max-h-60 overflow-y-auto">
+                  <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg z-50 min-w-[150px] max-h-60 overflow-y-auto">
                     {availableModels.map((m) => (
                       <button
                         key={m.id}
                         onClick={() => handleModelSelect(m.id)}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-white/60 ${
-                          m.id === model ? 'bg-blue-50/80 text-blue-700' : 'text-gray-700'
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 ${
+                          m.id === model ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
                         }`}
                       >
                         {m.name}
@@ -277,7 +277,7 @@ export function Header({
               <div className="flex items-center gap-0.5 max-w-[200px] h-[30px]">
                 <button
                   onClick={handleCwdClick}
-                  className="h-[30px] px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200/60 rounded-l-md hover:bg-blue-200/80 flex items-center gap-1.5 transition-colors duration-150 min-w-0"
+                  className="h-[30px] px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-l-md hover:bg-blue-100 flex items-center gap-1.5 transition-colors duration-150 min-w-0"
                   title={`Working directory: ${cwd}\nClick to change`}
                 >
                   <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,7 +289,7 @@ export function Header({
                   <button
                     onClick={() => !hasActiveResponse && setShowFolderBrowser(true)}
                     className={`h-[30px] px-1.5 py-1 text-xs rounded-r-md border-l border-blue-200 transition-colors duration-150 flex items-center ${
-                      hasActiveResponse ? 'bg-gray-100/80 text-gray-400 border border-gray-200/60 cursor-not-allowed' : 'bg-blue-100 text-blue-700 border border-blue-200/60 hover:bg-blue-200/80'
+                      hasActiveResponse ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
                     }`}
                     title={hasActiveResponse ? 'Cannot change folder while response is active' : 'Browse for folder'}
                     disabled={hasActiveResponse}

@@ -172,7 +172,7 @@ export function ToolsSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1 w-80 bg-white/80 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg z-50">
+        <div className="absolute left-0 top-full mt-1 w-80 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-lg shadow-lg z-50">
           {/* Custom Tools Header */}
           {availableTools.length > 0 && (
             <>

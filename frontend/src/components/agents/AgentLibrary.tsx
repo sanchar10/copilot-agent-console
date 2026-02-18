@@ -29,7 +29,7 @@ function AgentCard({ agent }: { agent: Agent }) {
     useSessionStore.setState({
       isNewSession: true,
       newSessionSettings: {
-        name: 'New Session',
+        name: `${agent.name} Session`,
         model: agent.model,
         cwd: defaultCwd,
         mcpServers: agent.mcp_servers || [],

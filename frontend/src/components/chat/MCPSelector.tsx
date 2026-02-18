@@ -107,7 +107,7 @@ export function MCPSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-72 bg-white/80 backdrop-blur-xl rounded-lg shadow-lg border border-white/40 z-50">
+        <div className="absolute top-full left-0 mt-1 w-72 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-lg shadow-lg z-50">
           <div className="p-2 border-b border-white/40">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-gray-500">MCP Servers</span>
