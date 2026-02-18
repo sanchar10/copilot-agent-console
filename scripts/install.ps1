@@ -92,20 +92,29 @@ if (-not $pipx) {
 Write-Host ""
 Write-Host "  📦 Installing Copilot Agent Console..." -ForegroundColor Yellow
 
+$installed = $false
 if ($pipx) {
     try {
         pipx install --force $WHL_URL *>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) { $installed = $true }
     } catch { }
-    if ($LASTEXITCODE -ne 0) {
+    if (-not $installed) {
         Write-Host "  ⚠️  pipx install failed, trying pip..." -ForegroundColor Yellow
-        try {
-            pip install --force-reinstall --no-cache-dir $WHL_URL *>&1 | Out-Null
-        } catch { }
     }
-} else {
+}
+if (-not $installed) {
     try {
-        pip install --force-reinstall --no-cache-dir $WHL_URL *>&1 | Out-Null
-    } catch { }
+        $pipOutput = pip install --force-reinstall --no-cache-dir $WHL_URL 2>&1
+        if ($LASTEXITCODE -eq 0) { $installed = $true }
+        else { Write-Host "  ❌ pip install failed:" -ForegroundColor Red; Write-Host "     $pipOutput" -ForegroundColor Red }
+    } catch {
+        Write-Host "  ❌ pip install failed: $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+if (-not $installed) {
+    Write-Host "  ❌ Installation failed. Try manually:" -ForegroundColor Red
+    Write-Host "     pip install $WHL_URL" -ForegroundColor Yellow
+    exit 1
 }
 
 # --- Verify ---
