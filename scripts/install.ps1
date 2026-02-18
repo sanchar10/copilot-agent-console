@@ -103,17 +103,17 @@ if ($pipx) {
     }
 }
 if (-not $installed) {
-    try {
-        $pipOutput = pip install --user --no-cache-dir --ignore-installed $WHL_URL 2>&1
-        if ($LASTEXITCODE -eq 0) { $installed = $true }
-        else { Write-Host "  ❌ pip install failed:" -ForegroundColor Red; Write-Host "     $pipOutput" -ForegroundColor Red }
-    } catch {
-        Write-Host "  ❌ pip install failed: $($_.Exception.Message)" -ForegroundColor Red
+    # Use cmd /c to bypass PowerShell's stderr-to-error conversion
+    & cmd /c "pip install --user --no-cache-dir --ignore-installed $WHL_URL 2>NUL 1>NUL"
+    if ($LASTEXITCODE -eq 0) {
+        $installed = $true
+    } else {
+        Write-Host "  ❌ pip install failed (exit code $LASTEXITCODE)." -ForegroundColor Red
+        Write-Host "     Try running as Administrator:" -ForegroundColor Yellow
+        Write-Host "     pip install $WHL_URL" -ForegroundColor Yellow
     }
 }
 if (-not $installed) {
-    Write-Host "  ❌ Installation failed. Try manually:" -ForegroundColor Red
-    Write-Host "     pip install --user $WHL_URL" -ForegroundColor Yellow
     exit 1
 }
 
