@@ -51,23 +51,12 @@ if (-not $copilot) {
         exit 1
     }
 }
-$copilotVer = (copilot --version 2>&1) -replace '.*?(\d+\.\d+\.\d+[-\d]*).*', '$1'
+$copilotVer = ((copilot --version 2>&1) | Select-Object -First 1) -replace '.*?(\d+\.\d+\.\d+[-\d]*).*', '$1'
 Write-Host "  ✅ Copilot CLI $copilotVer" -ForegroundColor Green
 
-# --- Check Copilot auth ---
+# --- Copilot auth reminder ---
 Write-Host ""
-Write-Host "  Checking Copilot authentication..." -ForegroundColor DarkGray
-$authResult = copilot status 2>&1
-if ($LASTEXITCODE -ne 0 -or $authResult -match "not logged in|not authenticated") {
-    Write-Host "  🔐 You need to log in to GitHub Copilot." -ForegroundColor Yellow
-    Write-Host "     Running 'copilot login'..." -ForegroundColor Yellow
-    copilot login
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "  ❌ Copilot login failed. Please try 'copilot login' manually." -ForegroundColor Red
-        exit 1
-    }
-}
-Write-Host "  ✅ Copilot authenticated" -ForegroundColor Green
+Write-Host "  ℹ️  If not already authenticated, run 'copilot login' before starting." -ForegroundColor DarkGray
 
 # --- Install/Upgrade pipx ---
 $pipx = Get-Command pipx -ErrorAction SilentlyContinue
