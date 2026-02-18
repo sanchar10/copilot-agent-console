@@ -49,7 +49,7 @@ function AttachmentChips({ attachments }: { attachments: MessageAttachment[] }) 
             key={idx}
             onClick={hasPath ? () => handleClick(att.path!) : undefined}
             disabled={!hasPath}
-            className={`inline-flex items-center gap-1 bg-white/50 backdrop-blur border border-white/40 rounded px-2 py-0.5 text-xs text-gray-600 ${hasPath ? 'hover:bg-violet-50/80 hover:border-violet-300 hover:text-violet-700 cursor-pointer' : 'cursor-default'}`}
+            className={`inline-flex items-center gap-1 bg-white/50 backdrop-blur border border-white/40 rounded px-2 py-0.5 text-xs text-gray-600 ${hasPath ? 'hover:bg-blue-50/80 hover:border-blue-300 hover:text-blue-700 cursor-pointer' : 'cursor-default'}`}
             title={hasPath ? `Open ${name}` : name}
           >
             {fileIcon(name)}
@@ -81,7 +81,7 @@ const markdownComponents: Components = {
     
     if (isInline) {
       return (
-        <code className="bg-violet-50/80 text-violet-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
+        <code className="bg-blue-50/80 text-blue-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
           {children}
         </code>
       );
@@ -127,7 +127,7 @@ const markdownComponents: Components = {
   },
   a({ href, children }) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:text-violet-700 hover:underline">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 hover:underline">
         {children}
       </a>
     );
@@ -140,7 +140,7 @@ const markdownComponents: Components = {
   },
   blockquote({ children }) {
     return (
-      <blockquote className="border-l-4 border-violet-300 pl-4 italic text-gray-600 my-3">
+      <blockquote className="border-l-4 border-blue-300 pl-4 italic text-gray-600 my-3">
         {children}
       </blockquote>
     );
@@ -182,7 +182,7 @@ export const MessageBubble = memo(function MessageBubble({ message }: MessageBub
     <div className="flex gap-3">
       {/* Avatar */}
       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
-        isUser ? 'bg-violet-600' : 'bg-emerald-500'
+      isUser ? 'bg-blue-600' : 'bg-emerald-500'
       }`}>
         {isUser ? (
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -198,7 +198,7 @@ export const MessageBubble = memo(function MessageBubble({ message }: MessageBub
       {/* Message content */}
       <div className="flex-1 min-w-0">
         {/* Label */}
-        <div className={`text-sm font-medium mb-1 ${isUser ? 'text-violet-600' : 'text-emerald-600'}`}>
+        <div className={`text-sm font-medium mb-1 ${isUser ? 'text-blue-600' : 'text-emerald-600'}`}>
           {isUser ? 'You' : 'Copilot'}
           {isEnqueued && (
             <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700 border border-amber-200">
@@ -215,8 +215,8 @@ export const MessageBubble = memo(function MessageBubble({ message }: MessageBub
           isEnqueued
             ? 'bg-amber-50/80 backdrop-blur border border-amber-200/50'
             : isUser 
-              ? 'bg-violet-50/80 backdrop-blur border border-violet-200/50' 
-              : 'bg-white/50 backdrop-blur border border-white/40'
+              ? 'bg-blue-50/80 backdrop-blur border border-blue-200/50' 
+              : 'bg-white/60 backdrop-blur border border-gray-200/40'
         }`}>
           {!isUser && message.steps && message.steps.length > 0 && (
             <details className="mb-2 text-sm">

@@ -80,7 +80,7 @@ function TaskRunCard({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white/50 backdrop-blur border border-white/40 rounded-xl p-4 text-left hover:border-violet-300/60 hover:shadow-md transition-all"
+      className="w-full bg-white/50 backdrop-blur border border-white/40 rounded-xl p-4 text-left hover:border-blue-300/60 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
@@ -110,7 +110,7 @@ function TaskRunCard({
           </button>
         )}
         {run.session_id && run.status !== 'pending' && run.status !== 'running' && (
-          <span className="text-xs text-violet-500">💬 Click to open chat</span>
+          <span className="text-xs text-blue-500">💬 Click to open chat</span>
         )}
         <div className="flex-1" />
         {confirmDelete ? (
@@ -258,7 +258,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
             {scheduleId && (
               <button
                 onClick={() => openTab({ id: tabId.taskBoard(), type: 'task-board', label: 'Runs' })}
-                className="text-sm text-violet-600 hover:text-violet-800 transition-colors"
+                className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
               >
                 ← All Runs
               </button>

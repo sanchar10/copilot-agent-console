@@ -211,7 +211,7 @@ function ScheduleDialog({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm bg-violet-600 text-white rounded-lg hover:bg-violet-700"
+              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               {isEdit ? 'Save Changes' : 'Create Schedule'}
             </button>
@@ -250,7 +250,7 @@ function ScheduleCard({
   return (
     <div
       onClick={onEdit}
-      className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5 hover:border-violet-300/60 hover:shadow-md transition-all cursor-pointer"
+      className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5 hover:border-blue-300/60 hover:shadow-md transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between mb-3">
         <div>
@@ -271,7 +271,7 @@ function ScheduleCard({
       )}
 
       {schedule.next_run && schedule.enabled && (
-        <p className="text-xs text-violet-600 mb-3">
+        <p className="text-xs text-blue-600 mb-3">
           Next run: {new Date(schedule.next_run).toLocaleString()}
         </p>
       )}
@@ -289,7 +289,7 @@ function ScheduleCard({
         </button>
         <button
           onClick={onRunNow}
-          className="text-xs px-3 py-1.5 rounded-lg bg-violet-50/80 text-violet-700 hover:bg-violet-100/80 transition-colors"
+          className="text-xs px-3 py-1.5 rounded-lg bg-blue-50/80 text-blue-700 hover:bg-blue-100/80 transition-colors"
         >
           🚀 Run Now
         </button>
@@ -437,7 +437,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
           <button
             onClick={() => { setEditingSchedule(undefined); setDialogMode('create'); }}
             disabled={agents.length === 0}
-            className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50"
           >
             + New Schedule
           </button>

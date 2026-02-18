@@ -89,7 +89,7 @@ const streamingMarkdownComponents: Components = {
   code({ children }) {
     // Only inline code reaches here — all fenced blocks are handled by splitSegments
     return (
-      <code className="bg-violet-50/80 text-violet-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
+      <code className="bg-blue-50/80 text-blue-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
         {children}
       </code>
     );
@@ -122,7 +122,7 @@ const streamingMarkdownComponents: Components = {
   },
   a({ href, children }) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:text-violet-700 hover:underline">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 hover:underline">
         {children}
       </a>
     );
@@ -135,7 +135,7 @@ const streamingMarkdownComponents: Components = {
   },
   blockquote({ children }) {
     return (
-      <blockquote className="border-l-4 border-violet-300 pl-4 italic text-gray-600 my-3">
+      <blockquote className="border-l-4 border-blue-300 pl-4 italic text-gray-600 my-3">
         {children}
       </blockquote>
     );

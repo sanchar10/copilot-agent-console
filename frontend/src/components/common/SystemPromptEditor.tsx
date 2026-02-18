@@ -75,7 +75,7 @@ function FullVariant({
         onChange={(e) => handleContentChange(e.target.value)}
         placeholder="Enter the system prompt..."
         rows={6}
-        className="w-full px-3 py-2 border border-white/40 bg-white/50 backdrop-blur rounded-lg text-sm font-mono focus:ring-2 focus:ring-violet-500/50 focus:border-transparent"
+        className="w-full px-3 py-2 border border-white/40 bg-white/50 backdrop-blur rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
       />
     </section>
   );
@@ -153,7 +153,7 @@ function CompactVariant({
         className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 cursor-pointer ${
           disabled
             ? 'bg-white/50 text-gray-600 cursor-default'
-            : 'bg-violet-50/80 text-violet-700 hover:bg-violet-100/80'
+            : 'bg-blue-50/80 text-blue-700 hover:bg-blue-100/80'
         }`}
         title={hasContent ? `System prompt (${value?.mode || 'replace'})` : 'No custom system prompt — using SDK default'}
       >
@@ -205,7 +205,7 @@ function CompactVariant({
               onChange={(e) => setDraftContent(e.target.value)}
               placeholder="Enter system prompt... (empty = SDK default)"
               rows={5}
-              className={`w-full px-2 py-1.5 border border-white/40 rounded text-xs font-mono resize-y ${disabled ? 'bg-white/30 text-gray-500 cursor-default' : 'bg-white/50 focus:ring-2 focus:ring-violet-500/50 focus:border-transparent'}`}
+              className={`w-full px-2 py-1.5 border border-white/40 rounded text-xs font-mono resize-y ${disabled ? 'bg-white/30 text-gray-500 cursor-default' : 'bg-white/50 focus:ring-2 focus:ring-blue-500/50 focus:border-transparent'}`}
               autoFocus={!disabled}
               readOnly={disabled}
               disabled={disabled}
@@ -222,7 +222,7 @@ function CompactVariant({
             {!disabled && (
               <button
                 onClick={commitAndClose}
-                className="px-2.5 py-1 text-xs font-medium bg-violet-600 text-white rounded hover:bg-violet-700 transition-colors"
+                className="px-2.5 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
                 Apply
               </button>

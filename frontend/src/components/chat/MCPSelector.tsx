@@ -74,7 +74,7 @@ export function MCPSelector({
           transition-colors duration-150
           ${disabled 
             ? 'bg-white/50 text-gray-400 cursor-not-allowed' 
-            : 'bg-violet-50/80 text-violet-700 hover:bg-violet-100/80 cursor-pointer'
+            : 'bg-blue-50/80 text-blue-700 hover:bg-blue-100/80 cursor-pointer'
           }
         `}
         title={`${enabledCount}/${availableServers.length} MCP servers enabled`}
@@ -93,7 +93,7 @@ export function MCPSelector({
           />
         </svg>
         <span>MCP</span>
-        <span className="bg-violet-200/80 text-violet-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+        <span className="bg-blue-200/80 text-blue-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">
           {enabledCount}/{availableServers.length}
         </span>
         <svg
@@ -115,14 +115,14 @@ export function MCPSelector({
               <div className="flex gap-1">
                 <button
                   onClick={handleSelectAll}
-                  className="text-[10px] text-violet-600 hover:text-violet-800 px-1.5 py-0.5"
+                  className="text-[10px] text-blue-600 hover:text-blue-800 px-1.5 py-0.5"
                 >
                   All
                 </button>
                 <span className="text-gray-300">|</span>
                 <button
                   onClick={handleDeselectAll}
-                  className="text-[10px] text-violet-600 hover:text-violet-800 px-1.5 py-0.5"
+                  className="text-[10px] text-blue-600 hover:text-blue-800 px-1.5 py-0.5"
                 >
                   None
                 </button>
@@ -143,7 +143,7 @@ export function MCPSelector({
                     type="checkbox"
                     checked={isEnabled}
                     onChange={() => handleToggle(server.name)}
-                    className="mt-0.5 h-4 w-4 text-violet-600 rounded border-gray-300 focus:ring-violet-500"
+                    className="mt-0.5 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                     disabled={readOnly}
                   />
                   <div className="flex-1 min-w-0">

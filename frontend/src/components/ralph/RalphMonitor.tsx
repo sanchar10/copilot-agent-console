@@ -225,7 +225,7 @@ export function RalphMonitor() {
                     onClick={() => selectRun(run.id)}
                     className={`w-full text-left p-2 rounded-lg border transition-colors ${
                       selectedRunId === run.id 
-                        ? 'border-violet-400/60 bg-violet-50/60' 
+                        ? 'border-blue-400/60 bg-blue-50/60' 
                         : 'border-white/40 hover:bg-white/40'
                     }`}
                   >
@@ -262,7 +262,7 @@ export function RalphMonitor() {
                     onClick={() => selectRun(run.id)}
                     className={`w-full text-left p-2 rounded-lg border transition-colors ${
                       selectedRunId === run.id 
-                        ? 'border-violet-400/60 bg-violet-50/60' 
+                        ? 'border-blue-400/60 bg-blue-50/60' 
                         : 'border-white/40 hover:bg-white/40'
                     }`}
                   >
@@ -316,7 +316,7 @@ export function RalphMonitor() {
                   </div>
                   <div className="w-full bg-white/40 rounded-full h-2">
                     <div 
-                      className="bg-violet-500 h-2 rounded-full transition-all"
+                      className="bg-blue-500 h-2 rounded-full transition-all"
                       style={{ width: `${(selectedRun.current_job_index / selectedBatch.jobs.length) * 100}%` }}
                     />
                   </div>
@@ -461,7 +461,7 @@ export function RalphMonitor() {
                           value={feedbackText}
                           onChange={(e) => setFeedbackText(e.target.value)}
                           placeholder="Feedback (what should be fixed)..."
-                          className="flex-1 px-3 py-2 border border-white/40 bg-white/50 rounded focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                          className="flex-1 px-3 py-2 border border-white/40 bg-white/50 rounded focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                           onKeyDown={(e) => e.key === 'Enter' && handleFeedbackSubmit()}
                         />
                         <button
@@ -493,7 +493,7 @@ export function RalphMonitor() {
                         key={job.id}
                         className={`rounded border ${
                           index === selectedRun.current_job_index 
-                            ? 'border-violet-300/60 bg-violet-50/40' 
+                            ? 'border-blue-300/60 bg-blue-50/40' 
                             : 'border-white/40'
                         }`}
                       >
@@ -571,7 +571,7 @@ export function RalphMonitor() {
                                         </div>
                                       )}
                                       {msg.role === 'tool_start' && (
-                                        <div className="text-purple-600">
+                                        <div className="text-blue-600">
                                           ⚙️ Running: {msg.tool}
                                         </div>
                                       )}

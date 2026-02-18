@@ -53,7 +53,7 @@ function AgentCard({ agent }: { agent: Agent }) {
   return (
     <button
       onClick={handleClick}
-      className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5 text-left hover:border-violet-300/60 hover:shadow-md transition-all group relative"
+      className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5 text-left hover:border-blue-300/60 hover:shadow-md transition-all group relative"
     >
       <div className="flex items-start justify-between">
         <div className="text-3xl mb-3">{agent.icon}</div>
@@ -74,7 +74,7 @@ function AgentCard({ agent }: { agent: Agent }) {
           </span>
         </div>
       </div>
-      <h3 className="font-semibold text-gray-900 group-hover:text-violet-700 transition-colors">
+      <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
         {agent.name}
       </h3>
       <p className="text-sm text-gray-500 mt-1 line-clamp-2">
@@ -119,7 +119,7 @@ export function AgentLibrary() {
           </div>
           <button
             onClick={handleNewAgent}
-            className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -140,7 +140,7 @@ export function AgentLibrary() {
             </p>
             <button
               onClick={handleNewAgent}
-              className="mt-4 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm"
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
             >
               Create Agent
             </button>

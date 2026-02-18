@@ -172,7 +172,7 @@ export function Header({
   const modelName = availableModels.find(m => m.id === model)?.name || model;
 
   return (
-    <header className="h-14 border-b border-white/30 bg-white/60 backdrop-blur-xl shadow-sm flex items-center px-6">
+    <header className="h-14 border-b border-gray-200/30 bg-white/60 backdrop-blur-xl shadow-sm flex items-center px-6">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {sessionName ? (
           <>
@@ -204,7 +204,7 @@ export function Header({
                   onClick={handleModelClick}
                   className={`min-w-[80px] h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 ${
                     isNewSession 
-                      ? 'bg-violet-50/80 text-violet-700 hover:bg-violet-100 cursor-pointer' 
+                      ? 'bg-blue-50/80 text-blue-700 hover:bg-blue-100 cursor-pointer' 
                       : 'bg-white/50 backdrop-blur text-gray-600 cursor-default'
                   }`}
                   title={isNewSession ? 'Click to change model' : 'Model cannot be changed after session starts'}
@@ -219,13 +219,13 @@ export function Header({
                 
                 {/* Model dropdown */}
                 {showModelDropdown && (
-                  <div className="absolute top-full left-0 mt-1 bg-white/80 backdrop-blur-xl border border-white/40 rounded-xl shadow-xl z-10 min-w-[150px] max-h-60 overflow-y-auto">
+                  <div className="absolute top-full left-0 mt-1 bg-white/80 backdrop-blur-xl border border-gray-200/40 rounded-xl shadow-xl z-10 min-w-[150px] max-h-60 overflow-y-auto">
                     {availableModels.map((m) => (
                       <button
                         key={m.id}
                         onClick={() => handleModelSelect(m.id)}
                         className={`w-full text-left px-3 py-2 text-sm hover:bg-white/60 ${
-                          m.id === model ? 'bg-violet-50/80 text-violet-700' : 'text-gray-700'
+                          m.id === model ? 'bg-blue-50/80 text-blue-700' : 'text-gray-700'
                         }`}
                       >
                         {m.name}

@@ -59,7 +59,7 @@ export function TabBar() {
   }
 
   return (
-    <div className="flex items-center bg-white/30 backdrop-blur border-b border-white/30 overflow-x-auto">
+    <div className="flex items-center bg-white/40 backdrop-blur border-b border-gray-200/50 overflow-x-auto">
       {/* New session tab */}
       {isNewSession && (
         <div
@@ -67,8 +67,8 @@ export function TabBar() {
             // Deactivate all tabs to show new-session view
             useTabStore.setState({ activeTabId: null });
           }}
-          className={`group flex items-center gap-2 px-4 py-2 border-r border-white/30 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
-            ${activeTabId === null ? 'bg-white/70 backdrop-blur border-b-2 border-b-violet-500' : 'hover:bg-white/40'}`}
+          className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200/30 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
+            ${activeTabId === null ? 'bg-white/70 backdrop-blur border-b-2 border-b-blue-500' : 'hover:bg-white/40'}`}
         >
           <span className="text-sm font-medium text-gray-700">New Session</span>
           <button
@@ -101,9 +101,9 @@ export function TabBar() {
           <div
             key={tab.id}
             onClick={() => handleTabClick(tab)}
-            className={`group flex items-center gap-2 px-4 py-2 border-r border-white/30 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
+            className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200/30 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
               ${activeTabId === tab.id
-                ? 'bg-white/70 backdrop-blur border-b-2 border-b-violet-500' 
+                ? 'bg-white/70 backdrop-blur border-b-2 border-b-blue-500' 
                 : 'hover:bg-white/40'}`}
           >
             <span className="text-sm font-medium text-gray-700 truncate flex-1">

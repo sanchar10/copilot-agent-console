@@ -47,7 +47,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 border border-white/40 rounded-lg text-lg leading-tight text-center hover:bg-white/40 focus:ring-2 focus:ring-violet-500/50 focus:border-transparent h-[38px]"
+        className="w-full px-3 py-2 border border-white/40 rounded-lg text-lg leading-tight text-center hover:bg-white/40 focus:ring-2 focus:ring-blue-500/50 focus:border-transparent h-[38px]"
         title="Pick an icon"
       >
         {value}
@@ -67,8 +67,8 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
                       onChange(emoji);
                       setIsOpen(false);
                     }}
-                    className={`text-xl p-1 rounded hover:bg-violet-100/80 transition-colors ${
-                      value === emoji ? 'bg-violet-100/80 ring-1 ring-violet-400' : ''
+                    className={`text-xl p-1 rounded hover:bg-blue-100/80 transition-colors ${
+                      value === emoji ? 'bg-blue-100/80 ring-1 ring-blue-400' : ''
                     }`}
                   >
                     {emoji}

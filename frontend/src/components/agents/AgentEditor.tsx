@@ -188,7 +188,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                   ? 'bg-green-600 text-white'
                   : saveStatus === 'error'
                   ? 'bg-red-600 text-white'
-                  : 'bg-violet-600 text-white hover:bg-violet-700'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
               }`}
             >
               {saving ? 'Saving...' : saveStatus === 'success' ? '✓ Saved' : saveStatus === 'error' ? '✗ Failed' : 'Save'}
@@ -209,7 +209,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="My Agent"
-                  className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-violet-500/50 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
                 />
               </div>
               <div>
@@ -224,7 +224,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What does this agent do?"
-                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-violet-500/50 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
               />
             </div>
             <div>
@@ -232,7 +232,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
               <select
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
-                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-violet-500/50 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
               >
                 {availableModels.map((m) => (
                   <option key={m.id} value={m.id}>{m.name}</option>

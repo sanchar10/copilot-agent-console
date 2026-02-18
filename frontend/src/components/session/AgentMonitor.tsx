@@ -75,7 +75,7 @@ function AgentCard({ session, onNavigate }: { session: ActiveAgentSession; onNav
         </span>
         <button
           onClick={() => onNavigate(session.session_id)}
-          className="text-xs text-violet-600 hover:text-violet-500 transition-colors"
+          className="text-xs text-blue-600 hover:text-blue-500 transition-colors"
         >
           Open Session →
         </button>
