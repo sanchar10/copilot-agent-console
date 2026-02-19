@@ -73,8 +73,8 @@ export function MCPSelector({
           flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md
           transition-colors duration-150
           ${disabled 
-            ? 'bg-gray-100/80 text-gray-400 border border-gray-200/60 cursor-not-allowed' 
-            : 'bg-blue-100 text-blue-700 border border-blue-200/60 hover:bg-blue-200/80 cursor-pointer'
+            ? 'bg-gray-100/80 dark:bg-gray-800/80 text-gray-400 border border-gray-200/60 dark:border-gray-700/60 cursor-not-allowed' 
+            : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-700/60 hover:bg-blue-200/80 dark:hover:bg-blue-800/40 cursor-pointer'
           }
         `}
         title={`${enabledCount}/${availableServers.length} MCP servers enabled`}
@@ -93,7 +93,7 @@ export function MCPSelector({
           />
         </svg>
         <span>MCP</span>
-        <span className="bg-blue-200/80 text-blue-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+        <span className="bg-blue-200/80 dark:bg-blue-800/40 text-blue-800 dark:text-blue-300 px-1.5 py-0.5 rounded text-[10px] font-semibold">
           {enabledCount}/{availableServers.length}
         </span>
         <svg
@@ -107,22 +107,22 @@ export function MCPSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-72 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-lg shadow-lg z-50">
-          <div className="p-2 border-b border-white/40">
+        <div className="absolute top-full left-0 mt-1 w-72 bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+          <div className="p-2 border-b border-white/40 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-500">MCP Servers</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">MCP Servers</span>
               {!readOnly && (
               <div className="flex gap-1">
                 <button
                   onClick={handleSelectAll}
-                  className="text-[10px] text-blue-600 hover:text-blue-800 px-1.5 py-0.5"
+                  className="text-[10px] text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 px-1.5 py-0.5"
                 >
                   All
                 </button>
-                <span className="text-gray-300">|</span>
+                <span className="text-gray-300 dark:text-gray-600">|</span>
                 <button
                   onClick={handleDeselectAll}
-                  className="text-[10px] text-blue-600 hover:text-blue-800 px-1.5 py-0.5"
+                  className="text-[10px] text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 px-1.5 py-0.5"
                 >
                   None
                 </button>
@@ -137,7 +137,7 @@ export function MCPSelector({
               return (
                 <label
                   key={server.name}
-                  className={`flex items-start gap-2 px-3 py-2 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-white/40 cursor-pointer'}`}
+                  className={`flex items-start gap-2 px-3 py-2 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-white/40 dark:hover:bg-gray-700/40 cursor-pointer'}`}
                 >
                   <input
                     type="checkbox"
@@ -148,10 +148,10 @@ export function MCPSelector({
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-medium text-gray-900 truncate">
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                         {server.name}
                       </span>
-                      <span className="text-[10px] text-gray-400 bg-white/50 px-1 py-0.5 rounded">
+                      <span className="text-[10px] text-gray-400 bg-white/50 dark:bg-gray-700/50 px-1 py-0.5 rounded">
                         {server.source}
                       </span>
                     </div>

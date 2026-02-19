@@ -39,8 +39,8 @@ class MermaidErrorBoundary extends Component<{ children: ReactNode; code: string
   render() {
     if (this.state.hasError) {
       return (
-        <div className="rounded-lg border border-red-200 overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-2 bg-red-50 border-b border-red-200 text-red-600 text-sm">
+        <div className="rounded-lg border border-red-200 dark:border-red-800 overflow-hidden">
+          <div className="flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -56,17 +56,18 @@ class MermaidErrorBoundary extends Component<{ children: ReactNode; code: string
   }
 }
 
-// Hook to detect system dark mode preference
+// Hook to detect dark mode via 'dark' class on <html> (darkMode: 'class' strategy)
 function useDarkMode(): boolean {
   const [isDark, setIsDark] = useState(() => 
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+    typeof window !== 'undefined' && document.documentElement.classList.contains('dark')
   );
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
   }, []);
 
   return isDark;
@@ -169,7 +170,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
   if (isLoading) {
     return (
       <div className={`overflow-hidden not-prose rounded-md ${className}`}>
-        <div className="flex items-center gap-2 px-3 py-2 bg-white/50 backdrop-blur text-gray-600 text-sm">
+        <div className="flex items-center gap-2 px-3 py-2 bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur text-gray-600 dark:text-gray-400 text-sm">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
           </svg>
@@ -184,9 +185,9 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
   // Error state - show raw code with error message
   if (error) {
     return (
-      <div className={`rounded-lg border border-red-200 overflow-hidden ${className}`}>
-        <div className="flex items-center justify-between px-3 py-2 bg-red-50 border-b border-red-200">
-          <div className="flex items-center gap-2 text-red-600 text-sm">
+      <div className={`rounded-lg border border-red-200 dark:border-red-800 overflow-hidden ${className}`}>
+        <div className="flex items-center justify-between px-3 py-2 bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800">
+          <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -214,8 +215,8 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
           onClick={e => e.stopPropagation()}
         >
           {/* Modal header */}
-          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-gray-50/95 dark:bg-gray-800/95 border-b border-gray-200 z-10">
-            <div className="flex items-center gap-2 text-gray-600 text-sm">
+          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-gray-50/95 dark:bg-gray-800/95 border-b border-gray-200 dark:border-gray-700 z-10">
+            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
@@ -223,22 +224,22 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
             </div>
             <div className="flex items-center gap-2">
               {/* Modal zoom controls */}
-              <div className="flex items-center gap-1 mr-2 border-r border-gray-300 pr-2">
+              <div className="flex items-center gap-1 mr-2 border-r border-gray-300 dark:border-gray-600 pr-2">
                 <button
                   onClick={() => setModalZoom(z => Math.max(0.25, z - 0.25))}
                   disabled={modalZoom <= 0.25}
-                  className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors disabled:opacity-40"
+                  className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-40"
                   title="Zoom out"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
                   </svg>
                 </button>
-                <span className="text-sm text-gray-500 min-w-[3.5rem] text-center">{Math.round(modalZoom * 100)}%</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 min-w-[3.5rem] text-center">{Math.round(modalZoom * 100)}%</span>
                 <button
                   onClick={() => setModalZoom(z => Math.min(4, z + 0.25))}
                   disabled={modalZoom >= 4}
-                  className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors disabled:opacity-40"
+                  className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-40"
                   title="Zoom in"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -248,7 +249,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
                 <button
                   onClick={() => setModalZoom(1)}
                   disabled={modalZoom === 1}
-                  className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors disabled:opacity-40"
+                  className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-40"
                   title="Reset zoom"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,7 +260,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
               {/* Close button */}
               <button
                 onClick={() => setIsFullscreen(false)}
-                className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors"
+                className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
                 title="Close (Esc)"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,8 +298,8 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
       <FullscreenModal />
       <div className={`overflow-hidden not-prose ${className}`}>
         {/* Header with toggle and zoom controls */}
-        <div className="flex items-center justify-between px-2 py-1.5 bg-white/50 backdrop-blur rounded-t-md text-xs">
-          <div className="flex items-center gap-2 text-gray-600 text-sm">
+        <div className="flex items-center justify-between px-2 py-1.5 bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-t-md text-xs">
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
             </svg>
@@ -307,22 +308,22 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
           <div className="flex items-center gap-1">
             {/* Zoom controls */}
             {!showRaw && (
-              <div className="flex items-center gap-1 mr-2 border-r border-gray-300 pr-2">
+              <div className="flex items-center gap-1 mr-2 border-r border-gray-300 dark:border-gray-600 pr-2">
                 <button
                   onClick={() => setZoom(z => Math.max(0.25, z - 0.25))}
                   disabled={zoom <= 0.25}
-                  className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Zoom out"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
                   </svg>
                 </button>
-                <span className="text-xs text-gray-500 min-w-[3rem] text-center">{Math.round(zoom * 100)}%</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 min-w-[3rem] text-center">{Math.round(zoom * 100)}%</span>
                 <button
                   onClick={() => setZoom(z => Math.min(3, z + 0.25))}
                   disabled={zoom >= 3}
-                  className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Zoom in"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,7 +333,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
                 <button
                   onClick={() => setZoom(1)}
                   disabled={zoom === 1}
-                  className="p-1 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Reset zoom"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -345,7 +346,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
             {!showRaw && (
               <button
                 onClick={() => { setModalZoom(1); setIsFullscreen(true); }}
-                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors mr-1"
+                className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors mr-1"
                 title="Open fullscreen"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -356,7 +357,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
             {/* Toggle button */}
             <button
               onClick={() => setShowRaw(!showRaw)}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
             >
               {showRaw ? (
                 <>
@@ -409,7 +410,7 @@ export function MermaidDiagram({ code, className = '' }: MermaidDiagramProps) {
   // Guard against undefined/null code
   if (!code) {
     return (
-      <div className={`rounded-lg border border-white/40 p-4 bg-white/30 text-gray-500 text-sm ${className}`}>
+      <div className={`rounded-lg border border-white/40 dark:border-gray-700 p-4 bg-white/30 dark:bg-gray-800/30 text-gray-500 text-sm ${className}`}>
         No diagram code provided
       </div>
     );

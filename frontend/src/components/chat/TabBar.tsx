@@ -42,16 +42,14 @@ export function TabBar() {
   const handleTabClose = async (e: React.MouseEvent, tab: { id: string; type: string; sessionId?: string }) => {
     e.stopPropagation();
 
-    if (tab.type === 'session' && tab.sessionId) {
-      try {
-        await disconnectSession(tab.sessionId);
-      } catch (_err) {
-        // Ignore disconnect errors
-      }
-      clearSessionMessages(tab.sessionId);
-    }
-
+    // Close tab immediately for instant UI response
     closeTab(tab.id);
+
+    if (tab.type === 'session' && tab.sessionId) {
+      clearSessionMessages(tab.sessionId);
+      // Disconnect in background — don't block UI
+      disconnectSession(tab.sessionId).catch(() => {});
+    }
   };
 
   if (tabs.length === 0 && !isNewSession) {
@@ -59,7 +57,7 @@ export function TabBar() {
   }
 
   return (
-    <div className="flex items-center bg-gray-50 border-b border-gray-200 overflow-x-auto">
+    <div className="flex items-center bg-gray-50 dark:bg-[#252536] border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
       {/* New session tab */}
       {isNewSession && (
         <div
@@ -67,10 +65,10 @@ export function TabBar() {
             // Deactivate all tabs to show new-session view
             useTabStore.setState({ activeTabId: null });
           }}
-          className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
-            ${activeTabId === null ? 'bg-white border-b-2 border-b-blue-500' : 'hover:bg-gray-50'}`}
+          className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 dark:border-gray-700 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
+            ${activeTabId === null ? 'bg-white dark:bg-[#2a2a3c] border-b-2 border-b-blue-500' : 'hover:bg-gray-50 dark:hover:bg-[#2a2a3c]'}`}
         >
-          <span className="text-sm font-medium text-gray-700">New Session</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-100">New Session</span>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -81,10 +79,10 @@ export function TabBar() {
                 useTabStore.setState({ activeTabId: currentTabs[currentTabs.length - 1].id });
               }
             }}
-            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 transition-opacity flex-shrink-0"
+            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-opacity flex-shrink-0"
             title="Cancel new session"
           >
-            <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -101,20 +99,20 @@ export function TabBar() {
           <div
             key={tab.id}
             onClick={() => handleTabClick(tab)}
-            className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
+            className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 dark:border-gray-700 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
               ${activeTabId === tab.id
-                ? 'bg-white border-b-2 border-b-blue-500' 
-                : 'hover:bg-gray-50'}`}
+                ? 'bg-white dark:bg-[#2a2a3c] border-b-2 border-b-blue-500' 
+                : 'hover:bg-gray-50 dark:hover:bg-[#2a2a3c]'}`}
           >
-            <span className="text-sm font-medium text-gray-700 truncate flex-1">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate flex-1">
               {label}
             </span>
             <button
               onClick={(e) => handleTabClose(e, tab)}
-              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 transition-opacity flex-shrink-0"
+              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-opacity flex-shrink-0"
               title="Close tab"
             >
-              <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>

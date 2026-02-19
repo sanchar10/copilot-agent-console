@@ -69,7 +69,7 @@ export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onS
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="h-[30px] px-2 py-1 text-xs font-medium bg-amber-50/80 text-amber-700 rounded-md hover:bg-amber-100/80 flex items-center gap-1.5 transition-colors duration-150"
+        className="h-[30px] px-2 py-1 text-xs font-medium bg-amber-50/80 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-md hover:bg-amber-100/80 dark:hover:bg-amber-800/30 flex items-center gap-1.5 transition-colors duration-150"
         title={`${related.length} other session${related.length > 1 ? 's' : ''} in this folder`}
       >
         {/* Layers/stack icon */}
@@ -83,9 +83,9 @@ export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onS
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-lg shadow-lg z-50 min-w-[280px] max-h-[300px] overflow-y-auto">
-          <div className="px-3 py-2 border-b border-white/40">
-            <span className="text-xs font-medium text-gray-500">Sessions using same folder</span>
+        <div className="absolute top-full left-0 mt-1 bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[280px] max-h-[300px] overflow-y-auto">
+          <div className="px-3 py-2 border-b border-white/40 dark:border-gray-700">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Sessions using same folder</span>
           </div>
           <ul>
             {related.map(session => {
@@ -97,12 +97,12 @@ export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onS
                       onSessionClick(session.session_id);
                       setIsOpen(false);
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-white/40 flex items-center gap-2 transition-colors"
+                    className="w-full text-left px-3 py-2 hover:bg-white/40 dark:hover:bg-gray-700/40 flex items-center gap-2 transition-colors"
                   >
                     {/* Open tab indicator */}
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isTabOpen ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isTabOpen ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 truncate">{session.session_name}</p>
+                      <p className="text-sm text-gray-900 dark:text-gray-100 truncate">{session.session_name}</p>
                     </div>
                     <span className="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">
                       {formatRelativeTime(session.updated_at)}

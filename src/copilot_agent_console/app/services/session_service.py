@@ -438,6 +438,11 @@ class SessionService:
 
         def _format_tool_output(data: object) -> str | None:
             """Format tool result for display."""
+            # Check for error first
+            error = getattr(data, "error", None)
+            if error:
+                error_str = str(error)[:1000]
+                return _clean_text(f"Error: {error_str}")
             result = getattr(data, "result", None) or getattr(data, "output", None)
             if not result:
                 return None
@@ -537,6 +542,11 @@ class SessionService:
                     tool = getattr(data, "tool_name", None) or getattr(data, "name", None)
                     tool_call_id = getattr(data, "tool_call_id", None)
                     title = f"Tool done: {tool}" if tool else "Tool done"
+                    # Check for error/failure
+                    tool_error = getattr(data, "error", None)
+                    result_type = getattr(data, "resultType", None) or getattr(data, "result_type", None)
+                    if tool_error or result_type == "failure":
+                        title = f"Tool failed: {tool}" if tool else "Tool failed"
                     detail_parts = []
                     if tool_call_id:
                         detail_parts.append(f"id={tool_call_id}")

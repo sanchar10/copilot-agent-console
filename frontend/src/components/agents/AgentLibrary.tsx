@@ -53,7 +53,7 @@ function AgentCard({ agent }: { agent: Agent }) {
   return (
     <button
       onClick={handleClick}
-      className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5 text-left hover:border-blue-300/60 hover:shadow-md transition-all group relative"
+      className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-5 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all group relative"
     >
       <div className="flex items-start justify-between">
         <div className="text-3xl mb-3">{agent.icon}</div>
@@ -74,13 +74,13 @@ function AgentCard({ agent }: { agent: Agent }) {
           </span>
         </div>
       </div>
-      <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+      <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
         {agent.name}
       </h3>
-      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
         {agent.description || 'No description'}
       </p>
-      <div className="flex items-center gap-2 mt-3 text-xs text-gray-400">
+      <div className="flex items-center gap-2 mt-3 text-xs text-gray-400 dark:text-gray-500">
         <span>{agent.model}</span>
       </div>
     </button>
@@ -112,8 +112,8 @@ export function AgentLibrary() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">🤖 Agent Library</h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">🤖 Agent Library</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Create and manage agents
             </p>
           </div>
@@ -130,12 +130,12 @@ export function AgentLibrary() {
 
         {/* Grid */}
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Loading agents...</div>
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500">Loading agents...</div>
         ) : agents.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-4xl mb-3">🤖</div>
-            <h3 className="text-lg font-medium text-gray-700">No agents yet</h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">No agents yet</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Create your first agent to get started
             </p>
             <button

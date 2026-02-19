@@ -22,9 +22,9 @@ export function SessionList({ sessions }: SessionListProps) {
 
   if (sessions.length === 0) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-4 text-center text-gray-500 dark:text-gray-400">
         <p className="text-sm">No sessions yet</p>
-        <p className="text-xs mt-1 text-gray-400">Click "New Session" to start</p>
+        <p className="text-xs mt-1 text-gray-400 dark:text-gray-500">Click "New Session" to start</p>
       </div>
     );
   }

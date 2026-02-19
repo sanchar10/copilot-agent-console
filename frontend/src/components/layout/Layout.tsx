@@ -16,13 +16,13 @@ function UpdateBanner({ info, onDismiss }: { info: UpdateInfo; onDismiss: () => 
     : '';
 
   return (
-    <div className="bg-blue-600 text-white px-4 py-2 text-sm flex items-center justify-between">
+    <div className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 text-sm flex items-center justify-between">
       <div className="flex items-center gap-2">
         <span>🎉</span>
         <span>
           Version <strong>{info.latest_version}</strong> is available (current: {info.current_version}).
           {pipxCmd && (
-            <> Run: <code className="bg-blue-700 px-1.5 py-0.5 rounded text-xs font-mono">{pipxCmd}</code></>
+            <> Run: <code className="bg-blue-700 dark:bg-blue-800 px-1.5 py-0.5 rounded text-xs font-mono">{pipxCmd}</code></>
           )}
         </span>
         {info.release_url && (
@@ -58,7 +58,7 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-[#fafafa]">
+    <div className="flex flex-col h-screen bg-[#fafafa] dark:bg-[#1e1e2e]">
       {updateInfo && !dismissed && (
         <UpdateBanner info={updateInfo} onDismiss={() => setDismissed(true)} />
       )}

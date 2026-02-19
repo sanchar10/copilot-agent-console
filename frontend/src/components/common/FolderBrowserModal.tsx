@@ -77,14 +77,14 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath }: F
         {/* Current path bar - click anywhere to go to drives/root */}
         <button
           onClick={() => loadDirectory()}
-          className="w-full flex items-center gap-1.5 px-3 py-2 bg-white/50 backdrop-blur rounded-lg text-sm hover:bg-blue-50/60 transition-colors text-left"
+          className="w-full flex items-center gap-1.5 px-3 py-2 bg-white/50 dark:bg-[#1e1e2e]/50 backdrop-blur rounded-lg text-sm hover:bg-blue-50/60 dark:hover:bg-blue-900/30 transition-colors text-left"
           title="Go to drives / root"
         >
           <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
           {currentPath ? (
-            <span className="text-gray-700 font-mono text-xs truncate" title={currentPath}>
+            <span className="text-gray-700 dark:text-gray-200 font-mono text-xs truncate" title={currentPath}>
               {currentPath}
             </span>
           ) : (
@@ -94,7 +94,7 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath }: F
 
         {/* Error display */}
         {error && (
-          <div className="px-3 py-2 bg-red-50 text-red-700 text-sm rounded-lg flex items-center gap-2">
+          <div className="px-3 py-2 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm rounded-lg flex items-center gap-2">
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
@@ -103,12 +103,12 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath }: F
         )}
 
         {/* Directory listing */}
-        <div className="border border-white/40 rounded-lg overflow-hidden max-h-72 overflow-y-auto">
+        <div className="border border-white/40 dark:border-[#3a3a4e] rounded-lg overflow-hidden max-h-72 overflow-y-auto">
           {/* Go up button */}
           {parentPath !== null && (
             <button
               onClick={handleGoUp}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-50/60 text-blue-600 border-b border-white/40 transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-50/60 dark:hover:bg-blue-900/30 text-blue-600 border-b border-white/40 dark:border-[#3a3a4e] transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
@@ -142,8 +142,8 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath }: F
               disabled={entry.accessible === false}
               className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
                 entry.accessible === false
-                  ? 'text-gray-400 cursor-not-allowed bg-white/30'
-                  : 'text-gray-700 hover:bg-blue-50/60 hover:text-blue-700'
+                  ? 'text-gray-400 cursor-not-allowed bg-white/30 dark:bg-[#252536]/30'
+                  : 'text-gray-700 dark:text-gray-200 hover:bg-blue-50/60 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-400'
               }`}
               title={entry.accessible === false ? 'Permission denied' : entry.path}
             >

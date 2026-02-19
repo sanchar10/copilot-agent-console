@@ -12,19 +12,19 @@ import { listTaskRuns, abortTaskRun, deleteTaskRun } from '../../api/schedules';
 import { getSession, connectSession, getResponseStatus, resumeResponseStream } from '../../api/sessions';
 import type { TaskRunSummary, TaskRunStatus } from '../../types/schedule';
 
-const STATUS_CONFIG: Record<TaskRunStatus, { label: string; color: string; bg: string }> = {
-  pending: { label: 'Pending', color: 'text-amber-700', bg: 'bg-amber-100' },
-  running: { label: 'Running', color: 'text-blue-700', bg: 'bg-blue-100' },
-  completed: { label: 'Completed', color: 'text-emerald-700', bg: 'bg-emerald-100' },
-  failed: { label: 'Failed', color: 'text-red-700', bg: 'bg-red-100' },
-  timed_out: { label: 'Timed Out', color: 'text-orange-700', bg: 'bg-orange-100' },
-  aborted: { label: 'Aborted', color: 'text-gray-700', bg: 'bg-gray-100' },
+const STATUS_CONFIG: Record<TaskRunStatus, { label: string; color: string; bg: string; darkColor: string; darkBg: string }> = {
+  pending: { label: 'Pending', color: 'text-amber-700', bg: 'bg-amber-100', darkColor: 'dark:text-amber-400', darkBg: 'dark:bg-amber-900/30' },
+  running: { label: 'Running', color: 'text-blue-700', bg: 'bg-blue-100', darkColor: 'dark:text-blue-400', darkBg: 'dark:bg-blue-900/30' },
+  completed: { label: 'Completed', color: 'text-emerald-700', bg: 'bg-emerald-100', darkColor: 'dark:text-emerald-400', darkBg: 'dark:bg-emerald-900/30' },
+  failed: { label: 'Failed', color: 'text-red-700', bg: 'bg-red-100', darkColor: 'dark:text-red-400', darkBg: 'dark:bg-red-900/30' },
+  timed_out: { label: 'Timed Out', color: 'text-orange-700', bg: 'bg-orange-100', darkColor: 'dark:text-orange-400', darkBg: 'dark:bg-orange-900/30' },
+  aborted: { label: 'Aborted', color: 'text-gray-700', bg: 'bg-gray-100', darkColor: 'dark:text-gray-400', darkBg: 'dark:bg-gray-800' },
 };
 
 function StatusBadge({ status }: { status: TaskRunStatus }) {
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.color}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.color} ${config.darkBg} ${config.darkColor}`}>
       {status === 'running' && <span className="mr-1 animate-pulse">●</span>}
       {config.label}
     </span>
@@ -80,37 +80,37 @@ function TaskRunCard({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white/50 backdrop-blur border border-white/40 rounded-xl p-4 text-left hover:border-blue-300/60 hover:shadow-md transition-all"
+      className="w-full bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-4 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-gray-900 truncate">{run.agent_name}</h3>
-          <p className="text-sm text-gray-500 truncate mt-0.5">{run.prompt}</p>
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">{run.agent_name}</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">{run.prompt}</p>
         </div>
         <StatusBadge status={run.status} />
       </div>
 
-      <div className="flex items-center gap-4 text-xs text-gray-400 mt-2">
+      <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-gray-500 mt-2">
         {run.started_at && <span>{formatTime(run.started_at)}</span>}
         {run.duration_seconds !== null && <span>{formatDuration(run.duration_seconds)}</span>}
         {tokenStr && <span>🎟 {tokenStr}</span>}
       </div>
 
       {run.error && (
-        <p className="text-xs text-red-600 mt-2 line-clamp-2">{run.error}</p>
+        <p className="text-xs text-red-600 dark:text-red-400 mt-2 line-clamp-2">{run.error}</p>
       )}
 
-      <div className="mt-3 pt-2 border-t border-white/40 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="mt-3 pt-2 border-t border-white/40 dark:border-[#3a3a4e] flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
         {run.status === 'running' && (
           <button
             onClick={onAbort}
-            className="text-xs px-3 py-1.5 rounded-lg bg-red-50/80 text-red-700 hover:bg-red-100/80 transition-colors"
+            className="text-xs px-3 py-1.5 rounded-lg bg-red-50/80 text-red-700 hover:bg-red-100/80 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 transition-colors"
           >
             ⛔ Abort
           </button>
         )}
         {run.session_id && run.status !== 'pending' && run.status !== 'running' && (
-          <span className="text-xs text-blue-500">💬 Click to open chat</span>
+          <span className="text-xs text-blue-500 dark:text-blue-400">💬 Click to open chat</span>
         )}
         <div className="flex-1" />
         {confirmDelete ? (
@@ -118,7 +118,7 @@ function TaskRunCard({
             <button onClick={onDelete} className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
               Confirm
             </button>
-            <button onClick={() => setConfirmDelete(false)} className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-600 hover:bg-gray-300">
+            <button onClick={() => setConfirmDelete(false)} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
               Cancel
             </button>
           </div>
@@ -244,13 +244,13 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {scheduleName ? `Runs: ${scheduleName}` : '📋 Runs'}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {runningCount > 0 && <span className="text-blue-600">{runningCount} running</span>}
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {runningCount > 0 && <span className="text-blue-600 dark:text-blue-400">{runningCount} running</span>}
               {runningCount > 0 && pendingCount > 0 && ' · '}
-              {pendingCount > 0 && <span className="text-amber-600">{pendingCount} pending</span>}
+              {pendingCount > 0 && <span className="text-amber-600 dark:text-amber-400">{pendingCount} pending</span>}
               {runningCount === 0 && pendingCount === 0 && 'No active runs'}
             </p>
           </div>
@@ -265,7 +265,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
             )}
             <button
               onClick={refresh}
-              className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
               🔄 Refresh
             </button>
@@ -275,11 +275,11 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
         {/* Agent filter */}
         {!scheduleId && agents.length > 0 && (
           <div className="flex items-center gap-3 mb-4">
-            <label className="text-sm text-gray-500">Filter by agent:</label>
+            <label className="text-sm text-gray-500 dark:text-gray-400">Filter by agent:</label>
             <select
               value={agentFilter}
               onChange={(e) => setAgentFilter(e.target.value)}
-              className="border border-white/40 rounded-lg px-3 py-1.5 text-sm bg-white/50"
+              className="border border-white/40 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm bg-white/50 dark:bg-[#1e1e2e] dark:text-gray-100"
             >
               <option value="">All Agents</option>
               {agents.map((a) => (
@@ -290,15 +290,15 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
         )}
 
         {/* Filter Tabs */}
-        <div className="flex gap-1 mb-6 bg-white/40 backdrop-blur p-1 rounded-lg w-fit">
+        <div className="flex gap-1 mb-6 bg-white/40 dark:bg-[#2a2a3c]/40 backdrop-blur p-1 rounded-lg w-fit">
           {['all', 'running', 'completed', 'failed'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 filter === f
-                  ? 'bg-white/70 text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white/70 dark:bg-[#32324a] text-gray-900 dark:text-gray-100 shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -309,11 +309,11 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
 
         {/* Content */}
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Loading...</div>
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500">Loading...</div>
         ) : filteredRuns.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-4xl mb-3">📋</div>
-            <p className="text-gray-500">No runs {filter !== 'all' ? `with status "${filter}"` : 'yet'}</p>
+            <p className="text-gray-500 dark:text-gray-400">No runs {filter !== 'all' ? `with status "${filter}"` : 'yet'}</p>
           </div>
         ) : (
           <div className="space-y-3">

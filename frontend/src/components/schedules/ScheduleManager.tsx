@@ -43,7 +43,7 @@ function humanizeCron(cron: string): string {
 function StatusBadge({ enabled }: { enabled: boolean }) {
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-      enabled ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500'
+      enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
     }`}>
       {enabled ? 'Active' : 'Paused'}
     </span>
@@ -109,16 +109,16 @@ function ScheduleDialog({
   return (
     <>
       <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-        <form onSubmit={handleSubmit} className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-lg font-semibold">{isEdit ? 'Edit Schedule' : 'New Schedule'}</h2>
+        <form onSubmit={handleSubmit} className="bg-white/80 dark:bg-[#252536]/95 backdrop-blur-xl border border-white/30 dark:border-[#3a3a4e] rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
+          <h2 className="text-lg font-semibold dark:text-gray-100">{isEdit ? 'Edit Schedule' : 'New Schedule'}</h2>
 
           {!isEdit && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Agent</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Agent</label>
               <select
                 value={agentId}
                 onChange={(e) => setAgentId(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full border rounded-lg px-3 py-2 text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
               >
                 {agents.map((a) => (
                   <option key={a.id} value={a.id}>{a.icon} {a.name}</option>
@@ -128,23 +128,23 @@ function ScheduleDialog({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Schedule Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Schedule Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Morning news check"
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="w-full border rounded-lg px-3 py-2 text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Frequency</label>
             <select
               value={cronPreset}
               onChange={(e) => handlePresetChange(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm mb-2"
+              className="w-full border rounded-lg px-3 py-2 text-sm mb-2 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
             >
               {CRON_PRESETS.map((p) => (
                 <option key={p.label} value={p.value}>{p.label}</option>
@@ -155,37 +155,37 @@ function ScheduleDialog({
               value={cron}
               onChange={(e) => { setCron(e.target.value); setCronPreset(''); }}
               placeholder="Cron expression (e.g. 0 8 * * *)"
-              className="w-full border rounded-lg px-3 py-2 text-sm font-mono"
+              className="w-full border rounded-lg px-3 py-2 text-sm font-mono dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Prompt</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prompt</label>
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="What should the agent do each run?"
               rows={3}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="w-full border rounded-lg px-3 py-2 text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Working Directory</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Working Directory</label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={cwd}
                 onChange={(e) => setCwd(e.target.value)}
                 placeholder="Optional — uses default CWD if empty"
-                className="flex-1 border rounded-lg px-3 py-2 text-sm font-mono"
+                className="flex-1 border rounded-lg px-3 py-2 text-sm font-mono dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
               />
               <button
                 type="button"
                 onClick={() => setShowFolderPicker(true)}
-                className="px-3 py-2 border border-white/40 rounded-lg text-sm text-gray-600 hover:bg-white/40 transition-colors shrink-0"
+                className="px-3 py-2 border border-white/40 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-white/40 dark:hover:bg-[#32324a] transition-colors shrink-0"
                 title="Browse folders"
               >
                 📁
@@ -194,19 +194,19 @@ function ScheduleDialog({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Max Runtime (minutes)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Runtime (minutes)</label>
             <input
               type="number"
               value={maxRuntime}
               onChange={(e) => setMaxRuntime(Number(e.target.value))}
               min={1}
               max={120}
-              className="w-24 border rounded-lg px-3 py-2 text-sm"
+              className="w-24 border rounded-lg px-3 py-2 text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
             />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+            <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
               Cancel
             </button>
             <button
@@ -250,52 +250,52 @@ function ScheduleCard({
   return (
     <div
       onClick={onEdit}
-      className="bg-white/50 backdrop-blur border border-white/40 rounded-xl p-5 hover:border-blue-300/60 hover:shadow-md transition-all cursor-pointer"
+      className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-5 hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-semibold text-gray-900">{schedule.name}</h3>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{schedule.name}</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {schedule.agent_name} · {humanizeCron(schedule.cron)}
           </p>
         </div>
         <StatusBadge enabled={schedule.enabled} />
       </div>
 
-      <p className="text-sm text-gray-600 line-clamp-2 mb-3">{schedule.prompt}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">{schedule.prompt}</p>
 
       {schedule.cwd && (
-        <p className="text-xs text-gray-400 font-mono mb-3 truncate" title={schedule.cwd}>
+        <p className="text-xs text-gray-400 dark:text-gray-500 font-mono mb-3 truncate" title={schedule.cwd}>
           📁 {schedule.cwd}
         </p>
       )}
 
       {schedule.next_run && schedule.enabled && (
-        <p className="text-xs text-blue-600 mb-3">
+        <p className="text-xs text-blue-600 dark:text-blue-400 mb-3">
           Next run: {new Date(schedule.next_run).toLocaleString()}
         </p>
       )}
 
-      <div className="flex items-center gap-2 pt-2 border-t border-white/40" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-2 pt-2 border-t border-white/40 dark:border-[#3a3a4e]" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onToggle}
           className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
             schedule.enabled
-              ? 'bg-amber-50/80 text-amber-700 hover:bg-amber-100/80'
-              : 'bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100/80'
+              ? 'bg-amber-50/80 text-amber-700 hover:bg-amber-100/80 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
+              : 'bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100/80 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50'
           }`}
         >
           {schedule.enabled ? '⏸ Pause' : '▶ Enable'}
         </button>
         <button
           onClick={onRunNow}
-          className="text-xs px-3 py-1.5 rounded-lg bg-blue-50/80 text-blue-700 hover:bg-blue-100/80 transition-colors"
+          className="text-xs px-3 py-1.5 rounded-lg bg-blue-50/80 text-blue-700 hover:bg-blue-100/80 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors"
         >
           🚀 Run Now
         </button>
         <button
           onClick={onViewRuns}
-          className="text-xs px-3 py-1.5 rounded-lg bg-white/40 text-gray-600 hover:bg-white/60 transition-colors"
+          className="text-xs px-3 py-1.5 rounded-lg bg-white/40 text-gray-600 hover:bg-white/60 dark:bg-[#1e1e2e]/40 dark:text-gray-400 dark:hover:bg-[#32324a] transition-colors"
         >
           📋 Runs
         </button>
@@ -305,7 +305,7 @@ function ScheduleCard({
             <button onClick={onDelete} className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
               Confirm
             </button>
-            <button onClick={() => setConfirming(false)} className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-600 hover:bg-gray-300">
+            <button onClick={() => setConfirming(false)} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
               Cancel
             </button>
           </div>
@@ -429,8 +429,8 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
       <div className="max-w-4xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Automations</h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Automations</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Automated agent runs on cron schedules
             </p>
           </div>
@@ -446,11 +446,11 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
         {/* Agent filter */}
         {agents.length > 0 && (
           <div className="flex items-center gap-3 mb-4">
-            <label className="text-sm text-gray-500">Filter by agent:</label>
+            <label className="text-sm text-gray-500 dark:text-gray-400">Filter by agent:</label>
             <select
               value={filterAgentId}
               onChange={(e) => setFilterAgentId(e.target.value)}
-              className="border border-white/40 rounded-lg px-3 py-1.5 text-sm bg-white/50"
+              className="border border-white/40 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm bg-white/50 dark:bg-[#1e1e2e] dark:text-gray-100"
             >
               <option value="">All Agents</option>
               {agents.map((a) => (
@@ -458,7 +458,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
               ))}
             </select>
             {filterAgentId && (
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 {filteredSchedules.length} schedule{filteredSchedules.length !== 1 ? 's' : ''}
               </span>
             )}
@@ -466,14 +466,14 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
         )}
 
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Loading...</div>
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500">Loading...</div>
         ) : filteredSchedules.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-4xl mb-3">⏰</div>
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               {filterAgentId ? 'No schedules for this agent' : 'No schedules yet'}
             </p>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
               Create a schedule to run agents automatically
             </p>
           </div>

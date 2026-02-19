@@ -94,14 +94,14 @@ const streamingMarkdownComponents: Components = {
       return (
         <code
           data-filepath={text}
-          className="bg-blue-50/80 text-blue-700 px-1.5 py-0.5 rounded text-[0.9rem] font-mono cursor-pointer hover:underline"
+          className="bg-blue-50/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono cursor-pointer hover:underline"
         >
           📄 {children}
         </code>
       );
     }
     return (
-      <code className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
+      <code className="bg-gray-100 dark:bg-[#1e1e2e] text-pink-600 dark:text-pink-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
         {children}
       </code>
     );
@@ -109,32 +109,32 @@ const streamingMarkdownComponents: Components = {
   table({ children }) {
     return (
       <div className="overflow-x-auto my-3">
-        <table className="min-w-full border-collapse border border-gray-300">
+        <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
           {children}
         </table>
       </div>
     );
   },
   thead({ children }) {
-    return <thead className="bg-gray-100">{children}</thead>;
+    return <thead className="bg-gray-100 dark:bg-[#2a2a3c]">{children}</thead>;
   },
   th({ children }) {
     return (
-      <th className="border border-gray-300 px-3 py-2 text-left font-semibold text-sm">
+      <th className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-left font-semibold text-sm">
         {children}
       </th>
     );
   },
   td({ children }) {
     return (
-      <td className="border border-gray-300 px-3 py-2 text-sm">
+      <td className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm">
         {children}
       </td>
     );
   },
   a({ href, children }) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
         {children}
       </a>
     );
@@ -147,7 +147,7 @@ const streamingMarkdownComponents: Components = {
   },
   blockquote({ children }) {
     return (
-      <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-3">
+      <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 my-3">
         {children}
       </blockquote>
     );
@@ -165,7 +165,7 @@ const streamingMarkdownComponents: Components = {
     return <p className="my-2">{processFileLinks(children)}</p>;
   },
   hr() {
-    return <hr className="my-4 border-gray-300" />;
+    return <hr className="my-4 border-gray-300 dark:border-gray-600" />;
   },
 };
 
@@ -217,13 +217,13 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
         </div>
 
         {/* Message body */}
-        <div onClick={handleFilePathClick} className="rounded-lg px-4 py-3 bg-white border border-gray-200">
+        <div onClick={handleFilePathClick} className="rounded-lg px-4 py-3 bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700">
           {steps && steps.length > 0 && (
             <div className="mb-2 text-sm">
-              <div className="text-gray-600 font-medium mb-2">
+              <div className="text-gray-600 dark:text-gray-400 font-medium mb-2">
                 Steps ({steps.length})
               </div>
-              <div ref={stepsRef} className="space-y-2 text-gray-700 max-h-[300px] overflow-y-auto pr-1">
+              <div ref={stepsRef} className="space-y-2 text-gray-700 dark:text-gray-300 max-h-[300px] overflow-y-auto pr-1">
                 {steps.map((s, idx) => (
                   <div key={idx} className="border-l-2 border-emerald-300 pl-3">
                     <div className="font-medium">{s.title}</div>
@@ -233,7 +233,7 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
               </div>
             </div>
           )}
-          <div className="prose prose-sm max-w-none prose-gray">
+          <div className="prose prose-sm max-w-none prose-gray dark:prose-invert">
             {segments.map((seg, i) =>
               seg.type === 'text' ? (
                 <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={streamingMarkdownComponents}>

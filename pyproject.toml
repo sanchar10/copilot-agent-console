@@ -73,6 +73,9 @@ packages = ["src/copilot_agent_console"]
 [tool.hatch.build.targets.wheel.force-include]
 "frontend/dist" = "copilot_agent_console/static"
 
+[tool.hatch.build.targets.editable]
+packages = ["src/copilot_agent_console"]
+
 [tool.hatch.build.targets.sdist]
 include = [
     "src/",

@@ -324,7 +324,7 @@ class ToolsService:
             except Exception as exc:
                 logger.error(f"Tool {sdk_name} execution error: {exc}")
                 return SDKToolResult(
-                    textResultForLlm="Invoking this tool produced an error. Detailed information is not available.",
+                    textResultForLlm=f"Invoking this tool produced an error: {exc}",
                     resultType="failure",
                     error=str(exc),
                     toolTelemetry={},

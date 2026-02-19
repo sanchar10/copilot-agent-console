@@ -20,6 +20,11 @@ body {
   color: #0f172a;
 }
 
+html.dark body {
+  background-color: #1e1e2e;
+  color: #e2e8f0;
+}
+
 #root {
   height: 100%;
   overflow: hidden;
@@ -42,6 +47,18 @@ body {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #b0b0b0;
+}
+
+html.dark .overflow-y-auto::-webkit-scrollbar-track {
+  background: #2a2a3c;
+}
+
+html.dark .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #4a4a5e;
+}
+
+html.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #5a5a70;
 }
 
 /* Mermaid fullscreen: constrain SVG to fit within the modal viewport */

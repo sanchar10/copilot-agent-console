@@ -157,7 +157,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
 
   if (!isNew && !existingAgent) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-400">
+      <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">
         Agent not found. It may have been deleted.
       </div>
     );
@@ -168,14 +168,14 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {icon} {isNew ? 'New Agent' : name}
           </h1>
           <div className="flex items-center gap-2">
             {!isNew && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300/60 hover:bg-red-50/60 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-300/60 dark:border-red-700/60 hover:bg-red-50/60 dark:hover:bg-red-900/30 rounded-lg transition-colors"
               >
                 Delete
               </button>
@@ -199,40 +199,40 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
         {/* Form */}
         <div className="space-y-6">
           {/* Basic Info */}
-          <section className="bg-white/50 backdrop-blur rounded-xl border border-white/40 p-5 space-y-4">
-            <h2 className="font-semibold text-gray-700">Basic Info</h2>
+          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4">
+            <h2 className="font-semibold text-gray-700 dark:text-gray-300">Basic Info</h2>
             <div className="grid grid-cols-[1fr_80px] gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="My Agent"
-                  className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Icon</label>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Icon</label>
                 <EmojiPicker value={icon} onChange={setIcon} />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Description</label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What does this agent do?"
-                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Model</label>
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Model</label>
               <select
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
-                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
               >
                 {availableModels.map((m) => (
                   <option key={m.id} value={m.id}>{m.name}</option>
@@ -249,10 +249,10 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           />
 
           {/* Tools */}
-          <section className="bg-white/50 backdrop-blur rounded-xl border border-white/40 p-5 space-y-4">
+          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-700">Tools</h2>
-              <span className="text-xs text-gray-400">
+              <h2 className="font-semibold text-gray-700 dark:text-gray-300">Tools</h2>
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 {excludedBuiltinTools.length === 0 && builtinTools.length === 0
                   ? [
                       'All built-in tools enabled',
@@ -266,7 +266,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 }
               </span>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Select which tools this agent can use.
             </p>
             <ToolsSelector
@@ -283,16 +283,16 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           </section>
 
           {/* MCP Servers */}
-          <section className="bg-white/50 backdrop-blur rounded-xl border border-white/40 p-5 space-y-4">
+          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-700">MCP Servers</h2>
-              <span className="text-xs text-gray-400">
+              <h2 className="font-semibold text-gray-700 dark:text-gray-300">MCP Servers</h2>
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 {selectedMcpServers.length === 0
                   ? 'None selected'
                   : `${selectedMcpServers.length} selected`}
               </span>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Select which MCP servers this agent should use.
             </p>
             {availableMcpServers.length > 0 ? (
@@ -302,7 +302,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 onSelectionsChange={handleMcpChange}
               />
             ) : (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-gray-500 italic">
                 No MCP servers configured. Add global servers in ~/.copilot/mcp-config.json
                 or agent-only servers in ~/.copilot-agent-console/mcp-config.json
               </p>

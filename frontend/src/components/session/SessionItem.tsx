@@ -109,13 +109,13 @@ export function SessionItem({ session }: SessionItemProps) {
     const freshServers = await refreshMcpServers();
 
     // Helper to merge MCP servers — keep saved selections that still exist, add new servers
-    const mergeMcpServers = (savedSelections: string[]) => {
+    const mergeMcpServers = (savedSelections: string[] | undefined) => {
       const freshNames = new Set(freshServers.map(s => s.name));
-      if (savedSelections.length > 0) {
-        // Keep only saved selections that still exist in fresh servers
+      if (savedSelections !== undefined && savedSelections !== null) {
+        // User has configured selections (may be empty = chose none)
         return savedSelections.filter(name => freshNames.has(name));
       }
-      // No saved selections — default to all servers enabled
+      // Never configured — default to all servers enabled
       return freshServers.map(s => s.name);
     };
 
@@ -163,7 +163,7 @@ export function SessionItem({ session }: SessionItemProps) {
 
     // If already cached, just open tab but check for active response
     if (messagesPerSession[sessionId]) {
-      const mergedSelections = mergeMcpServers(session.mcp_servers || []);
+      const mergedSelections = mergeMcpServers(session.mcp_servers);
       updateSessionMcpServers(sessionId, mergedSelections);
       openGenericTab({ id: sessionTabId, type: 'session', label: session.session_name, sessionId });
       
@@ -184,7 +184,7 @@ export function SessionItem({ session }: SessionItemProps) {
       const sessionData = await getSession(sessionId);
       setMessages(sessionId, sessionData.messages);
       
-      const mergedSelections = mergeMcpServers(sessionData.mcp_servers || []);
+      const mergedSelections = mergeMcpServers(sessionData.mcp_servers);
       
       // Update session in store with adopted data (cwd, model, name, mcp_servers)
       setSessions(sessions.map(s => 
@@ -273,17 +273,17 @@ export function SessionItem({ session }: SessionItemProps) {
         onClick={handleClick}
         className={`group relative flex items-center gap-3 px-3 py-3 cursor-pointer transition-all rounded-lg ${
           isActive
-            ? 'bg-blue-50 border border-blue-200 shadow-sm'
+            ? 'bg-blue-50 border border-blue-200 shadow-sm dark:bg-blue-900/30 dark:border-blue-700'
             : isOpen
-            ? 'bg-gray-50 border border-gray-200'
-            : 'border border-transparent hover:bg-gray-50 hover:border-gray-200'
+            ? 'bg-gray-50 border border-gray-200 dark:bg-[#2a2a3c] dark:border-gray-700'
+            : 'border border-transparent hover:bg-gray-50 hover:border-gray-200 dark:hover:bg-[#32324a] dark:hover:border-gray-700'
         }`}
       >
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">
+          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
             {session.session_name}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             {formatDate(session.updated_at)}
           </p>
         </div>
@@ -309,7 +309,7 @@ export function SessionItem({ session }: SessionItemProps) {
           <button
             ref={infoButtonRef}
             onClick={handleInfoClick}
-            className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded transition-all"
+            className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-[#32324a] rounded transition-all"
             title="Session info"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,7 +320,7 @@ export function SessionItem({ session }: SessionItemProps) {
           {/* Delete button */}
           <button
             onClick={handleDeleteClick}
-            className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded transition-all"
+            className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-[#32324a] rounded transition-all"
             title="Delete session"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -335,19 +335,19 @@ export function SessionItem({ session }: SessionItemProps) {
         <div 
           ref={infoRef}
           style={{ top: popoverPosition.top, left: popoverPosition.left }}
-          className="fixed z-[9999] bg-white/95 backdrop-blur-xl border border-gray-200 rounded-lg shadow-xl p-3 min-w-[280px] text-sm"
+          className="fixed z-[9999] bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-[#3a3a4e] rounded-lg shadow-xl p-3 min-w-[280px] text-sm"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="space-y-2">
             <div>
-              <span className="text-gray-500 text-xs">Session ID</span>
+              <span className="text-gray-500 dark:text-gray-400 text-xs">Session ID</span>
               <div className="flex items-center gap-2">
-                <code className="text-gray-700 text-xs bg-gray-100 px-2 py-1 rounded break-all">
+                <code className="text-gray-700 dark:text-gray-300 text-xs bg-gray-100 dark:bg-[#1e1e2e] px-2 py-1 rounded break-all">
                   {session.session_id}
                 </code>
                 <button
                   onClick={handleCopyId}
-                  className="p-1 text-gray-400 hover:text-blue-600 shrink-0"
+                  className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 shrink-0"
                   title="Copy ID"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,23 +358,23 @@ export function SessionItem({ session }: SessionItemProps) {
             </div>
 
             <div>
-              <span className="text-gray-500 text-xs">Model</span>
-              <p className="text-gray-700">{session.model || '(not set)'}</p>
+              <span className="text-gray-500 dark:text-gray-400 text-xs">Model</span>
+              <p className="text-gray-700 dark:text-gray-300">{session.model || '(not set)'}</p>
             </div>
 
             <div>
-              <span className="text-gray-500 text-xs">Working Directory</span>
-              <p className="text-gray-200 break-all">{session.cwd || '(not adopted)'}</p>
+              <span className="text-gray-500 dark:text-gray-400 text-xs">Working Directory</span>
+              <p className="text-gray-200 dark:text-gray-400 break-all">{session.cwd || '(not adopted)'}</p>
             </div>
 
             <div>
-              <span className="text-gray-500 text-xs">Created</span>
-              <p className="text-gray-700">{formatFullDate(session.created_at)}</p>
+              <span className="text-gray-500 dark:text-gray-400 text-xs">Created</span>
+              <p className="text-gray-700 dark:text-gray-300">{formatFullDate(session.created_at)}</p>
             </div>
 
             <div>
-              <span className="text-gray-500 text-xs">Last Updated</span>
-              <p className="text-gray-700">{formatFullDate(session.updated_at)}</p>
+              <span className="text-gray-500 dark:text-gray-400 text-xs">Last Updated</span>
+              <p className="text-gray-700 dark:text-gray-300">{formatFullDate(session.updated_at)}</p>
             </div>
           </div>
         </div>,

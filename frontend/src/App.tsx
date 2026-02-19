@@ -7,6 +7,7 @@ import { useSessionStore } from './stores/sessionStore';
 import { useTabStore } from './stores/tabStore';
 import { useViewedStore } from './stores/viewedStore';
 import { useAgentMonitorStore } from './stores/agentMonitorStore';
+import { useTheme } from './hooks/useTheme';
 
 function App() {
   const refreshMcpServers = useSessionStore((state) => state.refreshMcpServers);
@@ -14,6 +15,9 @@ function App() {
   const tabs = useTabStore((state) => state.tabs);
   const { loadViewedTimestamps, loadActiveAgents } = useViewedStore();
   const { isOpen: isAgentMonitorOpen, setOpen: setAgentMonitorOpen } = useAgentMonitorStore();
+
+  // Initialize theme from localStorage on mount
+  useTheme();
 
   // Load available MCP servers, tools, viewed timestamps, and active agents on app startup
   useEffect(() => {

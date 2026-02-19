@@ -382,7 +382,7 @@ export function InputBox({ sessionId }: InputBoxProps) {
 
   return (
     <div
-      className={`border-t border-gray-100 bg-white p-4 ${isDragOver ? 'ring-2 ring-blue-400 bg-blue-50' : ''}`}
+      className={`border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-[#1e1e2e] p-4 ${isDragOver ? 'ring-2 ring-blue-400 bg-blue-50 dark:bg-blue-900/30' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -393,26 +393,26 @@ export function InputBox({ sessionId }: InputBoxProps) {
           <div className="flex flex-wrap gap-2 mb-2">
             {attachments.map((att, idx) => {
               return (
-                <div key={`uploaded-${idx}`} className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1 text-sm">
-                  <span className="text-gray-500">{fileIcon(att.originalName)}</span>
-                  <span className="text-gray-700 max-w-[200px] truncate">{att.originalName}</span>
-                  <span className="text-gray-400 text-xs">({(att.size / 1024).toFixed(0)}KB)</span>
-                  <button onClick={() => removeAttachment(idx)} className="text-gray-400 hover:text-red-500 ml-0.5" title="Remove">×</button>
+                <div key={`uploaded-${idx}`} className="flex items-center gap-1.5 bg-gray-50 dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">{fileIcon(att.originalName)}</span>
+                  <span className="text-gray-700 dark:text-gray-200 max-w-[200px] truncate">{att.originalName}</span>
+                  <span className="text-gray-400 dark:text-gray-500 text-xs">({(att.size / 1024).toFixed(0)}KB)</span>
+                  <button onClick={() => removeAttachment(idx)} className="text-gray-400 dark:text-gray-500 hover:text-red-500 ml-0.5" title="Remove">×</button>
                 </div>
               );
             })}
             {pendingFiles.map((file, idx) => (
-              <div key={`pending-${idx}`} className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1 text-sm">
-                <span className="text-gray-500">{fileIcon(file.name)}</span>
-                <span className="text-gray-700 max-w-[200px] truncate">{file.name}</span>
-                <span className="text-gray-400 text-xs">({(file.size / 1024).toFixed(0)}KB)</span>
-                <button onClick={() => setPendingFiles((prev) => prev.filter((_, i) => i !== idx))} className="text-gray-400 hover:text-red-500 ml-0.5" title="Remove">×</button>
+              <div key={`pending-${idx}`} className="flex items-center gap-1.5 bg-gray-50 dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 text-sm">
+                <span className="text-gray-500 dark:text-gray-400">{fileIcon(file.name)}</span>
+                <span className="text-gray-700 dark:text-gray-200 max-w-[200px] truncate">{file.name}</span>
+                <span className="text-gray-400 dark:text-gray-500 text-xs">({(file.size / 1024).toFixed(0)}KB)</span>
+                <button onClick={() => setPendingFiles((prev) => prev.filter((_, i) => i !== idx))} className="text-gray-400 dark:text-gray-500 hover:text-red-500 ml-0.5" title="Remove">×</button>
               </div>
             ))}
           </div>
         )}
         {isUploading && (
-          <div className="text-xs text-gray-400 mb-1">Uploading...</div>
+          <div className="text-xs text-gray-400 dark:text-gray-500 mb-1">Uploading...</div>
         )}
         <div className="flex items-end gap-2">
           {/* Hidden file input */}
@@ -427,7 +427,7 @@ export function InputBox({ sessionId }: InputBoxProps) {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isDisabled}
-            className="flex-shrink-0 h-12 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            className="flex-shrink-0 h-12 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 disabled:opacity-50"
             title="Attach files"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,8 +445,8 @@ export function InputBox({ sessionId }: InputBoxProps) {
               : isStreaming 
                 ? "Type a follow-up... (will be queued for the agent)" 
                 : "Type a message... (Enter to send, Shift+Enter for new line)"}
-            className={`flex-1 resize-none rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[48px] max-h-[200px] ${
-              isDragOver ? 'border-blue-400' : isStreaming ? 'border-amber-300 bg-amber-50' : 'border-gray-300'
+            className={`flex-1 resize-none rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[48px] max-h-[200px] dark:bg-[#2a2a3c] dark:text-gray-100 dark:placeholder-gray-500 ${
+              isDragOver ? 'border-blue-400' : isStreaming ? 'border-amber-300 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/20' : 'border-gray-300 dark:border-gray-600'
             }`}
             rows={1}
             disabled={isDisabled}
