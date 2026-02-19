@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 *.so
 TODO.md
+*.png
+test_sdk.py
 .Python
 build/
 develop-eggs/
