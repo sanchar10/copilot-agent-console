@@ -72,9 +72,6 @@ pipx install https://github.com/sanchar10/copilot-agent-console/releases/downloa
 
 ```powershell
 pip install https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl
-
-# Or with uv (faster):
-uv pip install https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl
 ```
 
 > If `agentconsole` command is not found after install, run as a module:
@@ -94,9 +91,6 @@ When a new version is available, the app shows a banner with the install command
 
 ```powershell
 pipx install --force https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl
-
-# Or with uv (faster):
-uv pip install --force-reinstall https://github.com/sanchar10/copilot-agent-console/releases/download/v0.2.0/copilot_agent_console-0.2.0-py3-none-any.whl
 ```
 
 ## Uninstalling

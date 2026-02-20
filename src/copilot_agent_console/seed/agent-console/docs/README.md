@@ -77,8 +77,6 @@ Then start:
 agentconsole
 ```
 
-> **Tip:** If you have [uv](https://docs.astral.sh/uv/) installed, you can use `uv pip install` in place of `pip install` for faster dependency resolution.
-
 > Need more control? See [Manual Installation](docs/INSTALL.md).
 
 ### First Things to Try
