@@ -288,10 +288,10 @@ export function Header({
                 selectedIds={subAgentSelections}
                 onSelectionChange={onSubAgentSelectionsChange}
                 readOnly={hasActiveResponse}
-                disabled={toolSelections.custom.length > 0 || toolSelections.builtin.length > 0 || toolSelections.excluded_builtin.length > 0}
+                disabled={toolSelections.custom.length > 0 || toolSelections.builtin.length > 0}
                 disabledReason={
-                  (toolSelections.custom.length > 0 || toolSelections.builtin.length > 0 || toolSelections.excluded_builtin.length > 0)
-                    ? 'Sub-agents cannot be used with tools (SDK limitation)'
+                  (toolSelections.custom.length > 0 || toolSelections.builtin.length > 0)
+                    ? 'Sub-agents cannot be used with custom or builtin tools (SDK limitation)'
                     : undefined
                 }
               />

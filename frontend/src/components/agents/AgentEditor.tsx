@@ -390,10 +390,10 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                   availableAgents={eligibleSubAgents}
                   selectedIds={selectedSubAgents}
                   onSelectionChange={setSelectedSubAgents}
-                  disabled={selectedTools.length > 0 || builtinTools.length > 0 || excludedBuiltinTools.length > 0}
+                  disabled={selectedTools.length > 0 || builtinTools.length > 0}
                   disabledReason={
-                    (selectedTools.length > 0 || builtinTools.length > 0 || excludedBuiltinTools.length > 0)
-                      ? 'Sub-agents cannot be used with tools (SDK limitation)'
+                    (selectedTools.length > 0 || builtinTools.length > 0)
+                      ? 'Sub-agents cannot be used with custom or builtin tools (SDK limitation)'
                       : undefined
                   }
                 />
