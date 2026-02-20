@@ -346,6 +346,19 @@ export function ChatPane() {
     }
   }, [isNewSession, newSessionSettings?.agentId]);
 
+  // Fetch starter prompts for new session from agent
+  const [newSessionStarterPrompts, setNewSessionStarterPrompts] = useState<StarterPrompt[]>([]);
+  const [newSessionPromptToSend, setNewSessionPromptToSend] = useState<string | null>(null);
+  useEffect(() => {
+    if (isNewSession && newSessionSettings?.agentId) {
+      getAgent(newSessionSettings.agentId)
+        .then((agent) => setNewSessionStarterPrompts(agent.starter_prompts || []))
+        .catch(() => setNewSessionStarterPrompts([]));
+    } else {
+      setNewSessionStarterPrompts([]);
+    }
+  }, [isNewSession, newSessionSettings?.agentId]);
+
   const handleNewSessionRelatedClick = useCallback(async (targetSessionId: string) => {
     const { messagesPerSession, setMessages } = useChatStore.getState();
     const targetTabId = `session:${targetSessionId}`;
@@ -426,7 +439,7 @@ export function ChatPane() {
             onSubAgentSelectionsChange={handleNewSessionSubAgentChange}
           />
           <div className="flex-1 overflow-y-auto p-4">
-            <div className="flex items-center justify-center h-full">
+            <div className="flex flex-col items-center justify-center h-full gap-4">
               <div className="text-center text-gray-500 dark:text-gray-400">
                 <svg className="w-16 h-16 mx-auto mb-4 text-blue-300 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -434,9 +447,25 @@ export function ChatPane() {
                 <p className="text-lg font-medium dark:text-gray-100">How can I help you today?</p>
                 <p className="text-sm mt-1 text-gray-400 dark:text-gray-500">Type a message to start a new session</p>
               </div>
+              {newSessionStarterPrompts.length > 0 && (
+                <div className="w-full max-w-xl space-y-2">
+                  {newSessionStarterPrompts.map((sp, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setNewSessionPromptToSend(sp.prompt)}
+                      title={sp.prompt}
+                      className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors"
+                    >
+                      <span className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</span>
+                      <span className="text-gray-400 dark:text-gray-500 mx-2">—</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          <InputBox />
+          <InputBox promptToSend={newSessionPromptToSend} onPromptSent={() => setNewSessionPromptToSend(null)} />
         </div>
       )}
       {!showNewSession && activeTab?.type === 'ralph-monitor' && <RalphMonitor />}
