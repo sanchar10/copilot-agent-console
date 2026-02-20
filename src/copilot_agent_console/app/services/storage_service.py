@@ -60,11 +60,12 @@ class StorageService:
             "model": session.model,
             "cwd": session.cwd,
             "mcp_servers": session.mcp_servers,
-            "tools": session.tools,
+            "tools": session.tools.model_dump() if hasattr(session.tools, 'model_dump') else session.tools,
             "system_message": session.system_message,
             "name_set": session.name_set,
             "agent_id": session.agent_id,
             "trigger": session.trigger,
+            "sub_agents": session.sub_agents,
         }
         self._session_file(session.session_id).write_text(
             json.dumps(session_data, indent=2, default=str), encoding="utf-8"
