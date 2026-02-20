@@ -34,6 +34,9 @@ export function markSessionReady(sessionId: string): void {
 
 interface InputBoxProps {
   sessionId?: string;
+  /** When set, InputBox auto-populates and submits this text, then calls onPromptSent */
+  promptToSend?: string | null;
+  onPromptSent?: () => void;
 }
 
 function fileIcon(filename: string): string {
@@ -51,7 +54,7 @@ function fileIcon(filename: string): string {
   return '📄';
 }
 
-export function InputBox({ sessionId }: InputBoxProps) {
+export function InputBox({ sessionId, promptToSend, onPromptSent }: InputBoxProps) {
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<(UploadedFile & { attachmentRef: AttachmentRef })[]>([]);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
@@ -168,8 +171,17 @@ export function InputBox({ sessionId }: InputBoxProps) {
     }
   };
 
-  const handleSubmit = async () => {
-    const trimmedInput = input.trim();
+  // Auto-submit starter prompt when provided
+  useEffect(() => {
+    if (promptToSend) {
+      handleSubmit(promptToSend);
+      onPromptSent?.();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promptToSend]);
+
+  const handleSubmit = async (overrideText?: string) => {
+    const trimmedInput = (overrideText || input).trim();
     if ((!trimmedInput && attachments.length === 0 && pendingFiles.length === 0) || isDisabled) return;
 
     // If agent is already running, enqueue the follow-up message.

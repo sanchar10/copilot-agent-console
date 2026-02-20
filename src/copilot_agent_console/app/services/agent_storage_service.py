@@ -90,9 +90,10 @@ class AgentStorageService:
             return None
 
         update_data = request.model_dump(exclude_unset=True)
-        for field, value in update_data.items():
-            setattr(agent, field, value)
-        agent.updated_at = datetime.utcnow()
+        update_data["updated_at"] = datetime.utcnow().isoformat()
+        # Re-validate to properly coerce nested models (SystemMessage, AgentTools)
+        merged = {**agent.model_dump(), **update_data}
+        agent = Agent.model_validate(merged)
 
         self.save_agent(agent)
         return agent

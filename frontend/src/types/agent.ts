@@ -15,6 +15,11 @@ export interface AgentTools {
   excluded_builtin: string[];
 }
 
+export interface StarterPrompt {
+  title: string;
+  prompt: string;
+}
+
 export interface Agent {
   id: string;
   name: string;
@@ -25,6 +30,7 @@ export interface Agent {
   tools: AgentTools;
   mcp_servers: string[];
   sub_agents: string[];
+  starter_prompts: StarterPrompt[];
   created_at: string;
   updated_at: string;
 }
@@ -38,6 +44,7 @@ export interface CreateAgentRequest {
   tools?: AgentTools;
   mcp_servers?: string[];
   sub_agents?: string[];
+  starter_prompts?: StarterPrompt[];
 }
 
 export interface UpdateAgentRequest {
@@ -49,4 +56,5 @@ export interface UpdateAgentRequest {
   tools?: AgentTools;
   mcp_servers?: string[];
   sub_agents?: string[];
+  starter_prompts?: StarterPrompt[];
 }

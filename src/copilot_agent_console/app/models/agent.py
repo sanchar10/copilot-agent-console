@@ -34,6 +34,12 @@ class AgentTools(BaseModel):
     )
 
 
+class StarterPrompt(BaseModel):
+    """A starter prompt suggestion shown when a session is created from an agent."""
+    title: str = Field(..., description="Short label for the prompt (3-5 words)")
+    prompt: str = Field(..., description="Full prompt text sent to chat on click")
+
+
 class AgentBase(BaseModel):
     """Base agent fields shared across create/update/full models."""
     name: str = Field(..., description="Display name of the agent")
@@ -56,6 +62,10 @@ class AgentBase(BaseModel):
         default_factory=list,
         description="List of agent IDs to use as sub-agents (Agent Teams)"
     )
+    starter_prompts: list[StarterPrompt] = Field(
+        default_factory=list,
+        description="Starter prompt suggestions shown in chat when session is created from this agent (max 4)"
+    )
 
 
 class AgentCreate(AgentBase):
@@ -73,6 +83,7 @@ class AgentUpdate(BaseModel):
     tools: AgentTools | None = None
     mcp_servers: list[str] | None = None
     sub_agents: list[str] | None = None
+    starter_prompts: list[StarterPrompt] | None = None
 
 
 class Agent(AgentBase):

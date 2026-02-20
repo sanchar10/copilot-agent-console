@@ -15,8 +15,8 @@ import { ScheduleManager } from '../schedules/ScheduleManager';
 import { TaskBoard } from '../taskboard/TaskBoard';
 import { TaskRunDetail } from '../taskboard/TaskRunDetail';
 import { updateSession, getSession } from '../../api/sessions';
-import { getEligibleSubAgents } from '../../api/agents';
-import type { AgentTools, SystemMessage, Agent } from '../../types/agent';
+import { getAgent, getEligibleSubAgents } from '../../api/agents';
+import type { AgentTools, SystemMessage, Agent, StarterPrompt } from '../../types/agent';
 
 /**
  * Per-session tab content — owns its own scroll position, header, messages, and input.
@@ -34,6 +34,8 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [cwdError, setCwdError] = useState<string | null>(null);
   const [eligibleSubAgents, setEligibleSubAgents] = useState<Agent[]>([]);
+  const [starterPrompts, setStarterPrompts] = useState<StarterPrompt[]>([]);
+  const [promptToSend, setPromptToSend] = useState<string | null>(null);
 
   const session = sessions.find((s) => s.session_id === sessionId);
   const rawMessages = messagesPerSession[sessionId];
@@ -174,6 +176,16 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
       .catch(() => setEligibleSubAgents([]));
   }, [session?.agent_id]);
 
+  // Fetch starter prompts from agent definition
+  useEffect(() => {
+    const agentId = session?.agent_id;
+    if (agentId) {
+      getAgent(agentId)
+        .then((agent) => setStarterPrompts(agent.starter_prompts || []))
+        .catch(() => setStarterPrompts([]));
+    }
+  }, [session?.agent_id]);
+
   const handleRelatedSessionClick= useCallback(async (targetSessionId: string) => {
     const { messagesPerSession, setMessages } = useChatStore.getState();
     const targetTabId = `session:${targetSessionId}`;
@@ -238,8 +250,24 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
                 <p className="text-sm">Loading messages...</p>
               </div>
             ) : messages.length === 0 && !isStreaming ? (
-              <div className="flex items-center justify-center h-full text-gray-400">
-                <p>Start a conversation...</p>
+              <div className="flex flex-col items-center justify-center h-full gap-4">
+                <p className="text-gray-400">Start a conversation...</p>
+                {starterPrompts.length > 0 && (
+                  <div className="w-full max-w-xl space-y-2">
+                    {starterPrompts.map((sp, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setPromptToSend(sp.prompt)}
+                        title={sp.prompt}
+                        className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors group"
+                      >
+                        <span className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</span>
+                        <span className="text-gray-400 dark:text-gray-500 mx-2">—</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <>
@@ -264,7 +292,7 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
       </div>
 
       {/* Input Area */}
-      <InputBox sessionId={sessionId} />
+      <InputBox sessionId={sessionId} promptToSend={promptToSend} onPromptSent={() => setPromptToSend(null)} />
     </div>
   );
 });

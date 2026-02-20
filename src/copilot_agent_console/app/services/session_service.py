@@ -75,33 +75,32 @@ def get_default_mcp_servers() -> list[str]:
     return [server.name for server in config.servers]
 
 
-def _migrate_tools(value: Any) -> dict:
-    """Migrate old tools formats to new {custom: [], builtin: []} format.
+def _migrate_tools(value: Any) -> AgentTools:
+    """Migrate old tools formats to new AgentTools model.
     
-    Old format 1 (dict[str, bool]): {"greet": true, "calc": false} -> {"custom": ["greet"], "builtin": []}
-    Old format 2 (list[str]):       ["greet", "calc"]               -> {"custom": ["greet", "calc"], "builtin": []}
-    Old format 3 (available/custom): {"available": [...], "custom": [...]} -> {"custom": [...available], "builtin": []}
-    New format:                     {"custom": [...], "builtin": [...]}   -> as-is
+    Old format 1 (dict[str, bool]): {"greet": true, "calc": false} -> AgentTools(custom=["greet"])
+    Old format 2 (list[str]):       ["greet", "calc"]               -> AgentTools(custom=["greet", "calc"])
+    Old format 3 (available/custom): {"available": [...], "custom": [...]} -> AgentTools(custom=[...available])
+    New format:                     {"custom": [...], "builtin": [...]}   -> AgentTools(...)
     """
     if isinstance(value, dict):
         if "builtin" in value:
-            return value  # Already new format
+            return AgentTools(**value)
         if "available" in value:
-            # Old agent format: {available: [...], custom: [...]}
-            return {"custom": value.get("available", []), "builtin": []}
+            return AgentTools(custom=value.get("available", []))
         # Old dict[str, bool] format
-        return {"custom": [k for k, v in value.items() if v], "builtin": []}
+        return AgentTools(custom=[k for k, v in value.items() if v])
     if isinstance(value, list):
-        return {"custom": value, "builtin": []}
-    return {"custom": [], "builtin": []}
+        return AgentTools(custom=value)
+    return AgentTools()
 
 
-def get_default_tools() -> dict:
+def get_default_tools() -> AgentTools:
     """Get default tool selections (all custom tools enabled, no builtin filter)."""
     from copilot_agent_console.app.services.tools_service import get_tools_service
     tools_service = get_tools_service()
     config = tools_service.get_tools_config()
-    return {"custom": [tool.name for tool in config.tools], "builtin": []}
+    return AgentTools(custom=[tool.name for tool in config.tools])
 
 
 class SessionService:

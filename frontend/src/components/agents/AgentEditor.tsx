@@ -65,6 +65,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedSubAgents, setSelectedSubAgents] = useState<string[]>([]);
   const [eligibleSubAgents, setEligibleSubAgents] = useState<Agent[]>([]);
+  const [starterPrompts, setStarterPrompts] = useState<{ title: string; prompt: string }[]>([]);
 
   // Load existing agent data
   useEffect(() => {
@@ -80,6 +81,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
       setExcludedBuiltinTools(existingAgent.tools.excluded_builtin || []);
       setSelectedMcpServers(existingAgent.mcp_servers || []);
       setSelectedSubAgents(existingAgent.sub_agents || []);
+      setStarterPrompts(existingAgent.starter_prompts || []);
     }
   }, [existingAgent, availableTools]);
 
@@ -122,8 +124,9 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
     },
     mcp_servers: selectedMcpServers,
     sub_agents: selectedSubAgents,
+    starter_prompts: starterPrompts.filter(p => p.title.trim() && p.prompt.trim()),
   }), [name, description, icon, model, systemMessage,
-    selectedTools, builtinTools, excludedBuiltinTools, selectedMcpServers, selectedSubAgents]);
+    selectedTools, builtinTools, excludedBuiltinTools, selectedMcpServers, selectedSubAgents, starterPrompts]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
@@ -417,6 +420,58 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
               <p className="text-sm text-gray-400 dark:text-gray-500 italic">
                 No eligible agents available. Agents need a prompt and description, and cannot have custom tools or excluded built-in tools.
               </p>
+            )}
+          </section>
+
+          {/* Starter Prompts */}
+          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-gray-700 dark:text-gray-300">💡 Starter Prompts</h2>
+              <span className="text-xs text-gray-400 dark:text-gray-500">
+                {starterPrompts.length}/4
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Clickable prompt suggestions shown when a session is created from this agent.
+            </p>
+            {starterPrompts.map((sp, idx) => (
+              <div key={idx} className="flex gap-2 items-start">
+                <div className="flex-1 space-y-1">
+                  <input
+                    type="text"
+                    value={sp.title}
+                    onChange={(e) => {
+                      const updated = [...starterPrompts];
+                      updated[idx] = { ...updated[idx], title: e.target.value };
+                      setStarterPrompts(updated);
+                    }}
+                    placeholder="Title (e.g. Task Tracker)"
+                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/60 dark:bg-[#1e1e2e]/60 text-gray-900 dark:text-white"
+                  />
+                  <textarea
+                    value={sp.prompt}
+                    onChange={(e) => {
+                      const updated = [...starterPrompts];
+                      updated[idx] = { ...updated[idx], prompt: e.target.value };
+                      setStarterPrompts(updated);
+                    }}
+                    placeholder="Full prompt text..."
+                    rows={2}
+                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/60 dark:bg-[#1e1e2e]/60 text-gray-900 dark:text-white resize-none"
+                  />
+                </div>
+                <button
+                  onClick={() => setStarterPrompts(starterPrompts.filter((_, i) => i !== idx))}
+                  className="mt-1 text-red-400 hover:text-red-600 text-sm"
+                  title="Remove"
+                >✕</button>
+              </div>
+            ))}
+            {starterPrompts.length < 4 && (
+              <button
+                onClick={() => setStarterPrompts([...starterPrompts, { title: '', prompt: '' }])}
+                className="text-sm text-blue-500 hover:text-blue-400"
+              >+ Add starter prompt</button>
             )}
           </section>
         </div>
