@@ -138,6 +138,7 @@ class SessionService:
             mcp_servers=mcp_servers,
             tools=tools,
             system_message=request.system_message,
+            sub_agents=request.sub_agents or [],
             agent_id=request.agent_id,
             trigger=request.trigger,
             # name_set = True only if user provided a custom name (not default)
@@ -699,6 +700,13 @@ class SessionService:
             session.system_message = request.system_message
             
             if old_sm != request.system_message and copilot_service.is_session_active(session_id):
+                need_recreate = True
+        
+        if request.sub_agents is not None:
+            old_sub = session.sub_agents
+            session.sub_agents = request.sub_agents
+            
+            if old_sub != request.sub_agents and copilot_service.is_session_active(session_id):
                 need_recreate = True
         
         # Destroy client so next message resumes with new config

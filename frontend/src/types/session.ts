@@ -8,6 +8,7 @@ export interface Session {
   mcp_servers?: string[];
   tools?: AgentTools;
   system_message?: SystemMessage | null;
+  sub_agents?: string[];
   created_at: string;
   updated_at: string;
   // Reference fields (informational only)
@@ -40,6 +41,7 @@ export interface CreateSessionRequest {
   tools?: AgentTools;
   system_message?: SystemMessage | null;
   agent_id?: string;
+  sub_agents?: string[];
 }
 
 export interface UpdateSessionRequest {
@@ -48,4 +50,5 @@ export interface UpdateSessionRequest {
   mcp_servers?: string[];
   tools?: AgentTools;
   system_message?: SystemMessage | null;
+  sub_agents?: string[];
 }

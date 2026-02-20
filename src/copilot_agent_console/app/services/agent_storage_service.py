@@ -7,9 +7,13 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from copilot_agent_console.app.config import AGENTS_DIR, ensure_directories
 from copilot_agent_console.app.models.agent import Agent, AgentCreate, AgentUpdate
+
+if TYPE_CHECKING:
+    from copilot_agent_console.app.services.mcp_service import MCPService
 
 
 class AgentStorageService:
@@ -100,6 +104,88 @@ class AgentStorageService:
             return False
         agent_file.unlink()
         return True
+
+    def get_eligible_sub_agents(self, exclude_agent_id: str | None = None) -> list[Agent]:
+        """Return agents eligible to be used as sub-agents.
+        
+        Eligibility rules:
+        1. No custom tools (SDK limitation)
+        2. No excluded built-in tools (SDK limitation)
+        3. No sub-agents of its own (no nesting)
+        4. Not the excluded agent (self-reference prevention)
+        5. Has non-empty system_message content (required as prompt)
+        6. Has non-empty description (required for auto-dispatch)
+        """
+        all_agents = self.list_agents()
+        eligible = []
+        for agent in all_agents:
+            if exclude_agent_id and agent.id == exclude_agent_id:
+                continue
+            if agent.tools.custom:
+                continue
+            if agent.tools.excluded_builtin:
+                continue
+            if agent.sub_agents:
+                continue
+            if not agent.system_message.content:
+                continue
+            if not agent.description:
+                continue
+            eligible.append(agent)
+        return eligible
+
+    def validate_sub_agents(self, sub_agent_ids: list[str], exclude_agent_id: str | None = None) -> list[str]:
+        """Validate that all sub-agent IDs are eligible. Returns list of error messages."""
+        errors = []
+        eligible_ids = {a.id for a in self.get_eligible_sub_agents(exclude_agent_id)}
+        for agent_id in sub_agent_ids:
+            if agent_id not in eligible_ids:
+                agent = self.load_agent(agent_id)
+                if not agent:
+                    errors.append(f"Sub-agent '{agent_id}' not found")
+                elif agent.tools.custom:
+                    errors.append(f"Sub-agent '{agent.name}' has custom tools (not supported)")
+                elif agent.tools.excluded_builtin:
+                    errors.append(f"Sub-agent '{agent.name}' has excluded built-in tools (not supported)")
+                elif agent.sub_agents:
+                    errors.append(f"Sub-agent '{agent.name}' has its own sub-agents (nesting not supported)")
+                elif not agent.system_message.content:
+                    errors.append(f"Sub-agent '{agent.name}' has no prompt (system message required)")
+                elif not agent.description:
+                    errors.append(f"Sub-agent '{agent.name}' has no description (required for auto-dispatch)")
+                elif exclude_agent_id and agent_id == exclude_agent_id:
+                    errors.append(f"Sub-agent '{agent.name}' cannot be its own sub-agent")
+                else:
+                    errors.append(f"Sub-agent '{agent_id}' is not eligible")
+        return errors
+
+    def convert_to_sdk_custom_agents(
+        self, sub_agent_ids: list[str], mcp_service: "MCPService"
+    ) -> list[dict]:
+        """Convert agent IDs to SDK CustomAgentConfig dicts.
+        
+        Returns list of dicts ready for session_opts["custom_agents"].
+        """
+        sdk_agents = []
+        for agent_id in sub_agent_ids:
+            agent = self.load_agent(agent_id)
+            if not agent:
+                continue
+            sdk_agent: dict = {
+                "name": agent.id,
+                "display_name": agent.name,
+                "description": agent.description,
+                "prompt": agent.system_message.content,
+                "infer": True,
+            }
+            if agent.tools.builtin:
+                sdk_agent["tools"] = agent.tools.builtin
+            if agent.mcp_servers:
+                resolved = mcp_service.get_servers_for_sdk(agent.mcp_servers)
+                if resolved:
+                    sdk_agent["mcp_servers"] = resolved
+            sdk_agents.append(sdk_agent)
+        return sdk_agents
 
 
 # Singleton instance

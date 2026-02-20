@@ -1,0 +1,136 @@
+# Agent Teams
+
+Sub-agents let your main agent delegate tasks to specialized agents that run in **separate contexts**. Instead of one agent doing everything, you can compose a team — each sub-agent has its own prompt, tools, and MCP servers.
+
+## What Are Sub-Agents?
+
+When you chat with an agent in Copilot Agent Console, it runs as the main agent for that session. Sub-agents are additional agents loaded alongside it. The main agent can **automatically delegate** tasks to a sub-agent when it determines one is better suited for the job.
+
+Each sub-agent runs in its own context — it has its own prompt, its own tool access, and returns results back to the main agent. This is fundamentally different from system prompts, which just change the main agent's behavior in the same context.
+
+**Example:** A "Dev Lead" agent that orchestrates the software development lifecycle across four specialists:
+
+```
+Dev Lead (main agent)
+├── Designer — designs solutions, evaluates trade-offs, proposes file structure
+├── Developer — writes code, implements features, fixes bugs
+├── Code Reviewer — reviews changes for bugs, security issues, and best practices
+└── Test Engineer — writes and runs tests, identifies edge cases, validates coverage
+```
+
+When you ask *"Implement a user authentication module"*, the Dev Lead coordinates the workflow: asks the Designer to design the approach and file structure, hands the design to the Developer to implement, sends the code to the Code Reviewer for a quality check, and finally passes it to the Test Engineer for test coverage — synthesizing feedback at each step before moving forward.
+
+## Setting Up Sub-Agents
+
+### 1. Create Agents
+
+First, create the agents you want to use as sub-agents in the **Agent Library** (sidebar → Agents). Each agent needs at minimum a name, description, and prompt.
+
+### 2. Add Sub-Agents to a Parent Agent
+
+Open the parent agent in the Agent Editor. In the **Sub-Agents** selector, pick which agents should be available as sub-agents. This works just like the MCP and Tools selectors.
+
+### 3. Start Chatting
+
+Select the parent agent and start a new chat. The sub-agent selector in the chat view shows which sub-agents are active — you can toggle them on/off per session.
+
+## How It Works
+
+When you send a message:
+
+1. Your message goes to the **main agent** (the one you selected)
+2. The main agent decides whether to handle it directly or delegate
+3. If it delegates, the **sub-agent** runs in a separate context with only its own tools and MCP servers
+4. The sub-agent's response flows back to the main agent
+5. The main agent incorporates the result and responds to you
+
+Sub-agents have `infer: true` by default — the main agent automatically decides when to delegate based on the sub-agent's description. You don't need to explicitly ask for a specific sub-agent.
+
+## Limitations
+
+- **No nesting** — Sub-agents cannot have their own sub-agents. Only one level of delegation is supported.
+- **No custom tools** — Agents that use custom tools (Python-based tools defined in the Tools Builder) cannot be used as sub-agents. This is an SDK limitation.
+- **No tool exclusions** — Agents that use the "excluded built-in tools" feature cannot be used as sub-agents. The SDK only supports tool whitelists, not blacklists.
+- **Prompt and description required** — Sub-agents must have both a system prompt and a description. The prompt defines the sub-agent's behavior; the description tells the main agent when to delegate.
+- **No per-agent model override** — Sub-agents use the session's model, not their own model setting.
+- **CLI agents are always present** — Agents defined in `~/.copilot/agents/` are always available in every session regardless of sub-agent selection.
+
+Agents eligible as sub-agents are marked with a 🤝 indicator in the Agent Library. You can filter the library to show only composable agents.
+
+## Example
+
+### Agent: Dev Lead
+
+```json
+{
+  "name": "Dev Lead",
+  "description": "Orchestrates feature development by coordinating design, coding, review, and testing",
+  "system_message": {
+    "mode": "replace",
+    "content": "You are a dev lead orchestrating the software development lifecycle. For feature requests: first delegate to the Designer for design and file structure, then hand the design to the Developer for implementation, send the code to the Code Reviewer for quality checks, and finally pass it to the Test Engineer for test coverage. Synthesize feedback at each stage before proceeding to the next."
+  },
+  "model": "claude-sonnet-4",
+  "mcp_servers": ["github"],
+  "sub_agents": ["designer", "developer", "code-reviewer", "test-engineer"]
+}
+```
+
+### Sub-Agent: Designer
+
+```json
+{
+  "name": "Designer",
+  "description": "Designs solutions, evaluates trade-offs, and proposes file structure",
+  "system_message": {
+    "mode": "replace",
+    "content": "You are a software designer. Analyze requirements, evaluate design trade-offs, propose file/module structure, and identify patterns to follow. Keep designs practical and aligned with the existing codebase."
+  },
+  "tools": {
+    "builtin": ["grep", "glob", "view"]
+  }
+}
+```
+
+### Sub-Agent: Developer
+
+```json
+{
+  "name": "Developer",
+  "description": "Implements features, writes code, and fixes bugs following the given design",
+  "system_message": {
+    "mode": "replace",
+    "content": "You are a software developer. Implement features following the provided design. Write clean, minimal code. Use existing patterns in the codebase. Make surgical changes — don't refactor unrelated code."
+  }
+}
+```
+
+### Sub-Agent: Code Reviewer
+
+```json
+{
+  "name": "Code Reviewer",
+  "description": "Reviews code for bugs, security issues, and adherence to best practices",
+  "system_message": {
+    "mode": "replace",
+    "content": "You are a code reviewer. Review changes for bugs, security vulnerabilities, and logic errors. Only flag issues that genuinely matter — never comment on style or formatting. Suggest concrete fixes."
+  },
+  "tools": {
+    "builtin": ["grep", "view"]
+  }
+}
+```
+
+### Sub-Agent: Test Engineer
+
+```json
+{
+  "name": "Test Engineer",
+  "description": "Writes tests, identifies edge cases, and validates coverage",
+  "system_message": {
+    "mode": "replace",
+    "content": "You are a test engineer. Write unit and integration tests for the given code. Identify edge cases, boundary conditions, and failure modes. Ensure tests are deterministic and cover the critical paths."
+  }
+}
+```
+
+When the Dev Lead receives *"Implement a user authentication module"*, it delegates to each sub-agent in sequence — design → implement → review → test — collecting and incorporating feedback at each stage to deliver a complete, tested feature.

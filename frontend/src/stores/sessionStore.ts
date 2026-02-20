@@ -14,6 +14,7 @@ interface NewSessionSettings {
   tools: AgentTools;
   systemMessage?: SystemMessage | null;
   agentId?: string;
+  subAgents?: string[];
 }
 
 interface SessionState {

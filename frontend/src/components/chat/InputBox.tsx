@@ -225,6 +225,7 @@ export function InputBox({ sessionId }: InputBoxProps) {
           tools: sessionTools,
           system_message: newSessionSettings?.systemMessage,
           agent_id: newSessionSettings?.agentId,
+          sub_agents: newSessionSettings?.subAgents,
         });
         addSession(session);
         openGenericTab({ id: tabId.session(session.session_id), type: 'session', label: session.session_name, sessionId: session.session_id });

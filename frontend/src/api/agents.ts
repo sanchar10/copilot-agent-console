@@ -52,3 +52,12 @@ export async function deleteAgent(agentId: string): Promise<void> {
     throw new Error('Failed to delete agent');
   }
 }
+
+export async function getEligibleSubAgents(excludeId?: string): Promise<Agent[]> {
+  const params = excludeId ? `?exclude=${encodeURIComponent(excludeId)}` : '';
+  const response = await fetch(`${API_BASE}/agents/eligible-sub-agents${params}`);
+  if (!response.ok) {
+    throw new Error('Failed to get eligible sub-agents');
+  }
+  return response.json();
+}

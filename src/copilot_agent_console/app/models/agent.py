@@ -52,6 +52,10 @@ class AgentBase(BaseModel):
         default_factory=list,
         description="List of enabled MCP server names (references globally-configured MCP servers)"
     )
+    sub_agents: list[str] = Field(
+        default_factory=list,
+        description="List of agent IDs to use as sub-agents (Agent Teams)"
+    )
 
 
 class AgentCreate(AgentBase):
@@ -68,6 +72,7 @@ class AgentUpdate(BaseModel):
     model: str | None = None
     tools: AgentTools | None = None
     mcp_servers: list[str] | None = None
+    sub_agents: list[str] | None = None
 
 
 class Agent(AgentBase):

@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { MCPSelector } from '../chat/MCPSelector';
 import { ToolsSelector } from '../chat/ToolsSelector';
+import { SubAgentSelector } from '../chat/SubAgentSelector';
 import { TokenUsageSlider } from '../chat/TokenUsageSlider';
 import { RelatedSessions } from '../chat/RelatedSessions';
 import { FolderBrowserModal } from '../common/FolderBrowserModal';
 import { SystemPromptEditor } from '../common/SystemPromptEditor';
 import type { MCPServer, MCPServerSelections } from '../../types/mcp';
 import type { ToolInfo, ToolSelections } from '../../api/tools';
-import type { AgentTools, SystemMessage } from '../../types/agent';
+import type { AgentTools, SystemMessage, Agent } from '../../types/agent';
 import type { Session } from '../../types/session';
 
 /** Convert string[] to Record<string, boolean> for selector components */
@@ -47,6 +48,8 @@ interface HeaderProps {
   sessions?: Session[];
   currentSessionId?: string;
   openTabs?: string[];
+  eligibleSubAgents?: Agent[];
+  subAgentSelections?: string[];
   onRelatedSessionClick?: (sessionId: string) => void;
   onNameChange?: (newName: string) => void;
   onModelChange?: (newModel: string) => void;
@@ -54,6 +57,7 @@ interface HeaderProps {
   onMcpSelectionsChange?: (selections: string[]) => void;
   onToolSelectionsChange?: (selections: AgentTools) => void;
   onSystemMessageChange?: (systemMessage: SystemMessage | null) => void;
+  onSubAgentSelectionsChange?: (selections: string[]) => void;
   cwdError?: string | null;
 }
 
@@ -80,6 +84,9 @@ export function Header({
   onMcpSelectionsChange,
   onToolSelectionsChange,
   onSystemMessageChange,
+  eligibleSubAgents = [],
+  subAgentSelections = [],
+  onSubAgentSelectionsChange,
   cwdError 
 }: HeaderProps) {
   const [isEditingName, setIsEditingName] = useState(false);
@@ -268,6 +275,16 @@ export function Header({
                 availableServers={availableMcpServers}
                 selections={listToSelections(mcpSelections, availableMcpServers)}
                 onSelectionsChange={(s: MCPServerSelections) => onMcpSelectionsChange(selectionsToList(s))}
+                readOnly={hasActiveResponse}
+              />
+            )}
+
+            {/* Sub-Agent selector (Agent Teams) */}
+            {eligibleSubAgents.length > 0 && onSubAgentSelectionsChange && (
+              <SubAgentSelector
+                availableAgents={eligibleSubAgents}
+                selectedIds={subAgentSelections}
+                onSelectionChange={onSubAgentSelectionsChange}
                 readOnly={hasActiveResponse}
               />
             )}

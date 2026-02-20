@@ -24,6 +24,7 @@ export interface Agent {
   model: string;
   tools: AgentTools;
   mcp_servers: string[];
+  sub_agents: string[];
   created_at: string;
   updated_at: string;
 }
@@ -36,6 +37,7 @@ export interface CreateAgentRequest {
   model?: string;
   tools?: AgentTools;
   mcp_servers?: string[];
+  sub_agents?: string[];
 }
 
 export interface UpdateAgentRequest {
@@ -46,4 +48,5 @@ export interface UpdateAgentRequest {
   model?: string;
   tools?: AgentTools;
   mcp_servers?: string[];
+  sub_agents?: string[];
 }
