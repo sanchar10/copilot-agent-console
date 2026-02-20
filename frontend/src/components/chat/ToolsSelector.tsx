@@ -162,7 +162,7 @@ export function ToolsSelector({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
         <span>Tools</span>
-        <span className="bg-amber-200 dark:bg-amber-800/40 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+        <span className="bg-amber-200 dark:bg-amber-800/40 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded text-[10px] font-semibold min-w-[2.5rem] text-center">
           {enabledCount}/{availableTools.length}{builtinSummary}
         </span>
         <svg

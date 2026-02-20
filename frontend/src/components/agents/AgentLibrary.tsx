@@ -92,11 +92,11 @@ function AgentCard({ agent }: { agent: Agent }) {
         <span>{agent.model}</span>
         {agent.sub_agents && agent.sub_agents.length > 0 && (
           <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-1.5 py-0.5 rounded font-medium" title="Has sub-agents">
-            🤝 {agent.sub_agents.length}
+            👥 {agent.sub_agents.length}
           </span>
         )}
         {isComposable && (
-          <span className="text-gray-300 dark:text-gray-600" title="Composable — can be used as a sub-agent">🤝</span>
+          <span className="text-gray-300 dark:text-gray-600" title="Composable — can be used as a sub-agent">🧩</span>
         )}
       </div>
     </button>

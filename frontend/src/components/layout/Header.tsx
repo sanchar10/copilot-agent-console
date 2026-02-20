@@ -267,7 +267,7 @@ export function Header({
                 onBuiltinToolsChange={isNewSession ? (builtin, excluded) => onToolSelectionsChange({ ...toolSelections, builtin, excluded_builtin: excluded }) : undefined}
                 readOnly={hasActiveResponse}
                 disabled={subAgentSelections.length > 0}
-                disabledReason={subAgentSelections.length > 0 ? 'Tools cannot be used with sub-agents (CLI limitation)' : undefined}
+                disabledReason={subAgentSelections.length > 0 ? 'Tools cannot be used with sub-agents (SDK limitation)' : undefined}
               />
             )}
 
@@ -291,7 +291,7 @@ export function Header({
                 disabled={toolSelections.custom.length > 0 || toolSelections.builtin.length > 0 || toolSelections.excluded_builtin.length > 0}
                 disabledReason={
                   (toolSelections.custom.length > 0 || toolSelections.builtin.length > 0 || toolSelections.excluded_builtin.length > 0)
-                    ? 'Sub-agents cannot be used with tools (CLI limitation)'
+                    ? 'Sub-agents cannot be used with tools (SDK limitation)'
                     : undefined
                 }
               />

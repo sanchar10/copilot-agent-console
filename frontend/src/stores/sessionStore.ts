@@ -72,10 +72,13 @@ export const useSessionStore = create<SessionState>((set) => ({
       state.refreshMcpServers(),
       state.refreshTools(),
     ]);
+    // servers/toolsConfig refresh the store's available lists;
+    // new sessions start with none selected
+    void servers; void toolsConfig;
     
-    // Default: all servers and custom tools enabled, no builtin filter
-    const defaultMcpServers = servers.map(s => s.name);
-    const defaultTools: AgentTools = { custom: toolsConfig.map(t => t.name), builtin: [], excluded_builtin: [] };
+    // Default: no servers or custom tools selected, no builtin filter
+    const defaultMcpServers: string[] = [];
+    const defaultTools: AgentTools = { custom: [], builtin: [], excluded_builtin: [] };
     
     // Deactivate current tab so new-session view takes over
     useTabStore.setState({ activeTabId: null });

@@ -70,9 +70,9 @@ export function SubAgentSelector({
         `}
         title={disabledReason || `${enabledCount}/${availableAgents.length} sub-agents enabled`}
       >
-        <span className="text-sm">🤝</span>
-        <span>Agents</span>
-        <span className="bg-purple-200/80 dark:bg-purple-800/40 text-purple-800 dark:text-purple-300 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+        <span className="text-sm">👥</span>
+        <span>Sub-Agents</span>
+        <span className="bg-purple-200/80 dark:bg-purple-800/40 text-purple-800 dark:text-purple-300 px-1.5 py-0.5 rounded text-[10px] font-semibold min-w-[2.5rem] text-center">
           {enabledCount}/{availableAgents.length}
         </span>
         <svg
