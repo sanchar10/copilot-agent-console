@@ -6,6 +6,7 @@ interface SubAgentSelectorProps {
   selectedIds: string[];
   onSelectionChange: (selectedIds: string[]) => void;
   disabled?: boolean;
+  disabledReason?: string;
   readOnly?: boolean;
 }
 
@@ -14,6 +15,7 @@ export function SubAgentSelector({
   selectedIds,
   onSelectionChange,
   disabled = false,
+  disabledReason,
   readOnly = false,
 }: SubAgentSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +68,7 @@ export function SubAgentSelector({
             : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border border-purple-200/60 dark:border-purple-700/60 hover:bg-purple-200/80 dark:hover:bg-purple-800/40 cursor-pointer'
           }
         `}
-        title={`${enabledCount}/${availableAgents.length} sub-agents enabled`}
+        title={disabledReason || `${enabledCount}/${availableAgents.length} sub-agents enabled`}
       >
         <span className="text-sm">🤝</span>
         <span>Agents</span>

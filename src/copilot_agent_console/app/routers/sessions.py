@@ -256,7 +256,10 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
     logger.info(f"[SSE] Loading {len(mcp_servers_sdk)} MCP servers for session {session_id}")
     
     # Get local/custom tools for this session
-    tools_sdk = tools_service.get_sdk_tools(session.tools.custom if session.tools.custom else None)
+    # Only load custom tools if the user explicitly selected some.
+    # Passing tools=[] when none selected avoids a CLI bug where
+    # tools + workingDirectory causes custom_agents to be silently dropped.
+    tools_sdk = tools_service.get_sdk_tools(session.tools.custom) if session.tools.custom else []
     logger.info(f"[SSE] Loading {len(tools_sdk)} custom tools for session {session_id}")
     
     # Get built-in tool whitelist/blacklist

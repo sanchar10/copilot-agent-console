@@ -195,6 +195,7 @@ class SessionClient:
             if custom_agents:
                 resume_opts["custom_agents"] = custom_agents
             
+            logger.info(f"[{self.session_id}] Resuming SDK session with custom_agents={len(custom_agents or [])}")
             self.session = await self.client.resume_session(self.session_id, resume_opts)
             self.touch()
             logger.info(f"[{self.session_id}] Resumed SDK session with mcp_servers={len(mcp_servers or {})}, tools={len(tools or [])}")

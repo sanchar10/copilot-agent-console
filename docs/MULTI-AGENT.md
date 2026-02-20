@@ -48,6 +48,7 @@ Sub-agents have `infer: true` by default — the main agent automatically decide
 
 ## Limitations
 
+- **Tools and sub-agents are mutually exclusive** — A session cannot use both tools (custom or built-in include/exclude) and sub-agents simultaneously. This is a CLI-level limitation where `cwd` combined with `tools`/`available_tools` causes `custom_agents` to be silently dropped. The UI enforces this by disabling one selector when the other has selections. Sub-agents themselves _can_ have their own tools and MCP servers — the restriction only applies at the parent session level.
 - **No nesting** — Sub-agents cannot have their own sub-agents. Only one level of delegation is supported.
 - **No custom tools** — Agents that use custom tools (Python-based tools defined in the Tools Builder) cannot be used as sub-agents. This is an SDK limitation.
 - **No tool exclusions** — Agents that use the "excluded built-in tools" feature cannot be used as sub-agents. The SDK only supports tool whitelists, not blacklists.

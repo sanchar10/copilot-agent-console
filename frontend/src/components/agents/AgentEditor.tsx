@@ -290,6 +290,8 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 setBuiltinTools(builtin);
                 setExcludedBuiltinTools(excluded);
               }}
+              disabled={selectedSubAgents.length > 0}
+              disabledReason={selectedSubAgents.length > 0 ? 'Tools cannot be used with sub-agents (CLI limitation)' : undefined}
             />
           </section>
 
@@ -339,6 +341,12 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                   availableAgents={eligibleSubAgents}
                   selectedIds={selectedSubAgents}
                   onSelectionChange={setSelectedSubAgents}
+                  disabled={selectedTools.length > 0 || builtinTools.length > 0 || excludedBuiltinTools.length > 0}
+                  disabledReason={
+                    (selectedTools.length > 0 || builtinTools.length > 0 || excludedBuiltinTools.length > 0)
+                      ? 'Sub-agents cannot be used with tools (CLI limitation)'
+                      : undefined
+                  }
                 />
                 {/* Show warning for ineligible sub-agents still selected */}
                 {selectedSubAgents.filter(id => !eligibleSubAgents.some(a => a.id === id)).length > 0 && (

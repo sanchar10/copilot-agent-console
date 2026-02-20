@@ -290,6 +290,7 @@ Main agent runs, delegates to sub-agents as needed
 ## Limitations & Future Considerations
 
 ### Current Limitations
+- **Tools and sub-agents are mutually exclusive** — CLI bug: when `cwd` + `tools`/`available_tools` are both present, `custom_agents` are silently dropped from the system prompt. The UI enforces mutual exclusion — if any tools are selected, sub-agents are disabled and vice versa. Sub-agents themselves can have tools/MCP; only the parent session level is affected.
 - **One level only** — no agent → sub-agent → sub-sub-agent chains
 - **No custom tools on sub-agents** — SDK limitation
 - **No tool exclusions on sub-agents** — SDK only supports whitelists
@@ -301,3 +302,17 @@ Main agent runs, delegates to sub-agents as needed
 - **Custom tool support** — if SDK adds tool handler attachment per agent
 - **Agent marketplace** — shareable agent templates with sub-agent compositions
 - **Auto-composition** — suggest sub-agents based on the main agent's prompt
+
+
+
+  ┌──────────────────┬────────────────────────┐
+  │ Config           │ custom_agents visible? │
+  ├──────────────────┼────────────────────────┤
+  │ no-cwd, no-tools │ ✅ Yes                 │
+  ├──────────────────┼────────────────────────┤
+  │ cwd, no-tools    │ ✅ Yes                 │
+  ├──────────────────┼────────────────────────┤
+  │ no-cwd, 1-tool   │ ✅ Yes                 │
+  ├──────────────────┼────────────────────────┤
+  │ cwd + 1-tool     │ ❌ No                  │
+  └──────────────────┴────────────────────────┘
