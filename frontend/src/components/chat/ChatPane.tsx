@@ -253,17 +253,16 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
               <div className="flex flex-col items-center justify-center h-full gap-4">
                 <p className="text-gray-400">Start a conversation...</p>
                 {starterPrompts.length > 0 && (
-                  <div className="w-full max-w-xl space-y-2">
+                  <div className="w-full max-w-4xl mx-auto space-y-2 px-4">
                     {starterPrompts.map((sp, idx) => (
                       <button
                         key={idx}
                         onClick={() => setPromptToSend(sp.prompt)}
                         title={sp.prompt}
-                        className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors group"
+                        className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors"
                       >
-                        <span className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</span>
-                        <span className="text-gray-400 dark:text-gray-500 mx-2">—</span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</span>
+                        <div className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</div>
                       </button>
                     ))}
                   </div>
@@ -448,7 +447,7 @@ export function ChatPane() {
                 <p className="text-sm mt-1 text-gray-400 dark:text-gray-500">Type a message to start a new session</p>
               </div>
               {newSessionStarterPrompts.length > 0 && (
-                <div className="w-full max-w-xl space-y-2">
+                <div className="w-full max-w-4xl mx-auto space-y-2 px-4">
                   {newSessionStarterPrompts.map((sp, idx) => (
                     <button
                       key={idx}
@@ -456,9 +455,8 @@ export function ChatPane() {
                       title={sp.prompt}
                       className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors"
                     >
-                      <span className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</span>
-                      <span className="text-gray-400 dark:text-gray-500 mx-2">—</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</span>
+                      <div className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</div>
                     </button>
                   ))}
                 </div>
