@@ -353,3 +353,33 @@ class TestSessionServiceUpdate:
             # Cleanup
             del copilot._session_clients["s1"]
         asyncio.run(_run())
+
+    def test_sub_agents_change_destroys_active_client(self, monkeypatch, tmp_path):
+        async def _run():
+            svc, copilot, session = self._setup(monkeypatch, tmp_path)
+            copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
+
+            from copilot_agent_console.app.models.session import SessionUpdate
+            await svc.update_session("s1", SessionUpdate(sub_agents=["some-agent"]))
+
+            assert not copilot.is_session_active("s1")
+        asyncio.run(_run())
+
+    def test_same_sub_agents_does_not_destroy_client(self, monkeypatch, tmp_path):
+        async def _run():
+            svc, copilot, session = self._setup(monkeypatch, tmp_path)
+            # Set initial sub_agents
+            session.sub_agents = ["agent-a"]
+            from copilot_agent_console.app.services.storage_service import storage_service
+            storage_service.save_session(session)
+
+            copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
+
+            from copilot_agent_console.app.models.session import SessionUpdate
+            await svc.update_session("s1", SessionUpdate(sub_agents=["agent-a"]))
+
+            assert copilot.is_session_active("s1")
+
+            # Cleanup
+            del copilot._session_clients["s1"]
+        asyncio.run(_run())

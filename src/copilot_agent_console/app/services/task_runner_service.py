@@ -17,6 +17,7 @@ from copilot_agent_console.app.services.response_buffer import ResponseBuffer, R
 from copilot_agent_console.app.services.task_run_storage_service import task_run_storage_service
 from copilot_agent_console.app.services.session_service import session_service
 from copilot_agent_console.app.services.mcp_service import mcp_service
+from copilot_agent_console.app.services.agent_storage_service import agent_storage_service
 from copilot_agent_console.app.services.tools_service import get_tools_service
 from copilot_agent_console.app.services.logging_service import get_logger
 from copilot_agent_console.app.config import DEFAULT_CWD
@@ -117,6 +118,13 @@ class TaskRunnerService:
                         "content": agent.system_message.content,
                     }
 
+                # Resolve sub-agents (Agent Teams)
+                custom_agents_sdk = None
+                if agent.sub_agents:
+                    custom_agents_sdk = agent_storage_service.convert_to_sdk_custom_agents(
+                        agent.sub_agents, mcp_service
+                    )
+
                 # Create buffer for collecting response
                 buffer = await self._buffer_manager.create_buffer(session_id)
 
@@ -134,6 +142,7 @@ class TaskRunnerService:
                         excluded_tools=excluded_tools,
                         system_message=system_message,
                         is_new_session=True,
+                        custom_agents=custom_agents_sdk,
                     ),
                     timeout=max_runtime_minutes * 60,
                 )

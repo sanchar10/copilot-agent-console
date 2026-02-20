@@ -20,6 +20,12 @@ async def list_agents() -> list[Agent]:
     return agent_storage_service.list_agents()
 
 
+@router.get("/eligible-sub-agents", response_model=list[Agent])
+async def get_eligible_sub_agents(exclude: str | None = None) -> list[Agent]:
+    """Get agents eligible to be used as sub-agents."""
+    return agent_storage_service.get_eligible_sub_agents(exclude_agent_id=exclude)
+
+
 @router.get("/{agent_id}", response_model=Agent)
 async def get_agent(agent_id: str) -> Agent:
     """Get an agent definition by ID."""

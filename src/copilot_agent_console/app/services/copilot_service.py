@@ -132,7 +132,7 @@ class SessionClient:
         """Update last activity timestamp."""
         self.last_activity = time.time()
     
-    async def create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None) -> object:
+    async def create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, custom_agents: list[dict] | None = None) -> object:
         """Create a new SDK session.
         
         Args:
@@ -142,6 +142,7 @@ class SessionClient:
             available_tools: Optional list of built-in tool names to whitelist (opt-in)
             excluded_tools: Optional list of built-in tool names to blacklist (opt-out, ignored if available_tools set)
             system_message: Optional system message dict with mode and content
+            custom_agents: Optional list of SDK CustomAgentConfig dicts (Agent Teams)
         """
         await self.start()
         assert self.client is not None
@@ -166,12 +167,15 @@ class SessionClient:
         if system_message:
             session_opts["system_message"] = system_message
         
+        if custom_agents:
+            session_opts["custom_agents"] = custom_agents
+        
         self.session = await self.client.create_session(session_opts)
         self.touch()
-        logger.info(f"[{self.session_id}] Created SDK session with model={model}, mcp_servers={len(mcp_servers or {})}, tools={len(tools or [])}, system_message={'yes' if system_message else 'no'}")
+        logger.info(f"[{self.session_id}] Created SDK session with model={model}, mcp_servers={len(mcp_servers or {})}, tools={len(tools or [])}, system_message={'yes' if system_message else 'no'}, custom_agents={len(custom_agents or [])}")
         return self.session
     
-    async def resume_session(self, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None) -> object | None:
+    async def resume_session(self, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, custom_agents: list[dict] | None = None) -> object | None:
         """Resume an existing SDK session."""
         await self.start()
         assert self.client is not None
@@ -188,7 +192,10 @@ class SessionClient:
                 resume_opts["excluded_tools"] = excluded_tools
             if system_message:
                 resume_opts["system_message"] = system_message
+            if custom_agents:
+                resume_opts["custom_agents"] = custom_agents
             
+            logger.info(f"[{self.session_id}] Resuming SDK session with custom_agents={len(custom_agents or [])}")
             self.session = await self.client.resume_session(self.session_id, resume_opts)
             self.touch()
             logger.info(f"[{self.session_id}] Resumed SDK session with mcp_servers={len(mcp_servers or {})}, tools={len(tools or [])}")
@@ -197,7 +204,7 @@ class SessionClient:
             logger.warning(f"[{self.session_id}] Could not resume session: {e}")
             return None
     
-    async def get_or_create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, is_new_session: bool = False) -> object:
+    async def get_or_create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, is_new_session: bool = False, custom_agents: list[dict] | None = None) -> object:
         """Get existing session or create/resume one."""
         if self.session:
             self.touch()
@@ -206,14 +213,14 @@ class SessionClient:
         # For new sessions, skip resume attempt - we know it doesn't exist in SDK
         if not is_new_session:
             logger.info(f"[{self.session_id}] Attempting to resume existing session")
-            session = await self.resume_session(mcp_servers, tools, available_tools, excluded_tools, system_message)
+            session = await self.resume_session(mcp_servers, tools, available_tools, excluded_tools, system_message, custom_agents)
             if session:
                 return session
         else:
             logger.info(f"[{self.session_id}] New session - skipping resume attempt")
         
         # Create new
-        return await self.create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message)
+        return await self.create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, custom_agents)
 
 
 class CopilotService:
@@ -476,6 +483,7 @@ class CopilotService:
         is_new_session: bool = False,
         mode: str | None = None,
         attachments: list[dict] | None = None,
+        custom_agents: list[dict] | None = None,
     ) -> AsyncGenerator[dict, None]:
         """Send a message and stream the response.
 
@@ -485,7 +493,7 @@ class CopilotService:
 
         # Get or create per-session client
         client = await self.get_session_client(session_id, cwd)
-        session = await client.get_or_create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, is_new_session)
+        session = await client.get_or_create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, is_new_session, custom_agents)
 
         done = asyncio.Event()
         event_queue: asyncio.Queue[dict | None] = asyncio.Queue()
@@ -797,6 +805,7 @@ class CopilotService:
         is_new_session: bool = False,
         mode: str | None = None,
         attachments: list[dict] | None = None,
+        custom_agents: list[dict] | None = None,
     ) -> None:
         """Send a message in a background task that won't be cancelled.
         
@@ -821,6 +830,7 @@ class CopilotService:
                 is_new_session=is_new_session,
                 mode=mode,
                 attachments=attachments,
+                custom_agents=custom_agents,
             ):
                 event_type = evt.get("event")
                 

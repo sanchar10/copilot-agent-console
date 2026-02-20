@@ -170,3 +170,99 @@ class TestAgentEdgeCases:
         resp = client.put(f"/api/agents/{created['id']}", json={"name": "Updated"})
         updated = resp.json()
         assert updated["created_at"] == created["created_at"]
+
+
+class TestSubAgentEligibility:
+    """Test sub-agent eligibility rules via the API."""
+
+    def _make_eligible(self, client, name="Eligible Agent"):
+        """Create an agent that satisfies all sub-agent eligibility rules."""
+        return _create_agent(client, name=name, description="An eligible agent",
+            system_message={"mode": "replace", "content": "You are helpful."},
+            tools={"custom": [], "builtin": []})
+
+    def test_eligible_basic(self, client):
+        self._make_eligible(client)
+        resp = client.get("/api/agents/eligible-sub-agents")
+        assert resp.status_code == 200
+        agents = resp.json()
+        assert len(agents) == 1
+        assert agents[0]["name"] == "Eligible Agent"
+
+    def test_ineligible_no_description(self, client):
+        _create_agent(client, description="",
+            system_message={"mode": "replace", "content": "You are helpful."})
+        resp = client.get("/api/agents/eligible-sub-agents")
+        assert resp.json() == []
+
+    def test_ineligible_no_prompt(self, client):
+        _create_agent(client, description="A test",
+            system_message={"mode": "replace", "content": ""})
+        resp = client.get("/api/agents/eligible-sub-agents")
+        assert resp.json() == []
+
+    def test_ineligible_has_custom_tools(self, client):
+        _create_agent(client, description="A test",
+            system_message={"mode": "replace", "content": "Prompt"},
+            tools={"custom": ["web_search"], "builtin": []})
+        resp = client.get("/api/agents/eligible-sub-agents")
+        assert resp.json() == []
+
+    def test_ineligible_has_excluded_builtin(self, client):
+        _create_agent(client, description="A test",
+            system_message={"mode": "replace", "content": "Prompt"},
+            tools={"custom": [], "builtin": [], "excluded_builtin": ["grep"]})
+        resp = client.get("/api/agents/eligible-sub-agents")
+        assert resp.json() == []
+
+    def test_exclude_self(self, client):
+        agent = self._make_eligible(client)
+        resp = client.get(f"/api/agents/eligible-sub-agents?exclude={agent['id']}")
+        assert resp.json() == []
+
+    def test_ineligible_has_sub_agents(self, client):
+        """Agent with sub_agents of its own is not eligible (no nesting)."""
+        sub = self._make_eligible(client, name="Sub")
+        _create_agent(client, name="Parent", description="A parent",
+            system_message={"mode": "replace", "content": "Prompt"},
+            sub_agents=[sub["id"]])
+        resp = client.get("/api/agents/eligible-sub-agents")
+        agents = resp.json()
+        # Only "Sub" should be eligible, not "Parent"
+        assert len(agents) == 1
+        assert agents[0]["id"] == "sub"
+
+    def test_multiple_eligible(self, client):
+        self._make_eligible(client, name="Agent A")
+        self._make_eligible(client, name="Agent B")
+        resp = client.get("/api/agents/eligible-sub-agents")
+        assert len(resp.json()) == 2
+
+
+class TestSubAgentRoundTrip:
+    """Test that sub_agents field persists correctly."""
+
+    def test_sub_agents_saved_and_loaded(self, client):
+        # Create an eligible sub-agent first
+        sub = _create_agent(client, name="Sub Agent", description="A sub",
+            system_message={"mode": "replace", "content": "You are a sub."})
+        # Create parent with sub-agent
+        parent = _create_agent(client, name="Parent Agent", description="A parent",
+            system_message={"mode": "replace", "content": "You are a parent."},
+            sub_agents=[sub["id"]])
+        loaded = client.get(f"/api/agents/{parent['id']}").json()
+        assert loaded["sub_agents"] == [sub["id"]]
+
+    def test_sub_agents_default_empty(self, client):
+        agent = _create_agent(client)
+        loaded = client.get(f"/api/agents/{agent['id']}").json()
+        assert loaded["sub_agents"] == []
+
+    def test_update_sub_agents(self, client):
+        sub = _create_agent(client, name="Sub", description="A sub",
+            system_message={"mode": "replace", "content": "Sub prompt."})
+        parent = _create_agent(client, name="Parent", description="A parent",
+            system_message={"mode": "replace", "content": "Parent prompt."})
+        resp = client.put(f"/api/agents/{parent['id']}", json={"sub_agents": [sub["id"]]})
+        assert resp.status_code == 200
+        assert resp.json()["sub_agents"] == [sub["id"]]

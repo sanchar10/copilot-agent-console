@@ -13,6 +13,13 @@ function AgentCard({ agent }: { agent: Agent }) {
   const { openTab } = useTabStore();
   const { defaultCwd } = useUIStore();
 
+  // Check if this agent is composable (eligible as a sub-agent)
+  const isComposable = !agent.tools.custom?.length
+    && !agent.tools.excluded_builtin?.length
+    && !agent.sub_agents?.length
+    && !!agent.system_message?.content
+    && !!agent.description;
+
   const handleClick = () => {
     openTab({
       id: tabId.agentDetail(agent.id),
@@ -36,6 +43,7 @@ function AgentCard({ agent }: { agent: Agent }) {
         tools: agent.tools || { custom: [], builtin: [], excluded_builtin: [] },
         systemMessage: agent.system_message?.content ? agent.system_message : null,
         agentId: agent.id,
+        subAgents: agent.sub_agents || [],
       },
     });
   };
@@ -82,6 +90,14 @@ function AgentCard({ agent }: { agent: Agent }) {
       </p>
       <div className="flex items-center gap-2 mt-3 text-xs text-gray-400 dark:text-gray-500">
         <span>{agent.model}</span>
+        {agent.sub_agents && agent.sub_agents.length > 0 && (
+          <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-1.5 py-0.5 rounded font-medium" title="Has sub-agents">
+            👥 {agent.sub_agents.length}
+          </span>
+        )}
+        {isComposable && (
+          <span className="text-gray-300 dark:text-gray-600" title="Composable — can be used as a sub-agent">🧩</span>
+        )}
       </div>
     </button>
   );

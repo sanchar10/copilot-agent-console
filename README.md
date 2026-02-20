@@ -58,6 +58,9 @@ MCP servers can be defined globally (shared with CLI via `~/.copilot/mcp-config.
 ### 🔧 Custom Tools
 Python tools dropped into `~/.copilot-agent-console/tools/` become available to all agents. Each tool is defined with a `TOOL_SPECS` list containing name, description, JSON schema, and handler function. Tools auto-reload when files change — no restart needed. The built-in **Tool Builder** agent can generate custom tools from a natural language description — just describe what the tool should do.
 
+### 🤝 Agent Teams
+Compose agents into teams. A main agent can delegate tasks to specialized sub-agents that run in separate contexts — each with its own prompt, tools, and MCP servers. The main agent automatically decides when to delegate based on the sub-agent's description. See [Agent Teams](docs/MULTI-AGENT.md) for details.
+
 ### 🔄 Smart Ralph AI Runner (Experimental)
 Batch job execution based on the [Ralph Loop pattern](https://ghuntley.com/loop/). A dynamic list of jobs is built collaboratively and handed to Ralph Runner, which runs each one in a fresh agent session — preventing context bloat and isolating workflows.
 
@@ -77,7 +80,7 @@ Then start:
 agentconsole
 ```
 
-> Need more control? See [Manual Installation](docs/INSTALL.md).
+> For manual setup, upgrading, or uninstalling, see **[Manual Installation](docs/INSTALL.md)**.
 
 ### First Things to Try
 
@@ -142,6 +145,7 @@ Custom tools can be created using the built-in **Tool Builder** agent or written
 
 - [Manual Installation](docs/INSTALL.md) — Step-by-step setup, updating, and uninstalling
 - [Custom Tools](docs/CUSTOM-TOOLS.md) — Creating tools with Tool Builder or manually
+- [Agent Teams](docs/MULTI-AGENT.md) — Composing agents with sub-agents
 - [Troubleshooting](docs/TROUBLESHOOTING.md) — Common issues and SDK/CLI compatibility
 - [Contributing](docs/CONTRIBUTING.md) — Development setup, building, testing, and architecture
 

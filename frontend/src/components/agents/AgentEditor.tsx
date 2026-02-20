@@ -9,12 +9,14 @@ import { useTabStore, tabId } from '../../stores/tabStore';
 import { useUIStore } from '../../stores/uiStore';
 import { listMCPServers } from '../../api/mcp';
 import { getTools } from '../../api/tools';
+import { getEligibleSubAgents } from '../../api/agents';
 import { MCPSelector } from '../chat/MCPSelector';
 import { ToolsSelector } from '../chat/ToolsSelector';
+import { SubAgentSelector } from '../chat/SubAgentSelector';
 import { SystemPromptEditor } from '../common/SystemPromptEditor';
 import { EmojiPicker } from '../common/EmojiPicker';
 import { ConfirmModal } from '../common/ConfirmModal';
-import type { CreateAgentRequest, UpdateAgentRequest, SystemMessage } from '../../types/agent';
+import type { CreateAgentRequest, UpdateAgentRequest, SystemMessage, Agent } from '../../types/agent';
 import type { MCPServer, MCPServerSelections } from '../../types/mcp';
 import type { ToolInfo, ToolSelections } from '../../api/tools';
 
@@ -61,6 +63,8 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedSubAgents, setSelectedSubAgents] = useState<string[]>([]);
+  const [eligibleSubAgents, setEligibleSubAgents] = useState<Agent[]>([]);
 
   // Load existing agent data
   useEffect(() => {
@@ -75,6 +79,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
       setBuiltinTools(existingAgent.tools.builtin || []);
       setExcludedBuiltinTools(existingAgent.tools.excluded_builtin || []);
       setSelectedMcpServers(existingAgent.mcp_servers || []);
+      setSelectedSubAgents(existingAgent.sub_agents || []);
     }
   }, [existingAgent, availableTools]);
 
@@ -86,7 +91,11 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
     getTools().then((config) => {
       setAvailableTools(config.tools);
     }).catch(() => {});
-  }, []);
+    // Load eligible sub-agents (exclude self)
+    getEligibleSubAgents(isNew ? undefined : agentId)
+      .then(setEligibleSubAgents)
+      .catch(() => setEligibleSubAgents([]));
+  }, [agentId, isNew]);
 
   // Convert between agent's string[] and selector's Record<string, boolean>
   const mcpSelections: MCPServerSelections = listToSelections(selectedMcpServers, availableMcpServers);
@@ -112,8 +121,9 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
       excluded_builtin: excludedBuiltinTools,
     },
     mcp_servers: selectedMcpServers,
+    sub_agents: selectedSubAgents,
   }), [name, description, icon, model, systemMessage,
-    selectedTools, builtinTools, excludedBuiltinTools, selectedMcpServers]);
+    selectedTools, builtinTools, excludedBuiltinTools, selectedMcpServers, selectedSubAgents]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
@@ -182,7 +192,8 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             )}
             <button
               onClick={handleSave}
-              disabled={saving || !name.trim()}
+              disabled={saving || !name.trim() || selectedSubAgents.some(id => !eligibleSubAgents.some(a => a.id === id))}
+              title={selectedSubAgents.some(id => !eligibleSubAgents.some(a => a.id === id)) ? 'Remove ineligible sub-agents before saving' : undefined}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                 saveStatus === 'success'
                   ? 'bg-green-600 text-white'
@@ -193,13 +204,19 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             >
               {saving ? 'Saving...' : saveStatus === 'success' ? '✓ Saved' : saveStatus === 'error' ? '✗ Failed' : 'Save'}
             </button>
+            <button
+              onClick={() => closeTab(tabId.agentDetail(agentId))}
+              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 border border-gray-300/60 dark:border-gray-600/60 hover:bg-gray-50/60 dark:hover:bg-gray-800/30 rounded-lg transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
 
         {/* Form */}
         <div className="space-y-6">
           {/* Basic Info */}
-          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4">
+          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4 relative z-40">
             <h2 className="font-semibold text-gray-700 dark:text-gray-300">Basic Info</h2>
             <div className="grid grid-cols-[1fr_80px] gap-4">
               <div>
@@ -249,7 +266,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           />
 
           {/* Tools */}
-          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4">
+          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4 relative z-30">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-gray-700 dark:text-gray-300">Tools</h2>
               <span className="text-xs text-gray-400 dark:text-gray-500">
@@ -279,11 +296,42 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 setBuiltinTools(builtin);
                 setExcludedBuiltinTools(excluded);
               }}
+              disabled={selectedSubAgents.length > 0}
+              disabledReason={selectedSubAgents.length > 0 ? 'Tools cannot be used with sub-agents (SDK limitation)' : undefined}
             />
+            {selectedTools.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {selectedTools.map((t) => (
+                  <span key={t} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">
+                    ⚙️ {t}
+                  </span>
+                ))}
+              </div>
+            )}
+            {builtinTools.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                <span className="text-[10px] text-gray-400 dark:text-gray-500 self-center mr-1">include:</span>
+                {builtinTools.map((t) => (
+                  <span key={t} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200/60 dark:border-green-700/40">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
+            {excludedBuiltinTools.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                <span className="text-[10px] text-gray-400 dark:text-gray-500 self-center mr-1">exclude:</span>
+                {excludedBuiltinTools.map((t) => (
+                  <span key={t} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200/60 dark:border-red-700/40">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* MCP Servers */}
-          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4">
+          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4 relative z-20">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-gray-700 dark:text-gray-300">MCP Servers</h2>
               <span className="text-xs text-gray-400 dark:text-gray-500">
@@ -296,15 +344,78 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
               Select which MCP servers this agent should use.
             </p>
             {availableMcpServers.length > 0 ? (
-              <MCPSelector
-                availableServers={availableMcpServers}
-                selections={mcpSelections}
-                onSelectionsChange={handleMcpChange}
-              />
+              <>
+                <MCPSelector
+                  availableServers={availableMcpServers}
+                  selections={mcpSelections}
+                  onSelectionsChange={handleMcpChange}
+                />
+                {selectedMcpServers.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {selectedMcpServers.map((s) => (
+                      <span key={s} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-700/40">
+                        📡 {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
             ) : (
               <p className="text-sm text-gray-400 dark:text-gray-500 italic">
                 No MCP servers configured. Add global servers in ~/.copilot/mcp-config.json
                 or agent-only servers in ~/.copilot-agent-console/mcp-config.json
+              </p>
+            )}
+          </section>
+
+          {/* Sub-Agents (Agent Teams) */}
+          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4 relative z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-gray-700 dark:text-gray-300">👥 Sub-Agents</h2>
+              <span className="text-xs text-gray-400 dark:text-gray-500">
+                {selectedSubAgents.length === 0
+                  ? 'None selected'
+                  : `${selectedSubAgents.length} selected`}
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Select agents to compose into a team. The main agent can delegate tasks to sub-agents automatically.
+            </p>
+            {eligibleSubAgents.length > 0 ? (
+              <>
+                <SubAgentSelector
+                  availableAgents={eligibleSubAgents}
+                  selectedIds={selectedSubAgents}
+                  onSelectionChange={setSelectedSubAgents}
+                  disabled={selectedTools.length > 0 || builtinTools.length > 0 || excludedBuiltinTools.length > 0}
+                  disabledReason={
+                    (selectedTools.length > 0 || builtinTools.length > 0 || excludedBuiltinTools.length > 0)
+                      ? 'Sub-agents cannot be used with tools (SDK limitation)'
+                      : undefined
+                  }
+                />
+                {selectedSubAgents.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {selectedSubAgents.map((id) => {
+                      const agent = eligibleSubAgents.find(a => a.id === id);
+                      return (
+                        <span key={id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border border-purple-200/60 dark:border-purple-700/40">
+                          {agent?.icon || '🤖'} {agent?.name || id}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                {/* Show warning for ineligible sub-agents still selected */}
+                {selectedSubAgents.filter(id => !eligibleSubAgents.some(a => a.id === id)).length > 0 && (
+                  <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+                    ⚠️ {selectedSubAgents.filter(id => !eligibleSubAgents.some(a => a.id === id)).length} selected sub-agent(s) are no longer eligible. Remove them before saving.
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+                No eligible agents available. Agents need a prompt and description, and cannot have custom tools or excluded built-in tools.
               </p>
             )}
           </section>

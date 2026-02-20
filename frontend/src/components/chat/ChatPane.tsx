@@ -15,7 +15,8 @@ import { ScheduleManager } from '../schedules/ScheduleManager';
 import { TaskBoard } from '../taskboard/TaskBoard';
 import { TaskRunDetail } from '../taskboard/TaskRunDetail';
 import { updateSession, getSession } from '../../api/sessions';
-import type { AgentTools, SystemMessage } from '../../types/agent';
+import { getEligibleSubAgents } from '../../api/agents';
+import type { AgentTools, SystemMessage, Agent } from '../../types/agent';
 
 /**
  * Per-session tab content — owns its own scroll position, header, messages, and input.
@@ -32,6 +33,7 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
   const isProgrammaticScrollRef = useRef(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [cwdError, setCwdError] = useState<string | null>(null);
+  const [eligibleSubAgents, setEligibleSubAgents] = useState<Agent[]>([]);
 
   const session = sessions.find((s) => s.session_id === sessionId);
   const rawMessages = messagesPerSession[sessionId];
@@ -152,6 +154,26 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
     }
   }, [sessionId, sessions, setSessions]);
 
+  const handleSubAgentSelectionsChange = useCallback(async (subAgents: string[]) => {
+    try {
+      await updateSession(sessionId, { sub_agents: subAgents });
+      setSessions(sessions.map(s =>
+        s.session_id === sessionId ? { ...s, sub_agents: subAgents } : s
+      ));
+      clearReadySession(sessionId);
+    } catch (error) {
+      console.error('Failed to update sub-agents:', error);
+    }
+  }, [sessionId, sessions, setSessions]);
+
+  // Fetch eligible sub-agents (exclude session's own agent)
+  useEffect(() => {
+    const agentId = session?.agent_id;
+    getEligibleSubAgents(agentId || undefined)
+      .then(setEligibleSubAgents)
+      .catch(() => setEligibleSubAgents([]));
+  }, [session?.agent_id]);
+
   const handleRelatedSessionClick= useCallback(async (targetSessionId: string) => {
     const { messagesPerSession, setMessages } = useChatStore.getState();
     const targetTabId = `session:${targetSessionId}`;
@@ -197,6 +219,9 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
         onMcpSelectionsChange={handleMcpSelectionsChange}
         onToolSelectionsChange={handleToolSelectionsChange}
         onSystemMessageChange={handleSystemMessageChange}
+        eligibleSubAgents={eligibleSubAgents}
+        subAgentSelections={session?.sub_agents || []}
+        onSubAgentSelectionsChange={handleSubAgentSelectionsChange}
         cwdError={cwdError}
       />
 
@@ -278,6 +303,21 @@ export function ChatPane() {
     updateNewSessionSettings({ systemMessage });
   }, [updateNewSessionSettings]);
 
+  const handleNewSessionSubAgentChange = useCallback((subAgents: string[]) => {
+    updateNewSessionSettings({ subAgents });
+  }, [updateNewSessionSettings]);
+
+  // Fetch eligible sub-agents for new session view
+  const [newSessionEligibleSubAgents, setNewSessionEligibleSubAgents] = useState<Agent[]>([]);
+  useEffect(() => {
+    if (isNewSession) {
+      const agentId = newSessionSettings?.agentId;
+      getEligibleSubAgents(agentId || undefined)
+        .then(setNewSessionEligibleSubAgents)
+        .catch(() => setNewSessionEligibleSubAgents([]));
+    }
+  }, [isNewSession, newSessionSettings?.agentId]);
+
   const handleNewSessionRelatedClick = useCallback(async (targetSessionId: string) => {
     const { messagesPerSession, setMessages } = useChatStore.getState();
     const targetTabId = `session:${targetSessionId}`;
@@ -353,6 +393,9 @@ export function ChatPane() {
             onMcpSelectionsChange={handleNewSessionMcpChange}
             onToolSelectionsChange={handleNewSessionToolsChange}
             onSystemMessageChange={handleNewSessionSystemMessageChange}
+            eligibleSubAgents={newSessionEligibleSubAgents}
+            subAgentSelections={newSessionSettings.subAgents || []}
+            onSubAgentSelectionsChange={handleNewSessionSubAgentChange}
           />
           <div className="flex-1 overflow-y-auto p-4">
             <div className="flex items-center justify-center h-full">

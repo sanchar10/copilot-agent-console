@@ -30,6 +30,10 @@ class SessionBase(BaseModel):
         description="Whether the user explicitly set the session name. "
         "If False, the name will be auto-updated from SDK summary after first response."
     )
+    sub_agents: list[str] = Field(
+        default_factory=list,
+        description="List of sub-agent IDs enabled for this session (Agent Teams)"
+    )
     # Reference fields (informational only, no behavioral impact)
     agent_id: str | None = Field(default=None, description="Agent ID this session was created from (reference only)")
     trigger: str | None = Field(default=None, description="How this session was triggered: 'manual', 'schedule', or null for regular chat")
@@ -44,6 +48,7 @@ class SessionCreate(BaseModel):
     mcp_servers: list[str] | None = None
     tools: AgentTools | None = None
     system_message: dict | None = None
+    sub_agents: list[str] | None = None
     agent_id: str | None = None
     trigger: str | None = None
 
@@ -56,6 +61,7 @@ class SessionUpdate(BaseModel):
     mcp_servers: list[str] | None = None
     tools: AgentTools | None = None
     system_message: dict | None = None
+    sub_agents: list[str] | None = None
 
 
 class Session(SessionBase):

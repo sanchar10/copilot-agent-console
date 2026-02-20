@@ -13,6 +13,7 @@ from copilot_agent_console.app.config import SESSIONS_DIR
 from copilot_agent_console.app.models.message import MessageCreate
 from copilot_agent_console.app.models.session import Session, SessionCreate, SessionUpdate, SessionWithMessages
 from copilot_agent_console.app.services.copilot_service import copilot_service
+from copilot_agent_console.app.services.agent_storage_service import agent_storage_service
 from copilot_agent_console.app.services.mcp_service import mcp_service
 from copilot_agent_console.app.services.response_buffer import response_buffer_manager, ResponseStatus
 from copilot_agent_console.app.services.session_service import session_service
@@ -255,7 +256,10 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
     logger.info(f"[SSE] Loading {len(mcp_servers_sdk)} MCP servers for session {session_id}")
     
     # Get local/custom tools for this session
-    tools_sdk = tools_service.get_sdk_tools(session.tools.custom if session.tools.custom else None)
+    # Only load custom tools if the user explicitly selected some.
+    # Passing tools=[] when none selected avoids a CLI bug where
+    # tools + workingDirectory causes custom_agents to be silently dropped.
+    tools_sdk = tools_service.get_sdk_tools(session.tools.custom) if session.tools.custom else []
     logger.info(f"[SSE] Loading {len(tools_sdk)} custom tools for session {session_id}")
     
     # Get built-in tool whitelist/blacklist
@@ -266,6 +270,23 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
     system_message = None
     if session.system_message and session.system_message.get("content"):
         system_message = {"mode": session.system_message.get("mode", "replace"), "content": session.system_message["content"]}
+
+    # Resolve sub-agents (Agent Teams)
+    custom_agents_sdk = None
+    if session.sub_agents:
+        # Validate sub-agents are still eligible
+        errors = agent_storage_service.validate_sub_agents(
+            session.sub_agents, exclude_agent_id=session.agent_id
+        )
+        if errors:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Sub-agent validation failed: {'; '.join(errors)}"
+            )
+        custom_agents_sdk = agent_storage_service.convert_to_sdk_custom_agents(
+            session.sub_agents, mcp_service
+        )
+        logger.info(f"[SSE] Resolved {len(custom_agents_sdk)} sub-agents for session {session_id}")
 
     # Add user message to history
     session_service.add_user_message(session_id, request.content)
@@ -292,6 +313,7 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
                 is_new_session=request.is_new_session,
                 mode=request.mode,
                 attachments=[{"type": a.type, "path": a.path, **({"displayName": a.displayName} if a.displayName else {})} for a in request.attachments] if request.attachments else None,
+                custom_agents=custom_agents_sdk,
             )
             logger.info(f"[Background] Agent completed for session {session_id}")
             
