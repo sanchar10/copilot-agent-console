@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import { useUIStore } from '../../stores/uiStore';
 import { updateSettings } from '../../api/settings';
+import { apiClient } from '../../api/client';
 import { useTheme } from '../../hooks/useTheme';
 
 export function SettingsModal() {
@@ -134,7 +136,116 @@ export function SettingsModal() {
             <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
           </div>
         )}
+
+        {/* Mobile Companion */}
+        <MobileCompanionSection />
       </div>
     </Modal>
+  );
+}
+
+function MobileCompanionSection() {
+  const [apiToken, setApiToken] = useState<string | null>(null);
+  const [tunnelUrl, setTunnelUrl] = useState('');
+  const [showToken, setShowToken] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    apiClient.get<{ api_token: string }>('/settings/api-token')
+      .then(data => setApiToken(data.api_token))
+      .catch(() => {});
+  }, []);
+
+  const handleRegenerate = async () => {
+    try {
+      const data = await apiClient.post<{ api_token: string }>('/settings/api-token/regenerate');
+      setApiToken(data.api_token);
+    } catch (err) {
+      console.error('Failed to regenerate token:', err);
+    }
+  };
+
+  const qrValue = tunnelUrl && apiToken
+    ? `${tunnelUrl.replace(/\/$/, '')}/mobile?token=${encodeURIComponent(apiToken)}&baseUrl=${encodeURIComponent(tunnelUrl)}`
+    : null;
+
+  const handleCopy = () => {
+    if (apiToken) {
+      navigator.clipboard.writeText(apiToken);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4">
+      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+        📱 Mobile Companion
+      </h3>
+
+      <div className="space-y-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+            Tunnel URL
+          </label>
+          <input
+            type="url"
+            value={tunnelUrl}
+            onChange={(e) => setTunnelUrl(e.target.value)}
+            placeholder="https://your-id.devtunnels.ms"
+            className="w-full px-3 py-1.5 text-sm border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+          />
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            Run <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 py-0.5 rounded">devtunnel host -p 8765 --allow-anonymous</code> to create a tunnel
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+            API Token
+          </label>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-xs bg-gray-100 dark:bg-[#1e1e2e] px-2 py-1.5 rounded font-mono truncate">
+              {showToken ? apiToken : '••••••••••••••••'}
+            </code>
+            <button
+              onClick={() => setShowToken(!showToken)}
+              className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            >
+              {showToken ? 'Hide' : 'Show'}
+            </button>
+            <button
+              onClick={handleCopy}
+              className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400"
+            >
+              {copied ? '✓' : 'Copy'}
+            </button>
+          </div>
+          <button
+            onClick={handleRegenerate}
+            className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 mt-1"
+          >
+            Regenerate token
+          </button>
+        </div>
+
+        {qrValue && (
+          <div className="flex flex-col items-center pt-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              Scan with your phone to connect:
+            </p>
+            <div className="bg-white p-3 rounded-lg">
+              <QRCodeSVG value={qrValue} size={180} />
+            </div>
+          </div>
+        )}
+
+        {!qrValue && (
+          <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-2">
+            Enter your tunnel URL above to generate a QR code
+          </p>
+        )}
+      </div>
+    </div>
   );
 }

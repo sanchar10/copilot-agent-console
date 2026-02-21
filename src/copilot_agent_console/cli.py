@@ -76,6 +76,11 @@ def main():
         help="Prevent Windows from sleeping while the app is running (useful for scheduled tasks)"
     )
     parser.add_argument(
+        "--expose",
+        action="store_true",
+        help="Bind to 0.0.0.0 and allow remote access (for mobile companion via tunnel)"
+    )
+    parser.add_argument(
         "--version", "-v",
         action="store_true",
         help="Show version and exit"
@@ -126,13 +131,21 @@ def main():
         else:
             print("  ⚠️  --no-sleep is only supported on Windows")
 
+    # Expose mode: bind to 0.0.0.0 for remote access
+    host = args.host
+    if args.expose:
+        host = "0.0.0.0"
+        os.environ["COPILOT_EXPOSE"] = "1"
+        print("  📱 Expose mode enabled — accessible from other devices")
+        print("     Use a tunnel (e.g., devtunnel) to access from phone")
+
     print("\n  Press Ctrl+C to stop the server.\n")
     
     # Start server
     import uvicorn
     uvicorn.run(
         "copilot_agent_console.app.main:app",
-        host=args.host,
+        host=host,
         port=args.port,
         log_level="info",
     )

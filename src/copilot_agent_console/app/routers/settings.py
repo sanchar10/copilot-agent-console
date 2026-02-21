@@ -2,9 +2,14 @@
 
 import os
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from copilot_agent_console.app.middleware.auth import (
+    _is_localhost,
+    generate_api_token,
+    get_or_create_api_token,
+)
 from copilot_agent_console.app.services.storage_service import storage_service
 
 router = APIRouter(prefix="/settings", tags=["settings"])
@@ -76,3 +81,22 @@ async def check_for_update() -> dict:
         }
     except Exception:
         return {"update_available": False, "current_version": __version__}
+
+
+@router.get("/api-token")
+async def get_api_token(request: Request) -> dict:
+    """Get the current API token. Only accessible from localhost."""
+    if not _is_localhost(request):
+        raise HTTPException(status_code=403, detail="Token retrieval only allowed from localhost")
+    token = get_or_create_api_token()
+    return {"api_token": token}
+
+
+@router.post("/api-token/regenerate")
+async def regenerate_api_token(request: Request) -> dict:
+    """Regenerate the API token. Only accessible from localhost."""
+    if not _is_localhost(request):
+        raise HTTPException(status_code=403, detail="Token regeneration only allowed from localhost")
+    new_token = generate_api_token()
+    storage_service.update_settings({"api_token": new_token})
+    return {"api_token": new_token}

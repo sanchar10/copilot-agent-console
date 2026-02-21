@@ -18,6 +18,7 @@ from copilot_agent_console.app.services.response_buffer import response_buffer_m
 from copilot_agent_console.app.services.task_runner_service import TaskRunnerService
 from copilot_agent_console.app.services.scheduler_service import SchedulerService
 from copilot_agent_console.app.services.logging_service import setup_logging, get_logger
+from copilot_agent_console.app.middleware.auth import TokenAuthMiddleware
 
 # Configure logging with session-aware file logging (DEBUG level for comprehensive event logging)
 setup_logging(level=logging.DEBUG)
@@ -83,17 +84,26 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration for frontend dev server
+# CORS configuration — allow tunnel origins when running in expose mode
+_cors_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+if os.environ.get("COPILOT_EXPOSE") == "1":
+    # In expose mode, allow any origin (tunnel URLs are unpredictable)
+    # Auth middleware protects API routes via bearer token
+    _cors_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Token-based auth for non-localhost API access (mobile companion via tunnel)
+app.add_middleware(TokenAuthMiddleware)
 
 # Include routers
 app.include_router(agents.router, prefix=API_PREFIX)
