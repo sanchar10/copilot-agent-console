@@ -129,7 +129,7 @@ class ResponseBufferManager:
                     to_remove.append(session_id)
         
         for session_id in to_remove:
-            logger.info(f"[{session_id}] Removing stale buffer")
+            logger.debug(f"[{session_id}] Removing stale buffer")
             await self.remove_buffer(session_id)
     
     async def create_buffer(self, session_id: str) -> ResponseBuffer:

@@ -601,7 +601,7 @@ class CopilotService:
                 if full_response:
                     event_queue.put_nowait({"event": "turn_done", "data": {}})
                 full_response.clear()
-                logger.info(f"[{session_id}] assistant.message — turn boundary emitted")
+                logger.debug(f"[{session_id}] assistant.message — turn boundary emitted")
 
             elif event_type == "assistant.reasoning_delta":
                 text = _get_text(data)
@@ -788,7 +788,7 @@ class CopilotService:
                 yield item
 
         complete_response = "".join(full_response)
-        logger.info(f"[{session_id}] Agent response: {complete_response}")
+        logger.debug(f"[{session_id}] Agent response: {complete_response}")
 
     async def send_message_background(
         self,
