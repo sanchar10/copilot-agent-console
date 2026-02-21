@@ -98,14 +98,24 @@ async function main() {
 
   // Check for --no-sleep flag
   const noSleep = process.argv.includes('--no-sleep');
-  const env = noSleep ? { ...process.env, COPILOT_NO_SLEEP: '1' } : process.env;
+  const env = { ...process.env };
   if (noSleep) {
+    env.COPILOT_NO_SLEEP = '1';
     console.log('\x1b[33m🔋 Sleep prevention enabled (--no-sleep)\x1b[0m');
+  }
+
+  // Check for --expose flag (bind to 0.0.0.0 for mobile companion via tunnel)
+  const expose = process.argv.includes('--expose');
+  const backendHost = expose ? '0.0.0.0' : '127.0.0.1';
+  if (expose) {
+    env.COPILOT_EXPOSE = '1';
+    console.log('\x1b[33m📱 Expose mode enabled — backend bound to 0.0.0.0\x1b[0m');
+    console.log('\x1b[33m   Use a tunnel (e.g., devtunnel host -p 8765) for phone access\x1b[0m');
   }
 
   // Build commands that work on Windows
   const isWin = process.platform === 'win32';
-  const backendCmd = `"python -m uvicorn ${BACKEND_MODULE}:app --reload --port 8765"`;
+  const backendCmd = `"python -m uvicorn ${BACKEND_MODULE}:app --reload --host ${backendHost} --port 8765"`;
   const frontendCmd = `"npm --prefix ${FRONTEND} run dev"`;
 
   const proc = spawn('npx', [
