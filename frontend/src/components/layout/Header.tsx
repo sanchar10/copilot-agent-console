@@ -266,8 +266,7 @@ export function Header({
                 excludedBuiltinTools={toolSelections.excluded_builtin}
                 onBuiltinToolsChange={isNewSession ? (builtin, excluded) => onToolSelectionsChange({ ...toolSelections, builtin, excluded_builtin: excluded }) : undefined}
                 readOnly={hasActiveResponse}
-                disabled={subAgentSelections.length > 0}
-                disabledReason={subAgentSelections.length > 0 ? 'Tools cannot be used with sub-agents (SDK limitation)' : undefined}
+                subAgentsActive={subAgentSelections.length > 0}
               />
             )}
 

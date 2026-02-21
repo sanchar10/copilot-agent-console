@@ -299,8 +299,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 setBuiltinTools(builtin);
                 setExcludedBuiltinTools(excluded);
               }}
-              disabled={selectedSubAgents.length > 0}
-              disabledReason={selectedSubAgents.length > 0 ? 'Tools cannot be used with sub-agents (SDK limitation)' : undefined}
+              subAgentsActive={selectedSubAgents.length > 0}
             />
             {selectedTools.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -418,7 +417,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
               </>
             ) : (
               <p className="text-sm text-gray-400 dark:text-gray-500 italic">
-                No eligible agents available. Agents need a prompt and description, and cannot have custom tools or excluded built-in tools.
+                No eligible agents available. Agents need a prompt and description, and cannot have custom tools or sub-agents of their own.
               </p>
             )}
           </section>

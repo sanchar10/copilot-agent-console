@@ -15,6 +15,8 @@ interface ToolsSelectorProps {
   disabledReason?: string;
   /** When true, dropdown opens for viewing but all controls inside are disabled */
   readOnly?: boolean;
+  /** When true, sub-agents are active — custom tools + "Only" mode disabled, "All"/"Exclude" still available */
+  subAgentsActive?: boolean;
 }
 
 export function ToolsSelector({
@@ -27,6 +29,7 @@ export function ToolsSelector({
   disabled = false,
   disabledReason,
   readOnly = false,
+  subAgentsActive = false,
 }: ToolsSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -179,8 +182,11 @@ export function ToolsSelector({
           {availableTools.length > 0 && (
             <>
               <div className="flex items-center justify-between px-3 py-2 border-b border-white/40 dark:border-gray-700">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Custom Tools</span>
-                {!readOnly && (
+                <span className={`text-xs font-medium ${subAgentsActive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`}>
+                  Custom Tools
+                  {subAgentsActive && <span className="text-[10px] text-gray-400 ml-1">(disabled with sub-agents)</span>}
+                </span>
+                {!readOnly && !subAgentsActive && (
                 <div className="flex gap-2">
                   <button onClick={handleSelectAll} className="text-[10px] text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 font-medium">All</button>
                   <span className="text-gray-300 dark:text-gray-600">|</span>
@@ -192,13 +198,13 @@ export function ToolsSelector({
                 {availableTools.map((tool) => {
                   const isEnabled = selections[tool.name] !== false;
                   return (
-                    <label key={tool.name} className={`flex items-start gap-2 px-3 py-1.5 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-white/40 dark:hover:bg-gray-700/40 cursor-pointer'}`}>
+                    <label key={tool.name} className={`flex items-start gap-2 px-3 py-1.5 ${(readOnly || subAgentsActive) ? 'opacity-60 cursor-default' : 'hover:bg-white/40 dark:hover:bg-gray-700/40 cursor-pointer'}`}>
                       <input
                         type="checkbox"
                         checked={isEnabled}
                         onChange={() => handleToggle(tool.name)}
                         className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-                        disabled={readOnly}
+                        disabled={readOnly || subAgentsActive}
                       />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{tool.name}</div>
@@ -223,8 +229,8 @@ export function ToolsSelector({
                   <input type="radio" checked={draftMode === 'all'} onChange={() => handleBuiltinModeChange('all')} className="h-3 w-3" disabled={!onBuiltinToolsChange || readOnly} />
                   All
                 </label>
-                <label className={`flex items-center gap-1 text-[11px] ${!onBuiltinToolsChange ? 'opacity-50' : ''}`}>
-                  <input type="radio" checked={draftMode === 'include'} onChange={() => handleBuiltinModeChange('include')} className="h-3 w-3" disabled={!onBuiltinToolsChange || readOnly} />
+                <label className={`flex items-center gap-1 text-[11px] ${(!onBuiltinToolsChange || subAgentsActive) ? 'opacity-50' : ''}`} title={subAgentsActive ? 'Include mode not available with sub-agents' : ''}>
+                  <input type="radio" checked={draftMode === 'include'} onChange={() => handleBuiltinModeChange('include')} className="h-3 w-3" disabled={!onBuiltinToolsChange || readOnly || subAgentsActive} />
                   Only
                 </label>
                 <label className={`flex items-center gap-1 text-[11px] ${!onBuiltinToolsChange ? 'opacity-50' : ''}`}>
