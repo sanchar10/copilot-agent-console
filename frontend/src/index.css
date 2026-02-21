@@ -61,6 +61,12 @@ html.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #5a5a70;
 }
 
+/* Dark scrollbar for textareas */
+html.dark textarea {
+  color-scheme: dark;
+  scrollbar-color: #4a4a5e #2a2a3c;
+}
+
 /* Mermaid fullscreen: constrain SVG to fit within the modal viewport */
 .mermaid-fullscreen svg {
   width: auto !important;
