@@ -476,7 +476,7 @@ export function InputBox({ sessionId, promptToSend, onPromptSent }: InputBoxProp
             </Button>
           ) : null}
           <Button
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             disabled={(!input.trim() && attachments.length === 0 && pendingFiles.length === 0) || isDisabled}
             className="h-12 w-12 p-0"
           >
