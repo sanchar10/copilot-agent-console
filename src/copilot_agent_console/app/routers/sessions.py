@@ -212,6 +212,13 @@ async def enqueue_message(session_id: str, request: MessageCreate) -> dict:
         return result
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))
+    except Exception as e:
+        error_msg = str(e)
+        if "Session not found" in error_msg:
+            logger.warning(f"[Enqueue] SDK session gone for {session_id}, cleaning up buffer")
+            await response_buffer_manager.remove_buffer(session_id)
+            raise HTTPException(status_code=410, detail="Session expired, please send a new message")
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @router.post("/{session_id}/abort")
@@ -227,7 +234,17 @@ async def abort_session(session_id: str) -> dict:
         result = await copilot_service.abort_session(session_id)
         return result
     except ValueError as e:
+        # No active SDK session — clean up the buffer if it's stuck
+        logger.warning(f"[Abort] No SDK session for {session_id}, cleaning up buffer")
+        await response_buffer_manager.remove_buffer(session_id)
         raise HTTPException(status_code=409, detail=str(e))
+    except Exception as e:
+        error_msg = str(e)
+        if "Session not found" in error_msg:
+            logger.warning(f"[Abort] SDK session gone for {session_id}, cleaning up buffer")
+            await response_buffer_manager.remove_buffer(session_id)
+            return {"status": "aborted", "detail": "Session expired, buffer cleaned up"}
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 @router.post("/{session_id}/messages")
