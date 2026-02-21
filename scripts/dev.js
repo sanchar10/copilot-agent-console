@@ -110,13 +110,85 @@ async function main() {
   if (expose) {
     env.COPILOT_EXPOSE = '1';
     console.log('\x1b[33m📱 Expose mode enabled — backend bound to 0.0.0.0\x1b[0m');
-    console.log('\x1b[33m   Use a tunnel (e.g., devtunnel host -p 8765) for phone access\x1b[0m');
   }
 
   // Build commands that work on Windows
   const isWin = process.platform === 'win32';
   const backendCmd = `"python -m uvicorn ${BACKEND_MODULE}:app --reload --host ${backendHost} --port 8765"`;
   const frontendCmd = `"npm --prefix ${FRONTEND} run dev"`;
+
+  // If --expose, also start devtunnel and register the URL with the backend
+  let tunnelProc = null;
+  if (expose) {
+    if (!checkCommand('devtunnel')) {
+      console.error('\x1b[31mError: devtunnel CLI not found.\x1b[0m');
+      console.error('\x1b[33mInstall: winget install Microsoft.devtunnel\x1b[0m');
+      console.error('Then: devtunnel user login');
+      process.exit(1);
+    }
+
+    // Start devtunnel in the background
+    console.log('\x1b[33m🔗 Starting devtunnel on port 8765...\x1b[0m');
+    tunnelProc = spawn('devtunnel', ['host', '-p', '8765', '--allow-anonymous'], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      shell: true,
+    });
+
+    let tunnelUrl = null;
+    const urlPattern = /Connect via browser:\s+(https:\/\/[^\s,]+)/;
+
+    const handleTunnelOutput = (data) => {
+      const text = data.toString();
+      process.stderr.write(`\x1b[35m[tunnel]\x1b[0m ${text}`);
+      if (!tunnelUrl) {
+        const match = text.match(urlPattern);
+        if (match) {
+          tunnelUrl = match[1].replace(/\/$/, '');
+          console.log(`\n\x1b[32m📱 Tunnel active: ${tunnelUrl}\x1b[0m`);
+          console.log(`\x1b[32m   Mobile URL: ${tunnelUrl}/mobile\x1b[0m`);
+          // Register tunnel URL with backend (retry a few times since backend may still be starting)
+          const registerUrl = async (retries = 10) => {
+            for (let i = 0; i < retries; i++) {
+              try {
+                const http = require('http');
+                const postData = JSON.stringify({ tunnel_url: tunnelUrl });
+                await new Promise((resolve, reject) => {
+                  const req = http.request({
+                    hostname: '127.0.0.1', port: 8765,
+                    path: '/api/settings/mobile-companion/tunnel-url',
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Content-Length': postData.length },
+                  }, (res) => { res.resume(); resolve(); });
+                  req.on('error', reject);
+                  req.write(postData);
+                  req.end();
+                });
+                console.log('\x1b[32m   ✓ Tunnel URL registered with backend\x1b[0m');
+                console.log('\x1b[32m   Open Settings in desktop UI to see the QR code\x1b[0m\n');
+                return;
+              } catch {
+                await new Promise(r => setTimeout(r, 2000));
+              }
+            }
+            console.log('\x1b[33m   ⚠ Could not register tunnel URL — enter it manually in Settings\x1b[0m\n');
+          };
+          registerUrl();
+        }
+      }
+    };
+
+    tunnelProc.stdout.on('data', handleTunnelOutput);
+    tunnelProc.stderr.on('data', handleTunnelOutput);
+    tunnelProc.on('exit', (code) => {
+      if (code !== 0 && code !== null) {
+        console.error(`\x1b[31mdevtunnel exited with code ${code}\x1b[0m`);
+      }
+    });
+
+    // Clean up tunnel on process exit
+    process.on('exit', () => { if (tunnelProc) try { tunnelProc.kill(); } catch {} });
+    process.on('SIGINT', () => { if (tunnelProc) try { tunnelProc.kill(); } catch {} process.exit(); });
+  }
 
   const proc = spawn('npx', [
     'concurrently', '-k',

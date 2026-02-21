@@ -147,13 +147,24 @@ export function SettingsModal() {
 function MobileCompanionSection() {
   const [apiToken, setApiToken] = useState<string | null>(null);
   const [tunnelUrl, setTunnelUrl] = useState('');
+  const [exposeMode, setExposeMode] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Fetch mobile companion info (token, tunnel URL, expose status)
   useEffect(() => {
-    apiClient.get<{ api_token: string }>('/settings/api-token')
-      .then(data => setApiToken(data.api_token))
-      .catch(() => {});
+    apiClient.get<{ api_token: string; tunnel_url: string; expose: boolean }>('/settings/mobile-companion')
+      .then(data => {
+        setApiToken(data.api_token);
+        if (data.tunnel_url) setTunnelUrl(data.tunnel_url);
+        setExposeMode(data.expose);
+      })
+      .catch(() => {
+        // Fallback: just get token
+        apiClient.get<{ api_token: string }>('/settings/api-token')
+          .then(data => setApiToken(data.api_token))
+          .catch(() => {});
+      });
   }, []);
 
   const handleRegenerate = async () => {
@@ -196,7 +207,10 @@ function MobileCompanionSection() {
             className="w-full px-3 py-1.5 text-sm border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
           />
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            Run <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 py-0.5 rounded">devtunnel host -p 8765 --allow-anonymous</code> to create a tunnel
+            {exposeMode
+              ? 'Auto-detected from devtunnel. Edit if needed.'
+              : <>Run with <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 py-0.5 rounded">--expose</code> to auto-start a tunnel, or enter a URL manually.</>
+            }
           </p>
         </div>
 
@@ -242,7 +256,10 @@ function MobileCompanionSection() {
 
         {!qrValue && (
           <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-2">
-            Enter your tunnel URL above to generate a QR code
+            {exposeMode
+              ? 'Waiting for tunnel URL... It should appear automatically.'
+              : <>Start with <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 py-0.5 rounded">npm run dev -- --expose</code> to auto-generate a QR code</>
+            }
           </p>
         )}
       </div>

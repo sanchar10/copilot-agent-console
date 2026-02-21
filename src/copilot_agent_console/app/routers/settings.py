@@ -100,3 +100,34 @@ async def regenerate_api_token(request: Request) -> dict:
     new_token = generate_api_token()
     storage_service.update_settings({"api_token": new_token})
     return {"api_token": new_token}
+
+
+@router.get("/mobile-companion")
+async def get_mobile_companion_info(request: Request) -> dict:
+    """Get mobile companion connection info (tunnel URL, expose mode, token).
+    
+    Only accessible from localhost.
+    """
+    if not _is_localhost(request):
+        raise HTTPException(status_code=403, detail="Only accessible from localhost")
+    settings = storage_service.get_settings()
+    expose = os.environ.get("COPILOT_EXPOSE") == "1"
+    return {
+        "expose": expose,
+        "tunnel_url": settings.get("tunnel_url", ""),
+        "api_token": get_or_create_api_token(),
+    }
+
+
+@router.post("/mobile-companion/tunnel-url")
+async def set_tunnel_url(request: Request) -> dict:
+    """Set the tunnel URL (called by dev script when devtunnel starts).
+    
+    Only accessible from localhost.
+    """
+    if not _is_localhost(request):
+        raise HTTPException(status_code=403, detail="Only accessible from localhost")
+    body = await request.json()
+    url = body.get("tunnel_url", "")
+    storage_service.update_settings({"tunnel_url": url})
+    return {"tunnel_url": url}
