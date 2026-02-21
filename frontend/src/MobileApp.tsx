@@ -47,8 +47,11 @@ export function MobileApp() {
     return () => clearInterval(interval);
   }, [checkConnection]);
 
-  // Show setup screen if no token configured
-  if (!getStoredToken() && !searchParams.get('token')) {
+  // On localhost, no token is needed (backend skips auth for localhost)
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  // Show setup screen if no token configured AND not on localhost
+  if (!isLocalhost && !getStoredToken() && !searchParams.get('token')) {
     return (
       <div className="h-screen bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col">
         <MobileSettings onConnectionChange={checkConnection} />
