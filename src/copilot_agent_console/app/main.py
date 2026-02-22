@@ -67,6 +67,9 @@ async def lifespan(app: FastAPI):
     no_sleep = os.environ.get("COPILOT_NO_SLEEP") == "1"
     if no_sleep:
         _set_sleep_prevention(True)
+    # Check for unread sessions and send push notifications
+    from copilot_agent_console.app.services.notification_manager import notification_manager
+    await notification_manager.check_unread_on_startup()
     logger.info("Copilot Agent Console started successfully")
     yield
     # Shutdown
