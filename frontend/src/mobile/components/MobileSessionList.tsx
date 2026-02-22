@@ -46,8 +46,12 @@ export function MobileSessionList({ onNotification }: Props) {
   }, [setSessions]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (sessions.length > 0) {
+      setLoading(false);
+    } else {
+      loadData();
+    }
+  }, []);
 
   // SSE for active agent notifications with exponential backoff
   const sseBackoffRef = useRef(2000);
