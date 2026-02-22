@@ -159,11 +159,8 @@ export const mobileApiClient: ApiClientInterface & { testConnection(): Promise<b
   /** Test the connection to the backend */
   async testConnection(): Promise<boolean> {
     try {
-      const baseUrl = getStoredBaseUrl();
-      const healthUrl = baseUrl
-        ? `${baseUrl.replace(/\/$/, '')}/health`
-        : '/health';
-      const response = await fetch(healthUrl, {
+      // Use an authenticated API endpoint to verify both connectivity and token
+      const response = await fetch(`${getApiBase()}/sessions`, {
         headers: getHeaders(),
         signal: AbortSignal.timeout(5000),
       });

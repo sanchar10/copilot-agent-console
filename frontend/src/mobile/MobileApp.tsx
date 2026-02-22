@@ -148,7 +148,8 @@ export function MobileApp() {
   }
 
   // Show re-auth screen when token is invalid or connection lost
-  if (authError) {
+  // Skip if already navigating to settings (prevents double-click issue)
+  if (authError && !location.pathname.includes('/settings')) {
     return (
       <ConnectionErrorScreen
         authError={authError}
