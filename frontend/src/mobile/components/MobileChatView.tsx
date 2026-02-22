@@ -157,40 +157,14 @@ export function MobileChatView() {
         // Connect session first
         await mobileApiClient.post(`/sessions/${sessionId}/connect`);
 
-        // Send message — this returns an SSE stream
-        eventSourceRef.current?.close();
-        const es = mobileApiClient.createEventSource(
-          `/sessions/${sessionId}/response-stream`,
-          { from_chunk: '0', from_step: '0' }
-        );
-        eventSourceRef.current = es;
-
-        // Fire the message (the SSE stream from /messages won't work with EventSource
-        // since it's a POST, so we use the fire-and-poll approach)
+        // Send message first — this creates the response buffer on the server
         await mobileApiClient.post(`/sessions/${sessionId}/messages`, {
           content,
           is_new_session: false,
         });
 
-        es.addEventListener(SSE_EVENTS.DELTA, (event) => {
-          const data = JSON.parse(event.data);
-          appendStreamingContent(sessionId, data.content);
-        });
-
-        es.addEventListener(SSE_EVENTS.STEP, (event) => {
-          const step = JSON.parse(event.data);
-          addStreamingStep(sessionId, step);
-        });
-
-        es.addEventListener(SSE_EVENTS.DONE, () => {
-          es.close();
-          reloadMessages(sessionId);
-        });
-
-        es.addEventListener(SSE_EVENTS.ERROR, () => {
-          es.close();
-          reloadMessages(sessionId);
-        });
+        // Now connect SSE stream — buffer exists after message is sent
+        resumeStream(0, 0);
       }
     } catch (err) {
       console.error('Failed to send message:', err);

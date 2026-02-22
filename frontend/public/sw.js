@@ -1,7 +1,7 @@
 // Service Worker for Agent Console PWA
 // Serves offline fallback when server is unreachable
 
-const CACHE_NAME = 'agent-console-v9';
+const CACHE_NAME = 'agent-console-v10';
 
 // Inline offline page — no dependency on cache.addAll succeeding
 const OFFLINE_HTML = `<!DOCTYPE html>
@@ -102,19 +102,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets — cache-first
+  // Static assets — network-first (ensures fresh code through tunnel where HMR doesn't work)
   if (event.request.method === 'GET') {
     event.respondWith(
-      caches.match(event.request).then(
-        (cached) =>
-          cached ||
-          fetch(event.request).then((response) => {
-            if (response.ok) {
-              const clone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-            }
-            return response;
-          }).catch(() => new Response('', { status: 503 }))
+      fetch(event.request).then((response) => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() =>
+        caches.match(event.request).then(
+          (cached) => cached || new Response('', { status: 503 })
+        )
       )
     );
     return;
