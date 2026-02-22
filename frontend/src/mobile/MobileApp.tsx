@@ -5,7 +5,7 @@ import { MobileChatView } from './components/MobileChatView';
 import { MobileAgentMonitor } from './components/MobileAgentMonitor';
 import { MobileSettings } from './components/MobileSettings';
 import { NotificationBanner } from './components/NotificationBanner';
-import { mobileApiClient, setStoredToken, setStoredBaseUrl, getStoredToken, clearStoredCredentials, onAuthErrorChange, clearAuthError, getAuthError } from './mobileClient';
+import { mobileApiClient, setStoredToken, setStoredBaseUrl, getStoredToken, onAuthErrorChange, clearAuthError, getAuthError } from './mobileClient';
 import { useTheme } from '../hooks/useTheme';
 import './mobile.css';
 
@@ -37,6 +37,42 @@ class MobileErrorBoundary extends Component<{ children: ReactNode; onReset: () =
 }
 
 type TabId = 'sessions' | 'agents' | 'settings';
+
+/** Error screen with auto-recovery on network reconnect */
+function ConnectionErrorScreen({ authError, onRetry, onReconfigure }: {
+  authError: 'unauthorized' | 'network';
+  onRetry: () => void;
+  onReconfigure: () => void;
+}) {
+  useEffect(() => {
+    if (authError !== 'network') return;
+    const handleOnline = () => onRetry();
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [authError, onRetry]);
+
+  return (
+    <div className="h-dvh bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col items-center justify-center p-6 text-center safe-top">
+      <div className="text-5xl mb-4">{authError === 'unauthorized' ? '🔑' : '📡'}</div>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        {authError === 'unauthorized' ? 'Session Expired' : 'Connection Lost'}
+      </h2>
+      <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-xs">
+        {authError === 'unauthorized'
+          ? 'Your API token has been regenerated. Please scan the QR code again from the desktop Settings.'
+          : 'Unable to reach the server. Check your internet connection and retry.'}
+      </p>
+      <div className="flex flex-col gap-3 w-full max-w-xs">
+        <button onClick={onRetry} className="bg-blue-600 text-white rounded-lg py-3 px-4 font-medium">
+          Retry Connection
+        </button>
+        <button onClick={onReconfigure} className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg py-3 px-4 font-medium">
+          Re-configure Connection
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function MobileApp() {
   const navigate = useNavigate();
@@ -102,38 +138,11 @@ export function MobileApp() {
   // Show re-auth screen when token is invalid or connection lost
   if (authError) {
     return (
-      <div className="h-dvh bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col items-center justify-center p-6 text-center safe-top">
-        <div className="text-5xl mb-4">{authError === 'unauthorized' ? '🔑' : '📡'}</div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-          {authError === 'unauthorized' ? 'Session Expired' : 'Connection Lost'}
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-xs">
-          {authError === 'unauthorized'
-            ? 'Your API token has been regenerated. Please scan the QR code again from the desktop Settings.'
-            : 'Unable to reach the server. The tunnel URL may have changed. Please scan the QR code again from the desktop Settings.'}
-        </p>
-        <div className="flex flex-col gap-3 w-full max-w-xs">
-          <button
-            onClick={() => {
-              clearAuthError();
-              clearStoredCredentials();
-              navigate('/mobile/settings', { replace: true });
-            }}
-            className="bg-blue-600 text-white rounded-lg py-3 px-4 font-medium"
-          >
-            Re-configure Connection
-          </button>
-          <button
-            onClick={() => {
-              clearAuthError();
-              handleConnectionChange();
-            }}
-            className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg py-3 px-4 font-medium"
-          >
-            Retry Connection
-          </button>
-        </div>
-      </div>
+      <ConnectionErrorScreen
+        authError={authError}
+        onRetry={() => { clearAuthError(); handleConnectionChange(); }}
+        onReconfigure={() => { clearAuthError(); navigate('/mobile/settings', { replace: true }); }}
+      />
     );
   }
 

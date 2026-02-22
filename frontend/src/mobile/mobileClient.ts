@@ -108,8 +108,11 @@ async function safeFetch(input: RequestInfo, init?: RequestInit): Promise<Respon
   try {
     return await fetch(input, init);
   } catch (err) {
-    // Network error (tunnel down, DNS failure, offline)
-    setAuthError('network');
+    // Only show error screen if network is available but server unreachable (tunnel changed)
+    // When offline, stay silent — SSE backoff will auto-recover when network returns
+    if (navigator.onLine) {
+      setAuthError('network');
+    }
     throw err;
   }
 }
