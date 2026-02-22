@@ -149,6 +149,11 @@ class TaskRunnerService:
 
                 # send_message_background does NOT call buffer.complete() — caller must do it
                 buffer.complete()
+                
+                # Trigger delayed push notification check
+                from copilot_agent_console.app.services.notification_manager import notification_manager
+                preview = buffer.get_full_content()[:120] if buffer.chunks else ""
+                notification_manager.on_agent_completed(session_id, run.name or session_id[:8], preview)
 
                 # Collect result
                 if buffer.status == ResponseStatus.COMPLETED:

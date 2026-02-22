@@ -79,13 +79,13 @@ async function main() {
     console.log('\x1b[32m✓ Frontend dependencies OK\x1b[0m');
   }
 
-  // Check backend Python dependencies
-  const backendDeps = ['fastapi', 'uvicorn', 'pydantic', 'sse_starlette', 'copilot_agent_console'];
+  // Check backend Python dependencies (only third-party; our code is loaded via PYTHONPATH)
+  const backendDeps = ['fastapi', 'uvicorn', 'pydantic', 'sse_starlette'];
   const missingDeps = backendDeps.filter(dep => !checkPythonPackage(dep));
   
   if (missingDeps.length > 0) {
     console.log(`Installing backend dependencies (missing: ${missingDeps.join(', ')})...`);
-    run('pip install -e .', ROOT);
+    run('pip install -e .', ROOT);  // installs deps from pyproject.toml
     console.log('');
   } else {
     console.log('\x1b[32m✓ Backend dependencies OK\x1b[0m');
@@ -99,6 +99,11 @@ async function main() {
   // Check for --no-sleep flag
   const noSleep = process.argv.includes('--no-sleep');
   const env = { ...process.env };
+
+  // Point Python directly at this repo's src/ — no pip install -e . needed
+  const srcDir = path.join(ROOT, 'src');
+  env.PYTHONPATH = env.PYTHONPATH ? `${srcDir}${path.delimiter}${env.PYTHONPATH}` : srcDir;
+
   if (noSleep) {
     env.COPILOT_NO_SLEEP = '1';
     console.log('\x1b[33m🔋 Sleep prevention enabled (--no-sleep)\x1b[0m');
@@ -127,9 +132,75 @@ async function main() {
       process.exit(1);
     }
 
-    // Start devtunnel in the background
-    console.log('\x1b[33m🔗 Starting devtunnel on port 8765...\x1b[0m');
-    tunnelProc = spawn('devtunnel', ['host', '-p', '8765', '--allow-anonymous'], {
+    // Persistent tunnel: create once, reuse across restarts for stable URL
+    const settingsPath = path.join(process.env.USERPROFILE || process.env.HOME || '', '.copilot-agent-console', 'settings.json');
+    let tunnelId = null;
+
+    // Try to load saved tunnel ID
+    try {
+      if (fs.existsSync(settingsPath)) {
+        const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+        tunnelId = settings.devtunnel_id || null;
+      }
+    } catch {}
+
+    // Verify saved tunnel still exists
+    if (tunnelId) {
+      const exists = tryRun(`devtunnel show ${tunnelId}`);
+      if (!exists) {
+        console.log(`\x1b[33m⚠ Saved tunnel ${tunnelId} no longer exists, creating new one...\x1b[0m`);
+        tunnelId = null;
+      }
+    }
+
+    // Create persistent tunnel if none exists
+    if (!tunnelId) {
+      console.log('\x1b[33m🔗 Creating persistent devtunnel...\x1b[0m');
+      try {
+        const result = execSync('devtunnel create -j', { shell: true, encoding: 'utf-8' });
+        // devtunnel may print banner text before JSON — extract the JSON object
+        const jsonMatch = result.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error('No JSON in devtunnel output');
+        const parsed = JSON.parse(jsonMatch[0]);
+        tunnelId = parsed.tunnel?.tunnelId || parsed.tunnelId;
+        console.log(`\x1b[32m✓ Created tunnel: ${tunnelId}\x1b[0m`);
+
+        // Add port 5173
+        execSync(`devtunnel port create ${tunnelId} -p 5173`, { shell: true, stdio: 'ignore' });
+        console.log('\x1b[32m✓ Port 5173 configured\x1b[0m');
+
+        // Save tunnel ID to settings
+        let settings = {};
+        try {
+          if (fs.existsSync(settingsPath)) {
+            settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+          }
+        } catch {}
+        settings.devtunnel_id = tunnelId;
+        fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+        fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
+        console.log('\x1b[32m✓ Tunnel ID saved to settings\x1b[0m');
+      } catch (err) {
+        console.error('\x1b[31mFailed to create persistent tunnel:\x1b[0m', err.message);
+        console.error('\x1b[33mFalling back to ephemeral tunnel\x1b[0m');
+      }
+    } else {
+      console.log(`\x1b[32m✓ Reusing persistent tunnel: ${tunnelId}\x1b[0m`);
+    }
+
+    // Handle anonymous access
+    const allowAnon = process.argv.includes('--allow-anonymous');
+    if (allowAnon && tunnelId) {
+      try {
+        execSync(`devtunnel access create ${tunnelId} -a`, { shell: true, stdio: 'ignore' });
+      } catch {} // May already have anonymous access
+    }
+
+    // Start devtunnel host — Vite serves /mobile and proxies /api to backend
+    const tunnelArgs = tunnelId ? ['host', tunnelId] : ['host', '-p', '5173'];
+    if (!tunnelId && allowAnon) tunnelArgs.push('--allow-anonymous');
+    console.log(`\x1b[33m🔗 Starting devtunnel${allowAnon ? ' (anonymous access)' : ' (authenticated — same account only)'}...\x1b[0m`);
+    tunnelProc = spawn('devtunnel', tunnelArgs, {
       stdio: ['ignore', 'pipe', 'pipe'],
       shell: true,
     });

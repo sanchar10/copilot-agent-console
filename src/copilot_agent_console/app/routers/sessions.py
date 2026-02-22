@@ -367,6 +367,14 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
             
             # NOW mark the buffer complete - SSE done event will include the name
             buffer.complete()
+            
+            # Trigger delayed push notification check
+            from copilot_agent_console.app.services.notification_manager import notification_manager
+            preview = buffer.get_full_content()[:120] if buffer.chunks else ""
+            session_name = (buffer.updated_session_name 
+                          or (stored_meta.get("session_name") if stored_meta else None) 
+                          or session_id[:8])
+            notification_manager.on_agent_completed(session_id, session_name, preview)
         except asyncio.CancelledError:
             logger.warning(f"[Background] Agent task cancelled for session {session_id}")
             buffer.fail("Task was cancelled")
