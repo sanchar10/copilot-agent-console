@@ -123,6 +123,18 @@ export function MobileApp() {
     return onAuthErrorChange(setAuthError);
   }, []);
 
+  // Show "Disconnected" banner when phone goes offline
+  useEffect(() => {
+    const handleOffline = () => setConnected(false);
+    const handleOnline = () => setConnected(true);
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, []);
+
   // On localhost, no token is needed (backend skips auth for localhost)
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
