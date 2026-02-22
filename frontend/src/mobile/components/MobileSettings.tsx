@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   getStoredToken,
   getStoredBaseUrl,
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export function MobileSettings({ onConnectionChange }: Props) {
+  const navigate = useNavigate();
   const [token, setToken] = useState(getStoredToken() || '');
   const [baseUrl, setBaseUrl] = useState(getStoredBaseUrl() || '');
   const [testing, setTesting] = useState(false);
@@ -57,7 +59,10 @@ export function MobileSettings({ onConnectionChange }: Props) {
     const ok = await mobileApiClient.testConnection();
     setTestResult(ok ? 'success' : 'error');
     setTesting(false);
-    if (ok) onConnectionChange();
+    if (ok) {
+      onConnectionChange();
+      navigate('/mobile', { replace: true });
+    }
   };
 
   const handleDisconnect = () => {
