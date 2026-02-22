@@ -69,22 +69,18 @@ export const useViewedStore = create<ViewedState>((set, get) => ({
   hasUnread: (sessionId: string, sessionUpdatedAt: string, sessionCreatedAt?: string) => {
     const state = get();
     
-    // Don't show unread indicators until we've loaded the persisted timestamps
-    // This prevents false positives during the initial load race condition
     if (!state.isLoaded) {
       return false;
     }
     
     const lastViewed = state.lastViewed[sessionId];
-    
-    // Parse ISO timestamp to Unix seconds
     const updatedAtSeconds = new Date(sessionUpdatedAt).getTime() / 1000;
     
     // If never viewed, check if session has activity since creation
     if (!lastViewed) {
       if (!sessionCreatedAt) return false;
       const createdAtSeconds = new Date(sessionCreatedAt).getTime() / 1000;
-      return updatedAtSeconds > createdAtSeconds + 1; // 1s tolerance
+      return updatedAtSeconds > createdAtSeconds + 1;
     }
     
     // Has unread if updated after last viewed
