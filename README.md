@@ -61,6 +61,20 @@ Python tools dropped into `~/.copilot-agent-console/tools/` become available to 
 ### 🤝 Agent Teams
 Compose agents into teams. A main agent can delegate tasks to specialized sub-agents that run in separate contexts — each with its own prompt, tools, and MCP servers. The main agent automatically decides when to delegate based on the sub-agent's description. See [Agent Teams](docs/MULTI-AGENT.md) for details.
 
+### 📱 Mobile Companion
+Access Agent Console from your phone — a purpose-built mobile UI served through a secure devtunnel. Monitor active agents, check unread messages with blue dot indicators, and reply to agents on the go. Install as a PWA home screen app for a native-like experience with push notifications when agents complete.
+
+![Mobile Companion](docs/screenshots/mobile.jpg)
+
+**Highlights:**
+- **Pull-to-refresh** session list — no background polling
+- **Push notifications** when agents finish (iOS & Android)
+- **Live streaming** responses as the agent types
+- **Unread indicators** sync across desktop and mobile
+- **QR code setup** — scan from Settings, no manual URL entry
+
+Start with `--expose`, scan the QR code, done. See [Mobile Companion](docs/MOBILE-COMPANION.md) for details.
+
 ### 🔄 Smart Ralph AI Runner (Experimental)
 Batch job execution based on the [Ralph Loop pattern](https://ghuntley.com/loop/). A dynamic list of jobs is built collaboratively and handed to Ralph Runner, which runs each one in a fresh agent session — preventing context bloat and isolating workflows.
 
@@ -105,6 +119,9 @@ Options:
   --no-browser       Don't automatically open browser on start
   --no-sleep         Prevent Windows from sleeping while running
                      (useful when scheduled tasks need to run overnight)
+  --expose           Enable remote access via devtunnel for mobile companion
+  --allow-anonymous  Allow anonymous tunnel access (default: authenticated,
+                     same Microsoft account only). Requires --expose.
   --version, -v      Show version and exit
 ```
 
@@ -119,6 +136,12 @@ agentconsole --no-browser
 
 # Keep PC awake for overnight scheduled tasks
 agentconsole --no-sleep
+
+# Enable mobile companion (secure — requires your Microsoft account)
+agentconsole --expose
+
+# Enable mobile companion (anonymous — anyone with the URL can connect)
+agentconsole --expose --allow-anonymous
 ```
 
 ---
@@ -149,6 +172,7 @@ Custom tools can be created using the built-in **Tool Builder** agent or written
 - [Custom Tools](docs/CUSTOM-TOOLS.md) — Creating tools with Tool Builder or manually
 - [Agent Teams](docs/MULTI-AGENT.md) — Composing agents with sub-agents
 - [Troubleshooting](docs/TROUBLESHOOTING.md) — Common issues and SDK/CLI compatibility
+- [Mobile Companion](docs/MOBILE-COMPANION.md) — Phone access via secure tunnel
 - [Contributing](docs/CONTRIBUTING.md) — Development setup, building, testing, and architecture
 
 ---

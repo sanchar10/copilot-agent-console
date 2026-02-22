@@ -12,12 +12,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from copilot_agent_console.app.config import API_PREFIX, ensure_directories
-from copilot_agent_console.app.routers import agents, filesystem, logs, mcp, models, ralph, schedules, sessions, settings, tools, task_runs, viewed
+from copilot_agent_console.app.routers import agents, filesystem, logs, mcp, models, ralph, schedules, sessions, settings, tools, task_runs, viewed, push
 from copilot_agent_console.app.services.copilot_service import copilot_service
 from copilot_agent_console.app.services.response_buffer import response_buffer_manager
 from copilot_agent_console.app.services.task_runner_service import TaskRunnerService
 from copilot_agent_console.app.services.scheduler_service import SchedulerService
 from copilot_agent_console.app.services.logging_service import setup_logging, get_logger
+from copilot_agent_console.app.middleware.auth import TokenAuthMiddleware
 
 # Configure logging with session-aware file logging (DEBUG level for comprehensive event logging)
 setup_logging(level=logging.DEBUG)
@@ -66,6 +67,9 @@ async def lifespan(app: FastAPI):
     no_sleep = os.environ.get("COPILOT_NO_SLEEP") == "1"
     if no_sleep:
         _set_sleep_prevention(True)
+    # Check for unread sessions and send push notifications
+    from copilot_agent_console.app.services.notification_manager import notification_manager
+    await notification_manager.check_unread_on_startup()
     logger.info("Copilot Agent Console started successfully")
     yield
     # Shutdown
@@ -83,17 +87,26 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration for frontend dev server
+# CORS configuration — allow tunnel origins when running in expose mode
+_cors_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+if os.environ.get("COPILOT_EXPOSE") == "1":
+    # In expose mode, allow any origin (tunnel URLs are unpredictable)
+    # Auth middleware protects API routes via bearer token
+    _cors_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Token-based auth for non-localhost API access (mobile companion via tunnel)
+app.add_middleware(TokenAuthMiddleware)
 
 # Include routers
 app.include_router(agents.router, prefix=API_PREFIX)
@@ -108,6 +121,7 @@ app.include_router(settings.router, prefix=API_PREFIX)
 app.include_router(tools.router, prefix=API_PREFIX)
 app.include_router(task_runs.router, prefix=API_PREFIX)
 app.include_router(viewed.router, prefix=API_PREFIX)
+app.include_router(push.router, prefix=API_PREFIX)
 
 
 @app.get("/health")

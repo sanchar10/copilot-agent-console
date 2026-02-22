@@ -3,7 +3,7 @@
 import os
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 import aiofiles
@@ -61,12 +61,12 @@ async def read_raw_events(session_id: str) -> list[dict[str, Any]]:
 
 
 def get_session_mtime(session_id: str) -> datetime:
-    """Get modification time of SDK session folder."""
+    """Get modification time of SDK session folder (UTC-aware)."""
     session_folder = COPILOT_SESSION_STATE / session_id
     if session_folder.exists():
         mtime = os.path.getmtime(session_folder)
-        return datetime.fromtimestamp(mtime)
-    return datetime.utcnow()
+        return datetime.fromtimestamp(mtime, tz=timezone.utc)
+    return datetime.now(timezone.utc)
 
 
 def get_default_mcp_servers() -> list[str]:
@@ -113,7 +113,7 @@ class SessionService:
         when the user sends their first message (with CWD).
         """
         session_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
         # Get default CWD from settings
         settings = storage_service.get_settings()
@@ -168,18 +168,20 @@ class SessionService:
             
             # Get timestamps from SDK session
             # SDK returns: startTime, modifiedTime (ISO format with Z suffix)
-            mtime = get_session_mtime(session_id)
             sdk_start = getattr(sdk_session, "startTime", None)
             sdk_modified = getattr(sdk_session, "modifiedTime", None)
             
-            # Parse SDK timestamps
+            # Prefer SDK timestamps; file mtime is last resort
+            mtime = get_session_mtime(session_id)
             created_at = mtime
-            updated_at = mtime
             if sdk_start:
                 try:
                     created_at = datetime.fromisoformat(sdk_start.replace('Z', '+00:00'))
                 except (ValueError, AttributeError):
                     pass
+            
+            # updated_at defaults to created_at (not mtime) to avoid inflation
+            updated_at = created_at
             if sdk_modified:
                 try:
                     updated_at = datetime.fromisoformat(sdk_modified.replace('Z', '+00:00'))
@@ -278,12 +280,13 @@ class SessionService:
                 sdk_modified = getattr(sdk_session, "modifiedTime", None)
                 
                 created_at = mtime
-                updated_at = mtime
                 if sdk_start:
                     try:
                         created_at = datetime.fromisoformat(sdk_start.replace('Z', '+00:00'))
                     except (ValueError, AttributeError):
                         pass
+                # updated_at defaults to created_at, not mtime
+                updated_at = created_at
                 if sdk_modified:
                     try:
                         updated_at = datetime.fromisoformat(sdk_modified.replace('Z', '+00:00'))
@@ -291,8 +294,8 @@ class SessionService:
                         pass
             else:
                 # Web-created session not yet in SDK - use current time
-                created_at = datetime.utcnow()
-                updated_at = datetime.utcnow()
+                created_at = datetime.now(timezone.utc)
+                updated_at = datetime.now(timezone.utc)
             
             return Session(
                 session_id=session_id,
@@ -317,12 +320,13 @@ class SessionService:
         sdk_modified = getattr(sdk_session, "modifiedTime", None)
         
         created_at = mtime
-        updated_at = mtime
         if sdk_start:
             try:
                 created_at = datetime.fromisoformat(sdk_start.replace('Z', '+00:00'))
             except (ValueError, AttributeError):
                 pass
+        # updated_at defaults to created_at, not mtime
+        updated_at = created_at
         if sdk_modified:
             try:
                 updated_at = datetime.fromisoformat(sdk_modified.replace('Z', '+00:00'))
