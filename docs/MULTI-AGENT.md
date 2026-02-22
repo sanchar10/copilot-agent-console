@@ -49,9 +49,9 @@ Sub-agents have `infer: true` by default — the main agent automatically decide
 ## Limitations
 
 - **Tools and sub-agents are mutually exclusive** — A session cannot use both tools (custom or built-in include/exclude) and sub-agents simultaneously. This is a CLI-level limitation where `cwd` combined with `tools`/`available_tools` causes `custom_agents` to be silently dropped. The UI enforces this by disabling one selector when the other has selections. Sub-agents themselves _can_ have their own tools and MCP servers — the restriction only applies at the parent session level.
+- **Excluded tools propagate to sub-agents** — When the parent session uses `excluded_tools`, those exclusions apply to ALL sub-agents in the session. A sub-agent's built-in tool whitelist ("Only" mode) IS honored, but the parent's exclusions are applied on top: `effective tools = sub-agent's whitelist MINUS parent's exclusions`. For example, if the parent excludes `create` and a sub-agent whitelists `['create', 'view', 'powershell']`, the sub-agent gets only `view` and `powershell`. Use prompt instructions to guide delegation instead of excluding tools from the parent.
 - **No nesting** — Sub-agents cannot have their own sub-agents. Only one level of delegation is supported.
 - **No custom tools** — Agents that use custom tools (Python-based tools defined in the Tools Builder) cannot be used as sub-agents. This is an SDK limitation.
-- **No tool exclusions** — Agents that use the "excluded built-in tools" feature cannot be used as sub-agents. The SDK only supports tool whitelists, not blacklists.
 - **Prompt and description required** — Sub-agents must have both a system prompt and a description. The prompt defines the sub-agent's behavior; the description tells the main agent when to delegate.
 - **No per-agent model override** — Sub-agents use the session's model, not their own model setting.
 - **CLI agents are always present** — Agents defined in `~/.copilot/agents/` are always available in every session regardless of sub-agent selection.

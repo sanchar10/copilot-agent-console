@@ -12,6 +12,26 @@ When a session uses a working directory (`cwd`), GitHub Copilot CLI silently dro
 
 **Note:** Sub-agents themselves _can_ have their own tools, MCP servers, and built-in tool whitelists. The limitation only applies at the parent session level.
 
+## Excluded Tools Propagate to Sub-Agents
+
+**Affected area:** Agent definitions, Sub-agent tool availability
+
+When a parent session uses `excluded_tools` to remove tools (e.g., `create`, `powershell`, `edit`), those exclusions propagate to **all sub-agents** in the session. Sub-agents lose access to the excluded tools even though they have their own separate configurations.
+
+This means an orchestrator agent cannot exclude its own tools while keeping sub-agents fully capable. For example, excluding file/shell tools from a "team lead" agent to force delegation also strips those tools from the specialist agents it delegates to — making them unable to create files or run commands.
+
+**How it interacts with sub-agent tool whitelists:**
+
+A sub-agent's built-in tool whitelist (the "Only" mode) IS honored — the sub-agent only gets the tools it whitelists. However, the parent's exclusions are applied on top. The sub-agent's effective tool set is:
+
+```
+effective tools = sub-agent's whitelist MINUS parent's exclusions
+```
+
+**Example:** A parent agent excludes `create`. A sub-agent whitelists `['create', 'view', 'powershell']`. The sub-agent gets only `view` and `powershell` — `create` is removed because the parent excluded it.
+
+**Workaround:** Do not use `excluded_tools` on agents that have sub-agents. Instead, use prompt instructions to guide the parent agent to delegate rather than code directly.
+
 ## Sub-Agents Cannot Be Nested
 
 An agent that has sub-agents cannot itself be used as a sub-agent. Only leaf agents (no sub-agents of their own) are eligible for the sub-agent role.
