@@ -79,13 +79,13 @@ async function main() {
     console.log('\x1b[32m✓ Frontend dependencies OK\x1b[0m');
   }
 
-  // Check backend Python dependencies
-  const backendDeps = ['fastapi', 'uvicorn', 'pydantic', 'sse_starlette', 'copilot_agent_console'];
+  // Check backend Python dependencies (only third-party; our code is loaded via PYTHONPATH)
+  const backendDeps = ['fastapi', 'uvicorn', 'pydantic', 'sse_starlette'];
   const missingDeps = backendDeps.filter(dep => !checkPythonPackage(dep));
   
   if (missingDeps.length > 0) {
     console.log(`Installing backend dependencies (missing: ${missingDeps.join(', ')})...`);
-    run('pip install -e .', ROOT);
+    run('pip install -e .', ROOT);  // installs deps from pyproject.toml
     console.log('');
   } else {
     console.log('\x1b[32m✓ Backend dependencies OK\x1b[0m');
@@ -98,8 +98,14 @@ async function main() {
 
   // Check for --no-sleep flag
   const noSleep = process.argv.includes('--no-sleep');
-  const env = noSleep ? { ...process.env, COPILOT_NO_SLEEP: '1' } : process.env;
+  const env = { ...process.env };
+
+  // Point Python directly at this repo's src/ — no pip install -e . needed
+  const srcDir = path.join(ROOT, 'src');
+  env.PYTHONPATH = env.PYTHONPATH ? `${srcDir}${path.delimiter}${env.PYTHONPATH}` : srcDir;
+
   if (noSleep) {
+    env.COPILOT_NO_SLEEP = '1';
     console.log('\x1b[33m🔋 Sleep prevention enabled (--no-sleep)\x1b[0m');
   }
 
