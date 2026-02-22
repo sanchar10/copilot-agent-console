@@ -15,7 +15,7 @@ interface SessionItemProps {
 export function SessionItem({ session }: SessionItemProps) {
   const { removeSession, setSessions, sessions, refreshMcpServers, updateSessionMcpServers, updateSessionTimestamp, clearNewSession } = useSessionStore();
   const { messagesPerSession, setMessages, clearSessionMessages, setStreaming, appendStreamingContent, addStreamingStep, finalizeStreaming } = useChatStore();
-  const { isAgentActive, setAgentActive, markViewed, isLoaded: viewedLoaded, lastViewed } = useViewedStore();
+  const { isAgentActive, setAgentActive, markViewed, hasUnread } = useViewedStore();
   const { tabs, activeTabId, openTab: openGenericTab, switchTab, closeTab } = useTabStore();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -30,29 +30,8 @@ export function SessionItem({ session }: SessionItemProps) {
   // Check for indicators (only after viewed timestamps are loaded)
   const isRunning = isAgentActive(session.session_id);
   
-  // Compute hasUnread: show blue dot if session was modified after we last viewed it
-  const hasUnreadMessages = (() => {
-    // Don't show unread if we're currently viewing this session
-    if (isActive) return false;
-    
-    // Wait for viewed timestamps to load before showing indicators
-    if (!viewedLoaded) return false;
-    
-    const viewedAt = lastViewed[session.session_id];
-    const updatedAtSeconds = new Date(session.updated_at).getTime() / 1000;
-    
-    // If never viewed this session, it has unread content
-    // (created_at !== updated_at means there's been activity)
-    if (!viewedAt) {
-      const createdAtSeconds = new Date(session.created_at).getTime() / 1000;
-      // If session was modified after creation, it has unread content
-      const hasActivity = updatedAtSeconds > createdAtSeconds + 1; // 1 second tolerance
-      return hasActivity;
-    }
-    
-    // Has unread if session was modified after we last viewed it
-    return updatedAtSeconds > viewedAt;
-  })();
+  // Blue dot: unread if session was modified after we last viewed it
+  const hasUnreadMessages = !isActive && hasUnread(session.session_id, session.updated_at, session.created_at);
 
   // Position popover when shown
   useEffect(() => {

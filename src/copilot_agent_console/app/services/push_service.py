@@ -15,36 +15,42 @@ from copilot_agent_console.app.services.logging_service import get_logger
 logger = get_logger(__name__)
 
 PUSH_SUBSCRIPTIONS_FILE = APP_HOME / "push_subscriptions.json"
+VAPID_PEM_FILE = APP_HOME / "vapid_private.pem"
 
 
 def get_or_create_vapid_keys() -> dict[str, str]:
     """Get existing VAPID keys or generate new ones.
     
     Keys are stored in settings.json alongside other app settings.
-    Returns dict with 'vapid_public_key' and 'vapid_private_key'.
+    - vapid_private_key: PEM-encoded private key (what py_vapid uses natively)
+    - vapid_public_key: base64url-encoded uncompressed point (what browsers need)
     """
     from copilot_agent_console.app.services.storage_service import storage_service
     settings = storage_service.get_settings()
     
     if settings.get("vapid_public_key") and settings.get("vapid_private_key"):
+        # Ensure PEM file exists on disk (for pywebpush)
+        if not VAPID_PEM_FILE.exists():
+            APP_HOME.mkdir(parents=True, exist_ok=True)
+            VAPID_PEM_FILE.write_text(settings["vapid_private_key"])
         return {
             "vapid_public_key": settings["vapid_public_key"],
             "vapid_private_key": settings["vapid_private_key"],
         }
     
-    # Generate ECDSA P-256 key pair for VAPID
+    # Generate using py_vapid (ensures correct format for signing)
     import base64
-    from cryptography.hazmat.primitives.asymmetric import ec
+    from py_vapid import Vapid
     from cryptography.hazmat.primitives import serialization
     
-    private_key = ec.generate_private_key(ec.SECP256R1())
+    vapid = Vapid()
+    vapid.generate_keys()
     
-    # Private key as raw 32 bytes → base64url (no padding)
-    private_raw = private_key.private_numbers().private_value.to_bytes(32, "big")
-    private_b64 = base64.urlsafe_b64encode(private_raw).decode().rstrip("=")
+    # Private key as PEM string (py_vapid's native format)
+    private_pem = vapid.private_pem().decode("utf-8")
     
-    # Public key as uncompressed point (65 bytes) → base64url (no padding)
-    public_raw = private_key.public_key().public_bytes(
+    # Public key as base64url uncompressed point (browser's applicationServerKey format)
+    public_raw = vapid.public_key.public_bytes(
         serialization.Encoding.X962,
         serialization.PublicFormat.UncompressedPoint,
     )
@@ -52,13 +58,17 @@ def get_or_create_vapid_keys() -> dict[str, str]:
     
     storage_service.update_settings({
         "vapid_public_key": public_b64,
-        "vapid_private_key": private_b64,
+        "vapid_private_key": private_pem,
     })
+    
+    # Also save PEM to file for pywebpush (it prefers file paths)
+    APP_HOME.mkdir(parents=True, exist_ok=True)
+    VAPID_PEM_FILE.write_text(private_pem)
     
     logger.info("Generated new VAPID keys for push notifications")
     return {
         "vapid_public_key": public_b64,
-        "vapid_private_key": private_b64,
+        "vapid_private_key": private_pem,
     }
 
 
@@ -145,8 +155,8 @@ class PushSubscriptionService:
                 webpush(
                     subscription_info=sub,
                     data=payload,
-                    vapid_private_key=keys["vapid_private_key"],
-                    vapid_claims={"sub": "mailto:agentconsole@localhost"},
+                    vapid_private_key=str(VAPID_PEM_FILE),
+                    vapid_claims={"sub": "mailto:noreply@agentconsole.dev"},
                 )
                 sent += 1
             except WebPushException as e:

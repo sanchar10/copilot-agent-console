@@ -20,7 +20,7 @@ interface ViewedState {
   markViewed: (sessionId: string) => void;
   
   // Check if session has unread content
-  hasUnread: (sessionId: string, sessionUpdatedAt: string) => boolean;
+  hasUnread: (sessionId: string, sessionUpdatedAt: string, sessionCreatedAt?: string) => boolean;
   
   // Track active agents
   setAgentActive: (sessionId: string, active: boolean) => void;
@@ -66,7 +66,7 @@ export const useViewedStore = create<ViewedState>((set, get) => ({
     apiMarkViewed(sessionId);
   },
 
-  hasUnread: (sessionId: string, sessionUpdatedAt: string) => {
+  hasUnread: (sessionId: string, sessionUpdatedAt: string, sessionCreatedAt?: string) => {
     const state = get();
     
     // Don't show unread indicators until we've loaded the persisted timestamps
@@ -77,20 +77,18 @@ export const useViewedStore = create<ViewedState>((set, get) => ({
     
     const lastViewed = state.lastViewed[sessionId];
     
-    // If never viewed, it has unread content (unless it's a new session we just created)
-    if (!lastViewed) {
-      return false; // New sessions are considered "viewed" until they have agent responses
-    }
-    
     // Parse ISO timestamp to Unix seconds
     const updatedAtSeconds = new Date(sessionUpdatedAt).getTime() / 1000;
     
-    // Has unread if updated after last viewed
-    const result = updatedAtSeconds > lastViewed;
-    if (result) {
-      console.log(`[ViewedStore] hasUnread(${sessionId.slice(0,8)}): updatedAt=${updatedAtSeconds} > lastViewed=${lastViewed} = ${result}`);
+    // If never viewed, check if session has activity since creation
+    if (!lastViewed) {
+      if (!sessionCreatedAt) return false;
+      const createdAtSeconds = new Date(sessionCreatedAt).getTime() / 1000;
+      return updatedAtSeconds > createdAtSeconds + 1; // 1s tolerance
     }
-    return result;
+    
+    // Has unread if updated after last viewed
+    return updatedAtSeconds > lastViewed;
   },
 
   setAgentActive: (sessionId: string, active: boolean) => {
