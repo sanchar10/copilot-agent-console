@@ -49,8 +49,6 @@ export function MobileSessionList({ onNotification }: Props) {
     loadData();
   }, [loadData]);
 
-  // SSE for active agent notifications
-  useEffect(() => {
   // SSE for active agent notifications with exponential backoff
   const sseBackoffRef = useRef(2000);
 
