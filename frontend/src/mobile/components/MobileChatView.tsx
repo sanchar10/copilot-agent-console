@@ -6,6 +6,8 @@ import { useChatStore } from '../../stores/chatStore';
 import type { Message } from '../../types/message';
 import type { ChatStep } from '../../types/message';
 
+const EMPTY_MESSAGES: Message[] = [];
+
 interface SessionData {
   session_id: string;
   session_name: string;
@@ -32,8 +34,8 @@ export function MobileChatView() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
 
-  // Read from chatStore
-  const messages = useChatStore(s => sessionId ? (s.messagesPerSession[sessionId] || []) : []);
+  // Read from chatStore (use shallow equality to avoid infinite re-render from new [] refs)
+  const messages = useChatStore(s => sessionId ? s.messagesPerSession[sessionId] : undefined) ?? EMPTY_MESSAGES;
   const streamingState = useChatStore(s => s.getStreamingState(sessionId || null));
   const setMessages = useChatStore(s => s.setMessages);
   const addMessage = useChatStore(s => s.addMessage);
