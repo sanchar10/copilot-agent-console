@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mobileApiClient } from '../mobileClient';
 import { formatRelativeTime } from '../../utils/formatters';
@@ -47,36 +47,59 @@ export function MobileSessionList({ onNotification }: Props) {
 
   useEffect(() => {
     loadData();
-    // Poll for updates every 10 seconds
-    const interval = setInterval(loadData, 10000);
-    return () => clearInterval(interval);
   }, [loadData]);
 
   // SSE for active agent notifications
   useEffect(() => {
-    const es = mobileApiClient.createEventSource('/sessions/active-agents/stream');
+  // SSE for active agent notifications with exponential backoff
+  const sseBackoffRef = useRef(2000);
 
-    es.addEventListener(SSE_EVENTS.COMPLETED, (event) => {
-      const data = JSON.parse(event.data);
-      const sid = data.session_id;
-      const session = sessions.find(s => s.session_id === sid);
-      onNotification({
-        message: `Agent finished: ${session?.session_name || 'Session'}`,
-        sessionId: sid,
+  useEffect(() => {
+    let es: EventSource | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
+
+    function connect() {
+      if (cancelled) return;
+      es = mobileApiClient.createEventSource('/sessions/active-agents/stream');
+
+      es.addEventListener(SSE_EVENTS.COMPLETED, (event) => {
+        const data = JSON.parse(event.data);
+        const sid = data.session_id;
+        const session = sessions.find(s => s.session_id === sid);
+        onNotification({
+          message: `Agent finished: ${session?.session_name || 'Session'}`,
+          sessionId: sid,
+        });
+        // Reload sessions to pick up updated data
+        loadData();
       });
-    });
 
-    es.addEventListener(SSE_EVENTS.UPDATE, (event) => {
-      const data = JSON.parse(event.data);
-      const currentIds = new Set<string>(data.sessions.map((s: { session_id: string }) => s.session_id));
-      setActiveSessionIds(currentIds);
-    });
+      es.addEventListener(SSE_EVENTS.UPDATE, (event) => {
+        const data = JSON.parse(event.data);
+        const currentIds = new Set<string>(data.sessions.map((s: { session_id: string }) => s.session_id));
+        setActiveSessionIds(currentIds);
+        sseBackoffRef.current = 2000;
+      });
 
-    es.onerror = () => {
-      // SSE reconnects automatically
+      es.onopen = () => { sseBackoffRef.current = 2000; };
+
+      es.onerror = () => {
+        es?.close();
+        if (!cancelled) {
+          reconnectTimer = setTimeout(connect, sseBackoffRef.current);
+          sseBackoffRef.current = Math.min(sseBackoffRef.current * 2, 30000);
+        }
+      };
+    }
+
+    connect();
+
+    return () => {
+      cancelled = true;
+      es?.close();
+      if (reconnectTimer) clearTimeout(reconnectTimer);
     };
-
-    return () => es.close();
   }, [sessions, onNotification]);
 
   const handleRefresh = async () => {
@@ -95,6 +118,37 @@ export function MobileSessionList({ onNotification }: Props) {
     mobileApiClient.post(`/viewed/${sessionId}`).catch(() => {});
     navigate(`/mobile/chat/${sessionId}`);
   };
+
+  // Pull-to-refresh
+  const listRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef(0);
+  const [pullDistance, setPullDistance] = useState(0);
+  const isPulling = useRef(false);
+  const PULL_THRESHOLD = 60;
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    const el = listRef.current;
+    if (el && el.scrollTop <= 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    }
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling.current) return;
+    const diff = e.touches[0].clientY - touchStartY.current;
+    if (diff > 0) {
+      setPullDistance(Math.min(diff * 0.5, 100));
+    }
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    if (pullDistance > PULL_THRESHOLD && !refreshing) {
+      handleRefresh();
+    }
+    setPullDistance(0);
+    isPulling.current = false;
+  }, [pullDistance, refreshing]);
 
   if (loading) {
     return (
@@ -122,8 +176,31 @@ export function MobileSessionList({ onNotification }: Props) {
         </div>
       </div>
 
-      {/* Session list */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Session list with pull-to-refresh */}
+      <div
+        ref={listRef}
+        className="flex-1 overflow-y-auto"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        {/* Pull indicator */}
+        {pullDistance > 0 && (
+          <div className="flex justify-center py-2" style={{ height: pullDistance }}>
+            <svg
+              className={`w-6 h-6 text-gray-400 transition-transform ${pullDistance > PULL_THRESHOLD ? 'text-blue-500' : ''}`}
+              style={{ transform: `rotate(${Math.min(pullDistance / PULL_THRESHOLD, 1) * 180}deg)` }}
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </div>
+        )}
+        {refreshing && pullDistance === 0 && (
+          <div className="flex justify-center py-3">
+            <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full" />
+          </div>
+        )}
         {sessions.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
             <p>No sessions yet</p>
