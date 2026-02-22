@@ -1,7 +1,7 @@
 // Service Worker for Agent Console PWA
 // Serves offline fallback when server is unreachable
 
-const CACHE_NAME = 'agent-console-v7';
+const CACHE_NAME = 'agent-console-v8';
 
 // Inline offline page — no dependency on cache.addAll succeeding
 const OFFLINE_HTML = `<!DOCTYPE html>
