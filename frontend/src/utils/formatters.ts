@@ -25,3 +25,14 @@ export function formatRelativeTime(dateStr: string): string {
   
   return date.toLocaleDateString();
 }
+
+/**
+ * Format elapsed seconds into a human-readable duration (e.g., "5m", "1h 30m").
+ */
+export function formatElapsed(seconds: number): string {
+  if (seconds < 60) return `${Math.floor(seconds)}s`;
+  const mins = Math.floor(seconds / 60);
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  return `${hours}h ${mins % 60}m`;
+}

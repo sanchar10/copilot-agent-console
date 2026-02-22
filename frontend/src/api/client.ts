@@ -1,3 +1,5 @@
+import type { ApiClientInterface } from './apiInterface';
+
 const API_BASE = '/api';
 
 export class ApiError extends Error {
@@ -18,7 +20,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
-export const apiClient = {
+export const apiClient: ApiClientInterface = {
   async get<T>(path: string): Promise<T> {
     const response = await fetch(`${API_BASE}${path}`);
     return handleResponse<T>(response);
@@ -40,5 +42,12 @@ export const apiClient = {
       method: 'DELETE',
     });
     return handleResponse<T>(response);
+  },
+
+  createEventSource(path: string, params?: Record<string, string>): EventSource {
+    const searchParams = new URLSearchParams(params || {});
+    const qs = searchParams.toString();
+    const url = `${API_BASE}${path}${qs ? `?${qs}` : ''}`;
+    return new EventSource(url);
   },
 };

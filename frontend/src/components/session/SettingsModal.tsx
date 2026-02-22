@@ -138,21 +138,22 @@ export function SettingsModal() {
         )}
 
         {/* Mobile Companion */}
-        <MobileCompanionSection />
+        <MobileCompanionSection isOpen={isSettingsModalOpen} />
       </div>
     </Modal>
   );
 }
 
-function MobileCompanionSection() {
+function MobileCompanionSection({ isOpen }: { isOpen: boolean }) {
   const [apiToken, setApiToken] = useState<string | null>(null);
   const [tunnelUrl, setTunnelUrl] = useState('');
   const [exposeMode, setExposeMode] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Fetch mobile companion info (token, tunnel URL, expose status)
+  // Fetch mobile companion info every time the modal opens
   useEffect(() => {
+    if (!isOpen) return;
     apiClient.get<{ api_token: string; tunnel_url: string; expose: boolean }>('/settings/mobile-companion')
       .then(data => {
         setApiToken(data.api_token);
@@ -160,12 +161,11 @@ function MobileCompanionSection() {
         setExposeMode(data.expose);
       })
       .catch(() => {
-        // Fallback: just get token
         apiClient.get<{ api_token: string }>('/settings/api-token')
           .then(data => setApiToken(data.api_token))
           .catch(() => {});
       });
-  }, []);
+  }, [isOpen]);
 
   const handleRegenerate = async () => {
     try {
@@ -180,12 +180,23 @@ function MobileCompanionSection() {
     ? `${tunnelUrl.replace(/\/$/, '')}/mobile?token=${encodeURIComponent(apiToken)}&baseUrl=${encodeURIComponent(tunnelUrl)}`
     : null;
 
-  const handleCopy = () => {
-    if (apiToken) {
-      navigator.clipboard.writeText(apiToken);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    if (!apiToken) return;
+    try {
+      await navigator.clipboard.writeText(apiToken);
+    } catch {
+      // Fallback for non-secure contexts
+      const ta = document.createElement('textarea');
+      ta.value = apiToken;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
     }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -195,6 +206,29 @@ function MobileCompanionSection() {
       </h3>
 
       <div className="space-y-3">
+        {qrValue ? (
+          <div className="flex flex-col items-center py-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              Scan with your phone to connect:
+            </p>
+            <div className="bg-white p-3 rounded-lg shadow-sm">
+              <QRCodeSVG value={qrValue} size={180} />
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center max-w-xs break-all">
+              {tunnelUrl}/mobile
+            </p>
+          </div>
+        ) : (
+          <div className="bg-gray-50 dark:bg-[#1e1e2e] rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {exposeMode
+                ? 'Waiting for tunnel to connect...'
+                : 'Start the console with --expose to enable phone access'}
+            </p>
+          </div>
+        )}
+
+        {/* Tunnel URL — editable */}
         <div>
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
             Tunnel URL
@@ -206,62 +240,47 @@ function MobileCompanionSection() {
             placeholder="https://your-id.devtunnels.ms"
             className="w-full px-3 py-1.5 text-sm border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
           />
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            {exposeMode
-              ? 'Auto-detected from devtunnel. Edit if needed.'
-              : <>Run with <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 py-0.5 rounded">--expose</code> to auto-start a tunnel, or enter a URL manually.</>
-            }
-          </p>
+          {exposeMode && tunnelUrl && (
+            <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">
+              ✓ Auto-detected from devtunnel
+            </p>
+          )}
         </div>
 
+        {/* API Token */}
         <div>
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
             API Token
           </label>
           <div className="flex items-center gap-2">
-            <code className="flex-1 text-xs bg-gray-100 dark:bg-[#1e1e2e] px-2 py-1.5 rounded font-mono truncate">
-              {showToken ? apiToken : '••••••••••••••••'}
+            <code className="flex-1 text-xs bg-gray-100 dark:bg-[#1e1e2e] px-2 py-1.5 rounded font-mono overflow-hidden text-ellipsis whitespace-nowrap min-h-[28px] leading-[20px]">
+              {apiToken
+                ? (showToken ? apiToken : '••••••••••••••••')
+                : 'Loading...'}
             </code>
             <button
+              type="button"
               onClick={() => setShowToken(!showToken)}
-              className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400"
+              className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 whitespace-nowrap"
             >
               {showToken ? 'Hide' : 'Show'}
             </button>
             <button
+              type="button"
               onClick={handleCopy}
-              className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400"
+              className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 whitespace-nowrap"
             >
-              {copied ? '✓' : 'Copy'}
+              {copied ? '✓ Copied' : 'Copy'}
             </button>
           </div>
           <button
+            type="button"
             onClick={handleRegenerate}
             className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 mt-1"
           >
             Regenerate token
           </button>
         </div>
-
-        {qrValue && (
-          <div className="flex flex-col items-center pt-2">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-              Scan with your phone to connect:
-            </p>
-            <div className="bg-white p-3 rounded-lg">
-              <QRCodeSVG value={qrValue} size={180} />
-            </div>
-          </div>
-        )}
-
-        {!qrValue && (
-          <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-2">
-            {exposeMode
-              ? 'Waiting for tunnel URL... It should appear automatically.'
-              : <>Start with <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 py-0.5 rounded">npm run dev -- --expose</code> to auto-generate a QR code</>
-            }
-          </p>
-        )}
       </div>
     </div>
   );

@@ -2,9 +2,12 @@
 
 Protects /api/* routes when accessed from non-localhost origins (e.g., phone via tunnel).
 Localhost requests bypass auth so the desktop UI continues to work without a token.
+When a devtunnel is active, requests arrive from localhost but with a tunnel Host header;
+these are treated as remote and require a token.
 """
 
 import ipaddress
+import os
 import secrets
 
 from fastapi import Request
@@ -21,7 +24,13 @@ _LOCALHOST_ADDRS = {"127.0.0.1", "::1", "localhost"}
 
 
 def _is_localhost(request: Request) -> bool:
-    """Check if the request originates from localhost."""
+    """Check if the request originates from localhost (not via tunnel)."""
+    # When running with --expose, tunneled requests arrive from localhost
+    # but have a non-localhost Host header. Check Host to distinguish.
+    host_header = request.headers.get("host", "")
+    if host_header and not host_header.startswith(("localhost", "127.0.0.1", "[::1]")):
+        return False
+
     client = request.client
     if not client:
         return False

@@ -148,6 +148,58 @@ if ($ac) {
     Write-Host "  [NOTE] Restart your terminal, then run 'agentconsole'." -ForegroundColor Yellow
 }
 
+# --- Optional: Mobile Companion (devtunnel) ---
+Write-Host ""
+Write-Host "  Optional: Mobile Companion" -ForegroundColor Cyan
+Write-Host "  Access Agent Console from your phone via secure tunnel." -ForegroundColor DarkGray
+Write-Host ""
+$setupMobile = Read-Host "  Enable Mobile Companion? Requires devtunnel (y/N)"
+if ($setupMobile -eq 'y' -or $setupMobile -eq 'Y') {
+    $devtunnel = Get-Command devtunnel -ErrorAction SilentlyContinue
+    if (-not $devtunnel) {
+        Write-Host "  Installing devtunnel..." -ForegroundColor Yellow
+        $winget = Get-Command winget -ErrorAction SilentlyContinue
+        if ($winget) {
+            winget install Microsoft.devtunnel --accept-source-agreements --accept-package-agreements 2>&1 | ForEach-Object {
+                $line = $_.ToString().Trim()
+                if ($line -ne '') { Write-Host "  $line" -ForegroundColor DarkGray }
+            }
+            # Refresh PATH for current session
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+            $devtunnel = Get-Command devtunnel -ErrorAction SilentlyContinue
+        }
+        if (-not $devtunnel) {
+            Write-Host "  Installing devtunnel via npm..." -ForegroundColor Yellow
+            npm install -g @msdtunnel/devtunnel-cli 2>&1 | Out-Null
+            $devtunnel = Get-Command devtunnel -ErrorAction SilentlyContinue
+        }
+        if (-not $devtunnel) {
+            Write-Host "  [ERROR] Failed to install devtunnel." -ForegroundColor Red
+            Write-Host "     Install manually: https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started" -ForegroundColor Yellow
+        }
+    }
+    if ($devtunnel) {
+        Write-Host "  [OK] devtunnel installed" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "  Signing in to devtunnel (required for secure tunnels)..." -ForegroundColor Yellow
+        devtunnel user login
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  [OK] devtunnel authenticated" -ForegroundColor Green
+        } else {
+            Write-Host "  [WARN] devtunnel login failed. Run 'devtunnel user login' manually." -ForegroundColor Yellow
+        }
+        Write-Host ""
+        Write-Host "  Mobile Companion ready! Start with:" -ForegroundColor Green
+        Write-Host "     agentconsole --expose" -ForegroundColor Cyan
+        Write-Host "  Then open Settings in the UI and scan the QR code from your phone." -ForegroundColor DarkGray
+    }
+} else {
+    Write-Host "  Skipped. You can set up later:" -ForegroundColor DarkGray
+    Write-Host "     winget install Microsoft.devtunnel" -ForegroundColor DarkGray
+    Write-Host "     devtunnel user login" -ForegroundColor DarkGray
+    Write-Host "     agentconsole --expose" -ForegroundColor DarkGray
+}
+
 Write-Host ""
 Write-Host "  Ready! Run 'agentconsole' to start." -ForegroundColor Cyan
 Write-Host ""

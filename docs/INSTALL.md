@@ -11,6 +11,7 @@ Before installing Copilot Agent Console, ensure the following are available. All
 | **Node.js** | 18 or higher | `node --version` |
 | **GitHub Copilot CLI** | 0.0.410+ | `copilot --version` |
 | **GitHub Copilot subscription** | Active | [github.com/settings/copilot](https://github.com/settings/copilot) |
+| **devtunnel** *(optional)* | Latest | `devtunnel --version` |
 
 ### Step 1: Install Python
 
@@ -48,6 +49,30 @@ copilot --version   # Should show 0.0.410 or later
 Authenticate with GitHub (required before first use):
 ```powershell
 copilot login
+```
+
+### Step 4: Install devtunnel (Optional — for Mobile Companion)
+
+Only needed if you want to access Agent Console from your phone via `--expose`.
+
+**Option A: winget (Windows 10/11)**
+```powershell
+winget install Microsoft.devtunnel
+```
+
+**Option B: npm (any platform)**
+```powershell
+npm install -g @msdtunnel/devtunnel-cli
+```
+
+Then authenticate:
+```powershell
+devtunnel user login
+```
+
+Verify:
+```powershell
+devtunnel --version
 ```
 
 ---
