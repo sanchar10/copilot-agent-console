@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mobileApiClient } from '../mobileClient';
+import { mobileApiClient, getApiBase, getHeaders } from '../mobileClient';
 import { SSE_EVENTS } from '../../utils/sseConstants';
 import { useChatStore } from '../../stores/chatStore';
 import type { Message } from '../../types/message';
@@ -68,9 +68,11 @@ export function MobileChatView() {
     mobileApiClient.post(`/viewed/${sessionId}`).catch(() => {});
   }, [sessionId]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom on load and new messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+    });
   }, [messages, streamingState.content]);
 
   // Cleanup event source
@@ -157,14 +159,58 @@ export function MobileChatView() {
         // Connect session first
         await mobileApiClient.post(`/sessions/${sessionId}/connect`);
 
-        // Send message first — this creates the response buffer on the server
-        await mobileApiClient.post(`/sessions/${sessionId}/messages`, {
-          content,
-          is_new_session: false,
+        // POST /messages returns an SSE stream — read it directly (same as desktop)
+        const response = await fetch(`${getApiBase()}/sessions/${sessionId}/messages`, {
+          method: 'POST',
+          headers: getHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ content, is_new_session: false }),
         });
 
-        // Now connect SSE stream — buffer exists after message is sent
-        resumeStream(0, 0);
+        if (!response.ok || !response.body) {
+          reloadMessages(sessionId);
+          return;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let sseBuffer = '';
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            sseBuffer += decoder.decode(value, { stream: true });
+            const events = sseBuffer.split(/\r?\n\r?\n/);
+            sseBuffer = events.pop() || '';
+
+            for (const event of events) {
+              const lines = event.split(/\r?\n/);
+              let eventName = '';
+              let eventData = '';
+              for (const line of lines) {
+                if (line.startsWith('event:')) eventName = line.replace(/^event:\s?/, '').trim();
+                else if (line.startsWith('data:')) eventData = line.replace(/^data:\s?/, '');
+              }
+              if (!eventData) continue;
+              try {
+                const data = JSON.parse(eventData);
+                if (eventName === SSE_EVENTS.DELTA && data.content !== undefined) {
+                  appendStreamingContent(sessionId, data.content);
+                } else if (eventName === SSE_EVENTS.STEP && data.title) {
+                  addStreamingStep(sessionId, data);
+                } else if (eventName === SSE_EVENTS.DONE) {
+                  reloadMessages(sessionId);
+                } else if (eventName === SSE_EVENTS.ERROR) {
+                  reloadMessages(sessionId);
+                }
+              } catch { /* skip malformed event */ }
+            }
+          }
+        } catch {
+          // Stream interrupted — reload messages to get final state
+          reloadMessages(sessionId);
+        }
       }
     } catch (err) {
       console.error('Failed to send message:', err);
@@ -305,7 +351,7 @@ export function MobileChatView() {
             }}
             placeholder={streamingState.isStreaming ? 'Agent is working... (enqueue a follow-up)' : 'Type a message...'}
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-gray-200 dark:border-[#3a3a4e] bg-gray-50 dark:bg-[#2a2a3c] px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 resize-none rounded-xl border border-gray-200 dark:border-[#3a3a4e] bg-gray-50 dark:bg-[#2a2a3c] px-3 py-2.5 text-base text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             style={{ maxHeight: '120px' }}
           />
           <button

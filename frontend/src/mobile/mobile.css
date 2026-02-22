@@ -1,0 +1,25 @@
+/* Mobile-only styles — imported by MobileApp.tsx */
+
+/* Prevent iOS auto-zoom on input focus and double-tap zoom */
+.h-dvh {
+  height: 100vh; /* fallback */
+  height: 100dvh;
+  touch-action: manipulation;
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Notification slide-down animation */
+@keyframes slide-down {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out;
+}

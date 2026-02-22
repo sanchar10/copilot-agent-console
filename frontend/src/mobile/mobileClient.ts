@@ -39,7 +39,7 @@ export function clearStoredCredentials(): void {
 }
 
 /** Resolve the API base URL */
-function getApiBase(): string {
+export function getApiBase(): string {
   const baseUrl = getStoredBaseUrl();
   if (baseUrl) {
     // Remote access via tunnel — use full URL
@@ -50,7 +50,7 @@ function getApiBase(): string {
 }
 
 /** Build headers with optional auth token */
-function getHeaders(extra?: Record<string, string>): Record<string, string> {
+export function getHeaders(extra?: Record<string, string>): Record<string, string> {
   const headers: Record<string, string> = { ...extra };
   const token = getStoredToken();
   if (token) {

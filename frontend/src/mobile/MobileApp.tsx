@@ -7,6 +7,7 @@ import { MobileSettings } from './components/MobileSettings';
 import { NotificationBanner } from './components/NotificationBanner';
 import { mobileApiClient, setStoredToken, setStoredBaseUrl, getStoredToken, clearStoredCredentials, onAuthErrorChange, clearAuthError, getAuthError } from './mobileClient';
 import { useTheme } from '../hooks/useTheme';
+import './mobile.css';
 
 // Error boundary to catch render crashes and show a recovery UI
 class MobileErrorBoundary extends Component<{ children: ReactNode; onReset: () => void }, { error: Error | null }> {
@@ -92,7 +93,7 @@ export function MobileApp() {
   // Show setup screen if no token configured AND not on localhost
   if (!isLocalhost && !getStoredToken() && !searchParams.get('token')) {
     return (
-      <div className="h-screen bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col">
+      <div className="h-dvh bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col safe-top">
         <MobileSettings onConnectionChange={handleConnectionChange} />
       </div>
     );
@@ -101,7 +102,7 @@ export function MobileApp() {
   // Show re-auth screen when token is invalid or connection lost
   if (authError) {
     return (
-      <div className="h-screen bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col items-center justify-center p-6 text-center">
+      <div className="h-dvh bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col items-center justify-center p-6 text-center safe-top">
         <div className="text-5xl mb-4">{authError === 'unauthorized' ? '🔑' : '📡'}</div>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
           {authError === 'unauthorized' ? 'Session Expired' : 'Connection Lost'}
@@ -146,7 +147,7 @@ export function MobileApp() {
   const activeTab = getActiveTab();
 
   return (
-    <div className="h-screen bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col">
+    <div className="h-dvh bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col safe-top">
       {/* Connection indicator */}
       {connected === false && (
         <div className="bg-red-500 text-white text-center text-xs py-1">
