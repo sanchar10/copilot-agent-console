@@ -151,7 +151,7 @@ export function MobileSettings({ onConnectionChange }: Props) {
         <section className="bg-white dark:bg-[#2a2a3c] rounded-xl p-4 shadow-sm border border-gray-100 dark:border-[#3a3a4e]">
           <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Connection</h2>
 
-          {!isConfigured && (
+          {!isConfigured ? (
             <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg p-3 mb-4 text-sm">
               <p className="font-medium">Quick Setup</p>
               <p className="text-xs mt-1 mb-3">
@@ -164,6 +164,13 @@ export function MobileSettings({ onConnectionChange }: Props) {
                 📷 Scan QR Code
               </button>
             </div>
+          ) : (
+            <button
+              onClick={() => setShowScanner(true)}
+              className="w-full py-2 mb-3 text-sm text-blue-600 dark:text-blue-400 rounded-lg border border-blue-200 dark:border-blue-800"
+            >
+              📷 Re-scan QR Code
+            </button>
           )}
 
           <div className="space-y-3">
