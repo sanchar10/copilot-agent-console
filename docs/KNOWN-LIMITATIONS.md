@@ -62,3 +62,7 @@ MCP servers are configured globally in `~/.copilot/mcp-config.json` or `~/.copil
 ## Session Working Directory Cannot Be Changed After First Message
 
 While the working directory (`cwd`) can be updated in session settings, the underlying SDK client must be destroyed and recreated. This means the Copilot model loses all conversation context accumulated in the current SDK session.
+
+## Workflows Support Sequential Execution Only
+
+Workflow orchestration currently supports sequential agent chains only. Parallel execution patterns (fan-out / fan-in) are supported by the underlying Agent Framework programmatically but are not yet exposed in the declarative YAML format used by workflows. This will be added in a future update.

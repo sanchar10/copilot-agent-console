@@ -80,7 +80,25 @@ if ($needsLogin) {
 Write-Host ""
 Write-Host "  Installing Copilot Agent Console..." -ForegroundColor Yellow
 
+# Install Agent Framework (pre-release) — required for workflow orchestration
+# Installed separately because AF is pre-release and needs --pre flag.
+# For pipx installs, it gets injected into the venv after console install.
+Write-Host "  Installing Microsoft Agent Framework (pre-release)..." -ForegroundColor DarkGray
+$afInstalled = $false
+pip install --user --quiet agent-framework --pre 2>&1 | ForEach-Object {
+    $line = $_.ToString()
+    if ($line -match 'ERROR|error') { Write-Host "  $line" -ForegroundColor Red }
+}
+if ($LASTEXITCODE -eq 0) {
+    $afInstalled = $true
+    Write-Host "  [OK] Agent Framework installed" -ForegroundColor Green
+} else {
+    Write-Host "  [WARN] Agent Framework install failed. Workflows may not work." -ForegroundColor Yellow
+    Write-Host "     Try manually: pip install agent-framework --pre" -ForegroundColor Yellow
+}
+
 $installed = $false
+$usedPipx = $false
 $pipx = Get-Command pipx -ErrorAction SilentlyContinue
 if ($pipx) {
     pipx install --force $WHL_URL 2>&1 | ForEach-Object {
@@ -91,6 +109,7 @@ if ($pipx) {
     }
     if ($LASTEXITCODE -eq 0) {
         $installed = $true
+        $usedPipx = $true
     } else {
         Write-Host "  [WARN] pipx install failed, using pip instead..." -ForegroundColor Yellow
     }
@@ -114,6 +133,17 @@ if (-not $installed) {
 }
 if (-not $installed) {
     exit 1
+}
+
+# Inject Agent Framework into pipx venv (pipx uses isolated environments)
+if ($usedPipx -and $afInstalled) {
+    Write-Host "  Injecting Agent Framework into pipx environment..." -ForegroundColor DarkGray
+    pipx inject copilot-agent-console agent-framework --pip-args="--pre" 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  [OK] Agent Framework injected into pipx venv" -ForegroundColor Green
+    } else {
+        Write-Host "  [WARN] pipx inject failed. Run manually: pipx inject copilot-agent-console agent-framework --pip-args='--pre'" -ForegroundColor Yellow
+    }
 }
 
 # --- Verify ---

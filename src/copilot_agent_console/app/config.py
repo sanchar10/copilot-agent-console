@@ -35,6 +35,9 @@ DEFAULT_MODEL = "gpt-4.1"
 # Default working directory for new sessions (user's home)
 DEFAULT_CWD = str(Path.home())
 
+# Default timeout (seconds) for each workflow step (agent invocation)
+DEFAULT_WORKFLOW_STEP_TIMEOUT = 600  # 10 minutes
+
 # API settings
 API_PREFIX = "/api"
 

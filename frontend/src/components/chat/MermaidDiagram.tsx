@@ -296,9 +296,9 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
   return (
     <>
       <FullscreenModal />
-      <div className={`overflow-hidden not-prose ${className}`}>
+      <div className={`overflow-hidden not-prose flex flex-col ${className}`}>
         {/* Header with toggle and zoom controls */}
-        <div className="flex items-center justify-between px-2 py-1.5 bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-t-md text-xs">
+        <div className="flex items-center justify-between px-2 py-1.5 bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-t-md text-xs shrink-0">
           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -381,20 +381,23 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
         
         {/* Content - responsive container */}
         {showRaw ? (
-          <pre className="p-3 bg-gray-900 text-gray-100 text-sm overflow-x-auto rounded-b-md">
+          <pre className="p-3 bg-gray-900 text-gray-100 text-sm overflow-x-auto rounded-b-md flex-1 min-h-0">
             <code>{code}</code>
           </pre>
         ) : (
           <div 
-            className={`overflow-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-b-md`}
+            className={`flex-1 min-h-0 flex items-center justify-center ${zoom > 1 ? 'overflow-auto' : 'overflow-hidden'} ${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-b-md`}
           >
             <div 
-              className="w-full"
+              className="mermaid-fit-pane w-full h-full flex items-center justify-center"
               style={{ 
                 transform: `scale(${zoom})`, 
-                transformOrigin: 'top center', 
+                transformOrigin: 'center center', 
                 transition: 'transform 0.2s ease',
-                minWidth: zoom > 1 ? `${100 * zoom}%` : '100%',
+                ...(zoom > 1 ? {
+                  minWidth: `${100 * zoom}%`,
+                  minHeight: `${100 * zoom}%`,
+                } : {}),
               }}
               dangerouslySetInnerHTML={{ __html: svg }}
             />

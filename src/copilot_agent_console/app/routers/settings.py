@@ -18,6 +18,7 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 class SettingsUpdate(BaseModel):
     default_model: str | None = None
     default_cwd: str | None = None
+    workflow_step_timeout: int | None = None
 
 
 @router.get("")
@@ -40,6 +41,13 @@ async def update_settings(request: SettingsUpdate) -> dict:
                 detail=f"Directory does not exist: {request.default_cwd}"
             )
         updates["default_cwd"] = request.default_cwd
+    if request.workflow_step_timeout is not None:
+        if request.workflow_step_timeout < 30:
+            raise HTTPException(
+                status_code=400,
+                detail="workflow_step_timeout must be at least 30 seconds"
+            )
+        updates["workflow_step_timeout"] = request.workflow_step_timeout
     return storage_service.update_settings(updates)
 
 

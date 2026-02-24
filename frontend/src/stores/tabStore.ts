@@ -5,17 +5,18 @@
 
 import { create } from 'zustand';
 
-export type TabType = 'session' | 'ralph-monitor' | 'file' | 'agent-library' | 'agent-detail' | 'schedule-manager' | 'task-board' | 'task-run-detail';
+export type TabType = 'session' | 'ralph-monitor' | 'file' | 'agent-library' | 'agent-detail' | 'schedule-manager' | 'task-board' | 'task-run-detail' | 'workflow-library' | 'workflow-editor' | 'workflow-run';
 
 export interface Tab {
-  id: string;           // "session:<uuid>", "ralph-monitor", "file:<path>", "agent-library", "agent:<id>", "schedule-manager", "task-board", "task-run:<id>"
+  id: string;           // "session:<uuid>", "ralph-monitor", "file:<path>", "agent-library", "agent:<id>", "schedule-manager", "task-board", "task-run:<id>", "workflow-library", "workflow:<id>", "workflow-run:<id>"
   type: TabType;
   label: string;
   sessionId?: string;   // for type='session'
   filePath?: string;    // for type='file'
   agentId?: string;     // for type='agent-detail'
-  runId?: string;       // for type='task-run-detail'
+  runId?: string;       // for type='task-run-detail' or 'workflow-run'
   scheduleId?: string;  // for type='task-board' (optional filter)
+  workflowId?: string;  // for type='workflow-editor' or 'workflow-run'
 }
 
 interface TabState {
@@ -45,6 +46,9 @@ export const tabId = {
   scheduleManager: () => 'schedule-manager',
   taskBoard: (scheduleId?: string) => scheduleId ? `task-board:${scheduleId}` : 'task-board',
   taskRunDetail: (runId: string) => `task-run:${runId}`,
+  workflowLibrary: () => 'workflow-library',
+  workflowEditor: (workflowId: string) => `workflow:${workflowId}`,
+  workflowRun: (runId: string) => `workflow-run:${runId}`,
 };
 
 // Helper to extract session ID from a tab ID

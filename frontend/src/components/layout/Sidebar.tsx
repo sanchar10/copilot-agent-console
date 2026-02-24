@@ -5,6 +5,7 @@ import { useRalphStore } from '../../stores/ralphStore';
 import { useTabStore, tabId } from '../../stores/tabStore';
 import { useAgentMonitorStore } from '../../stores/agentMonitorStore';
 import { useAgentStore } from '../../stores/agentStore';
+import { useWorkflowStore } from '../../stores/workflowStore';
 import { listSessions } from '../../api/sessions';
 import { fetchModels } from '../../api/models';
 import { getSettings } from '../../api/settings';
@@ -20,6 +21,7 @@ export function Sidebar() {
   const { activeTabId, openTab } = useTabStore();
   const { setOpen: setAgentMonitorOpen, activeCount, setActiveCount } = useAgentMonitorStore();
   const { agents, fetchAgents } = useAgentStore();
+  const { workflows, fetchWorkflows } = useWorkflowStore();
   const { hasFlag } = useFeatureFlags();
   const showRalph = hasFlag('ralph');
 
@@ -61,6 +63,7 @@ export function Sidebar() {
           setDefaultCwd(settingsData.default_cwd);
         }
         fetchAgents();
+        fetchWorkflows();
       } catch (err) {
         // Backend may not be ready yet (dev mode race) — retry once after 2s
         console.warn('Initial load failed, retrying in 2s...', err);
@@ -78,6 +81,7 @@ export function Sidebar() {
             setDefaultCwd(settingsData.default_cwd);
           }
           fetchAgents();
+          fetchWorkflows();
         } catch (retryErr) {
           setError(retryErr instanceof Error ? retryErr.message : 'Failed to load data');
         }
@@ -86,7 +90,7 @@ export function Sidebar() {
       }
     }
     loadData();
-  }, [setSessions, setAvailableModels, setDefaultModel, setDefaultCwd, setLoading, setError, fetchAgents]);
+  }, [setSessions, setAvailableModels, setDefaultModel, setDefaultCwd, setLoading, setError, fetchAgents, fetchWorkflows]);
 
   const handleNewSession = async () => {
     // startNewSession now refreshes MCP servers automatically and enables all by default
@@ -164,11 +168,8 @@ export function Sidebar() {
         </button>
       </div>
 
-      {/* AGENTS Section */}
+      {/* Navigation — flat entries per design doc */}
       <div className="px-3 pt-3 pb-1 border-b border-gray-200 dark:border-[#3a3a4e]">
-        <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-2">
-          Agents
-        </h2>
         <button
           onClick={() => {
             fetchAgents();
@@ -180,10 +181,27 @@ export function Sidebar() {
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
           }`}
         >
-          <span>📚</span>
-          Library
+          <span>🤖</span>
+          Agents
           {agents.length > 0 && (
             <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{agents.length}</span>
+          )}
+        </button>
+        <button
+          onClick={() => {
+            fetchWorkflows();
+            openTab({ id: tabId.workflowLibrary(), type: 'workflow-library', label: 'Workflow Library' });
+          }}
+          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
+            activeTabId === tabId.workflowLibrary()
+              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+          }`}
+        >
+          <span>🔀</span>
+          Workflows
+          {workflows.length > 0 && (
+            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{workflows.length}</span>
           )}
         </button>
         <button

@@ -14,6 +14,9 @@ import { AgentEditor } from '../agents/AgentEditor';
 import { ScheduleManager } from '../schedules/ScheduleManager';
 import { TaskBoard } from '../taskboard/TaskBoard';
 import { TaskRunDetail } from '../taskboard/TaskRunDetail';
+import { WorkflowLibrary } from '../workflows/WorkflowLibrary';
+import { WorkflowEditor } from '../workflows/WorkflowEditor';
+import { WorkflowRunView } from '../workflows/WorkflowRunView';
 import { updateSession, getSession } from '../../api/sessions';
 import { getAgent, getEligibleSubAgents } from '../../api/agents';
 import type { AgentTools, SystemMessage, Agent, StarterPrompt } from '../../types/agent';
@@ -479,6 +482,13 @@ export function ChatPane() {
       )}
       {!showNewSession && activeTab?.type === 'task-run-detail' && activeTab.runId && (
         <TaskRunDetail runId={activeTab.runId} />
+      )}
+      {!showNewSession && activeTab?.type === 'workflow-library' && <WorkflowLibrary />}
+      {!showNewSession && activeTab?.type === 'workflow-editor' && activeTab.workflowId && (
+        <WorkflowEditor workflowId={activeTab.workflowId} />
+      )}
+      {!showNewSession && activeTab?.type === 'workflow-run' && activeTab.workflowId && activeTab.runId && (
+        <WorkflowRunView workflowId={activeTab.workflowId} runId={activeTab.runId} />
       )}
       {openSessionIds.map((sessionId) => (
         <SessionTabContent

@@ -13,7 +13,7 @@ A local desktop application for running and automating GitHub Copilot agents thr
 
 ## What Is This?
 
-Copilot Agent Console is a feature-rich application built on the [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli) and [Copilot Python SDK](https://github.com/github/copilot-sdk) that adds multi-session management, reusable agent personalities, scheduled automations, and external tool integration — all through a modern browser interface running on your machine.
+Copilot Agent Console is a feature-rich application built on the [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli), [Copilot Python SDK](https://github.com/github/copilot-sdk), and [Microsoft Agent Framework](https://github.com/microsoft/agent-framework) that adds multi-session management, multi-agent workflows, reusable agent personalities, scheduled automations, and external tool integration — all through a modern browser interface running on your machine.
 
 It leverages Copilot's agentic capabilities — orchestration, context management, built-in tools — and provides a platform to extend them for different use cases through custom tools, MCP servers, and agent personalities.
 
@@ -22,6 +22,13 @@ It leverages Copilot's agentic capabilities — orchestration, context managemen
 ---
 
 ## Features
+
+### 🔀 Workflows
+Multi-agent pipelines defined in YAML and powered by the [Microsoft Agent Framework](https://github.com/microsoft/agent-framework). Chain agents together — each step's output flows to the next. Run with a single click, watch events stream in real-time, and review run history with full traces.
+
+Ships with sample workflows including **Codebase Health Check** (scanner → analyst → report generator) and **Emoji Poem** (poet → illustrator).
+
+![Workflows](docs/screenshots/workflow-dark.jpg)
 
 ### 💬 Multi-Session Chat
 Multiple conversations run simultaneously in a tabbed interface. Each session has its own context, model selection, and tool configuration. Sessions persist across restarts.
@@ -103,8 +110,9 @@ agentconsole
 1. **Start a session** — Click `+` in the sidebar to create a new conversation.
 2. **Chat** — Type a message and hit Enter. Responses stream in real-time.
 3. **Create an agent** — Go to **Agents** in the sidebar, click **+ New Agent**, configure a name, system prompt, and model.
-4. **Schedule an automation** — On an agent card, click **Automations**, then **+ New Automation** to set a cron schedule.
-5. **Add custom tools** — Use the built-in **Tool Builder** agent to create tools via chat, or manually drop a `.py` file into `~/.copilot-agent-console/tools/` (see [Custom Tools](docs/CUSTOM-TOOLS.md)).
+4. **Run a workflow** — Go to **Workflows**, open **Emoji Poem** or **Codebase Health Check**, click **▶ Run**, enter a topic, and watch the agents chain.
+5. **Schedule an automation** — On an agent card, click **Automations**, then **+ New Automation** to set a cron schedule.
+6. **Add custom tools** — Use the built-in **Tool Builder** agent to create tools via chat, or manually drop a `.py` file into `~/.copilot-agent-console/tools/` (see [Custom Tools](docs/CUSTOM-TOOLS.md)).
 
 ---
 
@@ -155,6 +163,8 @@ All data is stored in `C:\Users\<username>\.copilot-agent-console\`:
 ├── settings.json        # Default model, working directory
 ├── sessions\            # Chat session history
 ├── agents\              # Agent library definitions
+├── workflows\           # Workflow YAML definitions
+├── workflow-runs\       # Workflow run history and working directories
 ├── schedules\           # Automation schedules
 ├── task-runs\           # Automation run history
 ├── tools\               # Custom Python tools (drop .py files here)
@@ -169,10 +179,12 @@ Custom tools can be created using the built-in **Tool Builder** agent or written
 ## More Information
 
 - [Manual Installation](docs/INSTALL.md) — Step-by-step setup, updating, and uninstalling
+- [Packaged Samples](docs/SAMPLES.md) — Pre-built agents, workflows, and automations to try
+- [Workflows](src/copilot_agent_console/seed/agent-console/docs/features/workflows.md) — Multi-agent pipelines with YAML
 - [Custom Tools](docs/CUSTOM-TOOLS.md) — Creating tools with Tool Builder or manually
 - [Agent Teams](docs/MULTI-AGENT.md) — Composing agents with sub-agents
-- [Troubleshooting](docs/TROUBLESHOOTING.md) — Common issues and SDK/CLI compatibility
 - [Mobile Companion](docs/MOBILE-COMPANION.md) — Phone access via secure tunnel
+- [Troubleshooting](docs/TROUBLESHOOTING.md) — Common issues and SDK/CLI compatibility
 - [Contributing](docs/CONTRIBUTING.md) — Development setup, building, testing, and architecture
 
 ---

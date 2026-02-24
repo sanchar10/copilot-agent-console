@@ -1,0 +1,19 @@
+kind: Workflow
+name: codebase-health-check
+description: Analyzes a codebase and generates a visual HTML health report with scores across five categories.
+trigger:
+  kind: OnConversationStart
+  id: health_check
+  actions:
+    - kind: InvokeAzureAgent
+      id: scan
+      agent:
+        name: Codebase Scanner
+    - kind: InvokeAzureAgent
+      id: analyze
+      agent:
+        name: Health Analyst
+    - kind: InvokeAzureAgent
+      id: report
+      agent:
+        name: Report Generator

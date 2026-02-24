@@ -11,6 +11,7 @@ Before installing Copilot Agent Console, ensure the following are available. All
 | **Node.js** | 18 or higher | `node --version` |
 | **GitHub Copilot CLI** | 0.0.410+ | `copilot --version` |
 | **GitHub Copilot subscription** | Active | [github.com/settings/copilot](https://github.com/settings/copilot) |
+| **Microsoft Agent Framework** | Pre-release | `pip show agent-framework` |
 | **devtunnel** *(optional)* | Latest | `devtunnel --version` |
 
 ### Step 1: Install Python
@@ -51,7 +52,22 @@ Authenticate with GitHub (required before first use):
 copilot login
 ```
 
-### Step 4: Install devtunnel (Optional — for Mobile Companion)
+### Step 4: Install Microsoft Agent Framework
+
+The [Agent Framework](https://github.com/microsoft/agent-framework) is required for workflow orchestration. It is currently in pre-release:
+
+```powershell
+pip install agent-framework --pre
+```
+
+Verify:
+```powershell
+pip show agent-framework    # Should show 1.0.0b* or later
+```
+
+> **Note:** The `--pre` flag is required because Agent Framework is in beta. This installs `agent-framework`, `agent-framework-core`, `agent-framework-declarative`, and `agent-framework-github-copilot` as transitive dependencies.
+
+### Step 5: Install devtunnel (Optional — for Mobile Companion)
 
 Only needed if you want to access Agent Console from your phone via `--expose`.
 

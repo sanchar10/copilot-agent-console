@@ -7,7 +7,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from copilot_agent_console.app.config import DEFAULT_CWD, DEFAULT_MODEL, METADATA_FILE, SESSIONS_DIR, SETTINGS_FILE, ensure_directories
+from copilot_agent_console.app.config import DEFAULT_CWD, DEFAULT_MODEL, DEFAULT_WORKFLOW_STEP_TIMEOUT, METADATA_FILE, SESSIONS_DIR, SETTINGS_FILE, ensure_directories
 from copilot_agent_console.app.models.session import Session
 
 
@@ -108,11 +108,13 @@ class StorageService:
         """Get user settings."""
         if SETTINGS_FILE.exists():
             settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
-            # Ensure default_cwd exists (for existing settings files)
+            # Ensure defaults exist (for existing settings files)
             if "default_cwd" not in settings:
                 settings["default_cwd"] = DEFAULT_CWD
+            if "workflow_step_timeout" not in settings:
+                settings["workflow_step_timeout"] = DEFAULT_WORKFLOW_STEP_TIMEOUT
             return settings
-        return {"default_model": DEFAULT_MODEL, "default_cwd": DEFAULT_CWD}
+        return {"default_model": DEFAULT_MODEL, "default_cwd": DEFAULT_CWD, "workflow_step_timeout": DEFAULT_WORKFLOW_STEP_TIMEOUT}
 
     def update_settings(self, settings: dict) -> dict:
         """Update user settings."""
