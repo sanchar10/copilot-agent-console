@@ -109,6 +109,8 @@ class StorageService:
         if SETTINGS_FILE.exists():
             settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
             # Ensure defaults exist (for existing settings files)
+            if "default_model" not in settings:
+                settings["default_model"] = DEFAULT_MODEL
             if "default_cwd" not in settings:
                 settings["default_cwd"] = DEFAULT_CWD
             if "workflow_step_timeout" not in settings:
