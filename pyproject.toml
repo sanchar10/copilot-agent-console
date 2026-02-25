@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "copilot-agent-console"
+name = "copilot-console"
 version = "0.4.0"
-description = "Copilot Agent Console - A feature-rich console for GitHub Copilot agents"
+description = "Copilot Console - A feature-rich console for GitHub Copilot agents"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
@@ -60,7 +60,7 @@ dev = [
 ]
 
 [project.scripts]
-copilot-console = "copilot_agent_console.cli:main"
+copilot-console = "copilot_console.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/sanchar10/copilot-agent-console"
@@ -69,13 +69,13 @@ Repository = "https://github.com/sanchar10/copilot-agent-console"
 Issues = "https://github.com/sanchar10/copilot-agent-console/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/copilot_agent_console"]
+packages = ["src/copilot_console"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"frontend/dist" = "copilot_agent_console/static"
+"frontend/dist" = "copilot_console/static"
 
 [tool.hatch.build.targets.editable]
-packages = ["src/copilot_agent_console"]
+packages = ["src/copilot_console"]
 
 [tool.hatch.build.targets.sdist]
 include = [

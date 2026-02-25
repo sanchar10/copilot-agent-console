@@ -89,7 +89,7 @@ def main():
 
     # Step 4: Test engine wrapper
     print("\n3. Testing WorkflowEngine wrapper...")
-    from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+    from copilot_console.app.services.workflow_engine import WorkflowEngine
     engine = WorkflowEngine()
 
     # Engine uses its own factory — register agents for this test
@@ -149,12 +149,12 @@ def main():
 
     # Step 7: Test full storage + engine integration
     print("\n6. Testing storage + engine integration...")
-    from copilot_agent_console.app.services.workflow_storage_service import WorkflowStorageService
-    from copilot_agent_console.app.services.workflow_run_service import WorkflowRunService
-    from copilot_agent_console.app.models.workflow import WorkflowCreate
+    from copilot_console.app.services.workflow_storage_service import WorkflowStorageService
+    from copilot_console.app.services.workflow_run_service import WorkflowRunService
+    from copilot_console.app.models.workflow import WorkflowCreate
 
     # Use temp dirs (don't touch real storage)
-    import copilot_agent_console.app.workflow_config as wf_config
+    import copilot_console.app.workflow_config as wf_config
     import tempfile as tf
     tmpdir = Path(tf.mkdtemp())
     orig_wf = wf_config.WORKFLOWS_DIR

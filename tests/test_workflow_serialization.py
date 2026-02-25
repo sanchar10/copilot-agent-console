@@ -30,7 +30,7 @@ class TestSerializeEventData:
 
     @pytest.fixture(autouse=True)
     def _import_serializer(self):
-        from copilot_agent_console.app.routers.workflows import _serialize_event_data
+        from copilot_console.app.routers.workflows import _serialize_event_data
         self.serialize = _serialize_event_data
 
     def test_none(self):
@@ -164,7 +164,7 @@ class TestSerializeWorkflowEvent:
 
     @pytest.fixture(autouse=True)
     def _import_serializer(self):
-        from copilot_agent_console.app.routers.workflows import _serialize_workflow_event
+        from copilot_console.app.routers.workflows import _serialize_workflow_event
         self.serialize = _serialize_workflow_event
 
     def _make_event(self, **kwargs):
@@ -285,12 +285,12 @@ class TestWorkflowRunEventsField:
     """Test that WorkflowRun model supports the events field."""
 
     def test_events_default_empty(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRun
+        from copilot_console.app.models.workflow import WorkflowRun
         run = WorkflowRun(id="run-1", workflow_id="wf-1")
         assert run.events == []
 
     def test_events_populated(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRun
+        from copilot_console.app.models.workflow import WorkflowRun
         events = [
             {"type": "started", "run_id": "run-1"},
             {"type": "executor_invoked", "executor_id": "step_a"},
@@ -303,7 +303,7 @@ class TestWorkflowRunEventsField:
 
     def test_events_roundtrip_json(self):
         """Events should survive JSON serialization and deserialization."""
-        from copilot_agent_console.app.models.workflow import WorkflowRun
+        from copilot_console.app.models.workflow import WorkflowRun
         events = [
             {"type": "started", "run_id": "run-1"},
             {"type": "output", "executor_id": "step_a", "data": "response text"},
@@ -325,7 +325,7 @@ class TestEventPersistence:
     @pytest.fixture(autouse=True)
     def setup_run_service(self, monkeypatch, tmp_path):
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -333,11 +333,11 @@ class TestEventPersistence:
         workflows_dir.mkdir()
         workflow_runs_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
 
-        from copilot_agent_console.app.services.workflow_run_service import WorkflowRunService
+        from copilot_console.app.services.workflow_run_service import WorkflowRunService
         self.service = WorkflowRunService()
 
     def test_mark_completed_stores_events(self):
@@ -417,7 +417,7 @@ class TestWorkflowEngineSyncAgents:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch, tmp_path):
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -427,7 +427,7 @@ class TestWorkflowEngineSyncAgents:
         workflow_runs_dir.mkdir()
         agents_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
 
@@ -435,7 +435,7 @@ class TestWorkflowEngineSyncAgents:
         self.monkeypatch = monkeypatch
 
     def _create_mock_agent(self, name, content="You are helpful.", description="A test agent"):
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.models.agent import Agent, SystemMessage
         return Agent(
             id=f"agent-{name}",
             name=name,
@@ -444,8 +444,8 @@ class TestWorkflowEngineSyncAgents:
         )
 
     def test_sync_populates_agents(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
 
         agents = [
             self._create_mock_agent("researcher", "You research topics."),
@@ -461,8 +461,8 @@ class TestWorkflowEngineSyncAgents:
         assert len(engine._registered_agents) == 2
 
     def test_sync_uses_system_message_content(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
 
         agents = [self._create_mock_agent("my-agent", "Custom instructions here.")]
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: agents)
@@ -477,9 +477,9 @@ class TestWorkflowEngineSyncAgents:
 
     def test_sync_no_system_message(self):
         """Agent without system_message falls back to description."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent
 
         agent = Agent(id="agent-1", name="fallback-agent", description="I help with stuff")
         agents = [agent]
@@ -493,8 +493,8 @@ class TestWorkflowEngineSyncAgents:
         assert "fallback-agent" in engine._registered_agents
 
     def test_sync_empty_library(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
 
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: [])
 
@@ -512,7 +512,7 @@ class TestAgentBridgeTools:
     def setup(self, monkeypatch, tmp_path):
         import sys
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -520,7 +520,7 @@ class TestAgentBridgeTools:
         workflows_dir.mkdir()
         workflow_runs_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
         self.monkeypatch = monkeypatch
@@ -528,7 +528,7 @@ class TestAgentBridgeTools:
     def _create_agent_with_tools(self, name="tool-agent", custom_tools=None,
                                   builtin=None, excluded_builtin=None,
                                   mcp_servers=None, model=None):
-        from copilot_agent_console.app.models.agent import Agent, AgentTools, SystemMessage
+        from copilot_console.app.models.agent import Agent, AgentTools, SystemMessage
         tools = AgentTools(
             custom=custom_tools or [],
             builtin=builtin or [],
@@ -546,10 +546,10 @@ class TestAgentBridgeTools:
 
     def test_custom_tools_become_function_tools(self):
         """Custom tool specs should be wrapped as FunctionTool with name, description, func, input_model."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.services import tools_service as ts_mod
-        from copilot_agent_console.app.models.tools import ToolSpecWithHandler
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services import tools_service as ts_mod
+        from copilot_console.app.models.tools import ToolSpecWithHandler
 
         def my_handler(location: str) -> str:
             return f"Weather in {location}"
@@ -584,10 +584,10 @@ class TestAgentBridgeTools:
 
     def test_multiple_custom_tools(self):
         """Multiple custom tools should all be converted to FunctionTool."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.services import tools_service as ts_mod
-        from copilot_agent_console.app.models.tools import ToolSpecWithHandler
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services import tools_service as ts_mod
+        from copilot_console.app.models.tools import ToolSpecWithHandler
 
         specs = [
             ToolSpecWithHandler(
@@ -610,8 +610,8 @@ class TestAgentBridgeTools:
 
     def test_no_custom_tools_passes_none(self):
         """Agent without custom tools should not set _tools."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
 
         agent = self._create_agent_with_tools(custom_tools=[])
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: [agent])
@@ -625,9 +625,9 @@ class TestAgentBridgeTools:
 
     def test_tool_resolution_failure_logs_warning(self):
         """If tools_service raises, agent should still be created without tools."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.services import tools_service as ts_mod
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services import tools_service as ts_mod
 
         agent = self._create_agent_with_tools(custom_tools=["nonexistent_tool"])
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: [agent])
@@ -652,7 +652,7 @@ class TestAgentBridgeBuiltinTools:
     def setup(self, monkeypatch, tmp_path):
         import sys
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -660,13 +660,13 @@ class TestAgentBridgeBuiltinTools:
         workflows_dir.mkdir()
         workflow_runs_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
         self.monkeypatch = monkeypatch
 
     def _create_agent_with_builtin(self, builtin=None, excluded_builtin=None):
-        from copilot_agent_console.app.models.agent import Agent, AgentTools, SystemMessage
+        from copilot_console.app.models.agent import Agent, AgentTools, SystemMessage
         tools = AgentTools(
             custom=[],
             builtin=builtin or [],
@@ -682,8 +682,8 @@ class TestAgentBridgeBuiltinTools:
 
     def test_available_tools_stored(self):
         """Builtin tools from agent definition should be stored as _available_tools."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
 
         agent = self._create_agent_with_builtin(builtin=["code_search", "file_reader"])
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: [agent])
@@ -697,8 +697,8 @@ class TestAgentBridgeBuiltinTools:
 
     def test_excluded_tools_stored(self):
         """Excluded builtin tools should be stored as _excluded_tools."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
 
         agent = self._create_agent_with_builtin(excluded_builtin=["web_search"])
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: [agent])
@@ -712,8 +712,8 @@ class TestAgentBridgeBuiltinTools:
 
     def test_no_builtin_tools_both_none(self):
         """Agent without builtin/excluded_builtin → both None."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
 
         agent = self._create_agent_with_builtin()
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: [agent])
@@ -727,7 +727,7 @@ class TestAgentBridgeBuiltinTools:
 
     def test_workflow_copilot_agent_is_github_copilot_agent(self):
         """WorkflowCopilotAgent must be a proper subclass of GitHubCopilotAgent."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         from agent_framework_github_copilot import GitHubCopilotAgent
         assert issubclass(WorkflowCopilotAgent, GitHubCopilotAgent)
 
@@ -739,7 +739,7 @@ class TestAgentBridgeMCPAndModel:
     def setup(self, monkeypatch, tmp_path):
         import sys
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -747,16 +747,16 @@ class TestAgentBridgeMCPAndModel:
         workflows_dir.mkdir()
         workflow_runs_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
         self.monkeypatch = monkeypatch
 
     def test_model_passed_in_settings(self):
         """Agent model should be passed via default_options and stored in settings."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         agent = Agent(
             id="agent-1", name="model-agent", description="Test",
@@ -774,10 +774,10 @@ class TestAgentBridgeMCPAndModel:
 
     def test_mcp_servers_passed_via_opts(self):
         """MCP servers should be passed via default_options and stored in _mcp_servers."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.services import mcp_service as mcp_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services import mcp_service as mcp_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         mcp_sdk_config = {
             "my-server": {"command": "npx", "args": ["-y", "my-mcp-server"]}
@@ -799,10 +799,10 @@ class TestAgentBridgeMCPAndModel:
 
     def test_mcp_resolution_failure_logs_warning(self):
         """If MCP resolution fails, agent is created without MCP servers."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.services import mcp_service as mcp_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.services import mcp_service as mcp_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         agent = Agent(
             id="agent-1", name="mcp-fail-agent", description="Test",
@@ -821,9 +821,9 @@ class TestAgentBridgeMCPAndModel:
 
     def test_no_model_uses_af_default(self):
         """Agent without model → AF falls back to its own default model from settings."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         agent = Agent(
             id="agent-1", name="no-model", description="Test",
@@ -846,7 +846,7 @@ class TestAgentBridgeSystemMessage:
     def setup(self, monkeypatch, tmp_path):
         import sys
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -854,16 +854,16 @@ class TestAgentBridgeSystemMessage:
         workflows_dir.mkdir()
         workflow_runs_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
         self.monkeypatch = monkeypatch
 
     def test_replace_mode_passed(self):
         """Agent with mode=replace should pass {mode: replace, content: ...} to AF."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         agent = Agent(
             id="agent-1", name="replace-agent", description="Test",
@@ -882,9 +882,9 @@ class TestAgentBridgeSystemMessage:
 
     def test_append_mode_passed(self):
         """Agent with mode=append should pass {mode: append, content: ...} to AF."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         agent = Agent(
             id="agent-1", name="append-agent", description="Test",
@@ -903,9 +903,9 @@ class TestAgentBridgeSystemMessage:
 
     def test_no_system_message_falls_back_to_description(self):
         """Agent without system_message should use description as append."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent
 
         agent = Agent(id="agent-1", name="no-msg", description="I help with code reviews")
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: [agent])
@@ -921,9 +921,9 @@ class TestAgentBridgeSystemMessage:
 
     def test_no_system_message_no_description_falls_back_to_name(self):
         """Agent without system_message or description uses 'You are {name}.'."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent
 
         agent = Agent(id="agent-1", name="mystery-agent", description="")
         self.monkeypatch.setattr(ass_mod.agent_storage_service, "list_agents", lambda: [agent])
@@ -937,9 +937,9 @@ class TestAgentBridgeSystemMessage:
 
     def test_empty_content_falls_back(self):
         """SystemMessage with empty content should fall back to description."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         agent = Agent(
             id="agent-1", name="empty-msg", description="Fallback desc",
@@ -963,7 +963,7 @@ class TestAgentBridgeSubAgents:
     def setup(self, monkeypatch, tmp_path):
         import sys
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -971,16 +971,16 @@ class TestAgentBridgeSubAgents:
         workflows_dir.mkdir()
         workflow_runs_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
         self.monkeypatch = monkeypatch
 
     def test_sub_agents_resolved_to_custom_agents(self):
         """Agent with sub_agents should have _custom_agents populated."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         sdk_custom_agents = [
             {"name": "sub-1", "display_name": "Sub Agent 1", "description": "Helper",
@@ -1006,9 +1006,9 @@ class TestAgentBridgeSubAgents:
 
     def test_no_sub_agents_custom_agents_is_none(self):
         """Agent without sub_agents should have _custom_agents as None."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         agent = Agent(
             id="agent-1", name="solo-agent", description="Solo",
@@ -1023,9 +1023,9 @@ class TestAgentBridgeSubAgents:
 
     def test_sub_agent_resolution_failure_logs_warning(self):
         """If sub-agent resolution fails, agent is created without custom_agents."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
-        from copilot_agent_console.app.services import agent_storage_service as ass_mod
-        from copilot_agent_console.app.models.agent import Agent, SystemMessage
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services import agent_storage_service as ass_mod
+        from copilot_console.app.models.agent import Agent, SystemMessage
 
         agent = Agent(
             id="agent-1", name="broken-parent", description="Parent",
@@ -1049,7 +1049,7 @@ class TestWorkflowCopilotAgentSessionInjection:
     """Tests for _inject_session_fields and _resume_session override."""
 
     def test_inject_available_tools(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         agent = WorkflowCopilotAgent(
             name="test", available_tools=["code_search"],
             default_options={"system_message": {"mode": "append", "content": "test"}},
@@ -1060,7 +1060,7 @@ class TestWorkflowCopilotAgentSessionInjection:
         assert "excluded_tools" not in config
 
     def test_inject_excluded_tools(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         agent = WorkflowCopilotAgent(
             name="test", excluded_tools=["web_search"],
             default_options={"system_message": {"mode": "append", "content": "test"}},
@@ -1071,7 +1071,7 @@ class TestWorkflowCopilotAgentSessionInjection:
         assert "available_tools" not in config
 
     def test_inject_custom_agents(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         custom = [{"name": "sub", "display_name": "Sub", "description": "Help",
                     "prompt": "You help.", "infer": True}]
         agent = WorkflowCopilotAgent(
@@ -1083,7 +1083,7 @@ class TestWorkflowCopilotAgentSessionInjection:
         assert config["custom_agents"] == custom
 
     def test_inject_all_fields(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         custom = [{"name": "sub", "display_name": "Sub", "description": "Help",
                     "prompt": "You help.", "infer": True}]
         agent = WorkflowCopilotAgent(
@@ -1096,7 +1096,7 @@ class TestWorkflowCopilotAgentSessionInjection:
         assert config["custom_agents"] == custom
 
     def test_inject_nothing_when_all_none(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         agent = WorkflowCopilotAgent(
             name="test",
             default_options={"system_message": {"mode": "append", "content": "test"}},
@@ -1109,7 +1109,7 @@ class TestWorkflowCopilotAgentSessionInjection:
 
     def test_available_takes_precedence_over_excluded(self):
         """If both available and excluded are set, available wins (matching SDK behavior)."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         agent = WorkflowCopilotAgent(
             name="test", available_tools=["code_search"], excluded_tools=["web_search"],
             default_options={"system_message": {"mode": "append", "content": "test"}},
@@ -1120,7 +1120,7 @@ class TestWorkflowCopilotAgentSessionInjection:
         assert "excluded_tools" not in config
 
     def test_inject_working_directory(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         agent = WorkflowCopilotAgent(
             name="test", working_directory="/tmp/workflow-run-123",
             default_options={"system_message": {"mode": "append", "content": "test"}},
@@ -1130,7 +1130,7 @@ class TestWorkflowCopilotAgentSessionInjection:
         assert config["working_directory"] == "/tmp/workflow-run-123"
 
     def test_inject_no_working_directory_when_none(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         agent = WorkflowCopilotAgent(
             name="test",
             default_options={"system_message": {"mode": "append", "content": "test"}},
@@ -1144,7 +1144,7 @@ class TestWorkflowEngineLifecycle:
     """Tests for WorkflowEngine set_working_directory and stop_agents."""
 
     def test_set_working_directory_updates_all_agents(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent, WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent, WorkflowEngine
         engine = WorkflowEngine()
         engine._agents = {
             "a1": WorkflowCopilotAgent(name="a1", default_options={"system_message": {"mode": "append", "content": "t"}}),
@@ -1156,7 +1156,7 @@ class TestWorkflowEngineLifecycle:
 
     @pytest.mark.asyncio
     async def test_stop_agents_calls_stop_on_all(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
         agent1 = MagicMock()
         agent1.stop = AsyncMock()
         agent2 = MagicMock()
@@ -1169,7 +1169,7 @@ class TestWorkflowEngineLifecycle:
 
     @pytest.mark.asyncio
     async def test_stop_agents_handles_errors_gracefully(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
         agent1 = MagicMock()
         agent1.stop = AsyncMock(side_effect=RuntimeError("boom"))
         agent2 = MagicMock()
@@ -1181,7 +1181,7 @@ class TestWorkflowEngineLifecycle:
         agent2.stop.assert_called_once()
 
     def test_collect_session_ids_from_agents(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
         agent1 = MagicMock()
         agent1._session_ids = ["sess-aaa", "sess-bbb"]
         agent2 = MagicMock()
@@ -1192,7 +1192,7 @@ class TestWorkflowEngineLifecycle:
         assert sorted(ids) == ["sess-aaa", "sess-bbb", "sess-ccc"]
 
     def test_collect_session_ids_no_client(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
         agent1 = MagicMock()
         agent1._session_ids = []
         engine = WorkflowEngine()
@@ -1200,7 +1200,7 @@ class TestWorkflowEngineLifecycle:
         assert engine.collect_session_ids() == []
 
     def test_collect_session_ids_empty(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
         engine = WorkflowEngine()
         engine._agents = {}
         assert engine.collect_session_ids() == []
@@ -1211,7 +1211,7 @@ class TestWorkflowRunServiceFlatStorage:
 
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path):
-        import copilot_agent_console.app.services.workflow_run_service as svc_mod
+        import copilot_console.app.services.workflow_run_service as svc_mod
         self._orig_dir = svc_mod.WORKFLOW_RUNS_DIR
         svc_mod.WORKFLOW_RUNS_DIR = tmp_path / "workflow-runs"
         svc_mod.WORKFLOW_RUNS_DIR.mkdir()
@@ -1221,7 +1221,7 @@ class TestWorkflowRunServiceFlatStorage:
         svc_mod.WORKFLOW_RUNS_DIR = self._orig_dir
 
     def test_save_and_load_flat(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         run = WorkflowRun(
             id="run-flat-1", workflow_id="wf-1", status=WorkflowRunStatus.PENDING,
             started_at=datetime(2025, 1, 1, tzinfo=timezone.utc), copilot_session_ids=["s1", "s2"],
@@ -1234,7 +1234,7 @@ class TestWorkflowRunServiceFlatStorage:
 
     def test_load_legacy_fallback(self):
         """Runs stored in date-based dirs should still load."""
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         date_dir = self.runs_dir / "2025-01-15"
         date_dir.mkdir()
         run = WorkflowRun(
@@ -1253,7 +1253,7 @@ class TestWorkflowRunServiceFlatStorage:
 
     def test_list_runs_includes_both(self):
         """list_runs should find both flat and legacy runs."""
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         # Flat run
         run1 = WorkflowRun(id="flat-1", workflow_id="wf-1", status=WorkflowRunStatus.COMPLETED,
                            started_at=datetime(2025, 2, 1, tzinfo=timezone.utc))
@@ -1277,7 +1277,7 @@ class TestWorkflowRunServiceFlatStorage:
 
     def test_delete_run_returns_run(self):
         """delete_run should return the WorkflowRun with session IDs."""
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         run = WorkflowRun(id="del-1", workflow_id="wf-1", status=WorkflowRunStatus.COMPLETED,
                           started_at=datetime(2025, 1, 1, tzinfo=timezone.utc), copilot_session_ids=["sess-x"])
         self.svc.save_run(run)
@@ -1291,7 +1291,7 @@ class TestWorkflowRunServiceFlatStorage:
 
     def test_copilot_session_ids_default_empty(self):
         """WorkflowRun.copilot_session_ids defaults to empty list."""
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         run = WorkflowRun(id="r1", workflow_id="wf-1", status=WorkflowRunStatus.PENDING,
                           started_at=datetime(2025, 1, 1, tzinfo=timezone.utc))
         assert run.copilot_session_ids == []
@@ -1302,7 +1302,7 @@ class TestRunningSubfolder:
 
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path):
-        import copilot_agent_console.app.services.workflow_run_service as svc_mod
+        import copilot_console.app.services.workflow_run_service as svc_mod
         self._orig_dir = svc_mod.WORKFLOW_RUNS_DIR
         svc_mod.WORKFLOW_RUNS_DIR = tmp_path / "workflow-runs"
         svc_mod.WORKFLOW_RUNS_DIR.mkdir()
@@ -1312,7 +1312,7 @@ class TestRunningSubfolder:
         svc_mod.WORKFLOW_RUNS_DIR = self._orig_dir
 
     def test_mark_running_moves_to_running_dir(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRunStatus
         run = self.svc.create_run("wf-1", "Test WF")
         assert (self.runs_dir / f"{run.id}.json").exists()
         run = self.svc.mark_running(run)
@@ -1361,7 +1361,7 @@ class TestRunningSubfolder:
         assert not (self.runs_dir / "running" / f"{run.id}.json").exists()
 
     def test_save_run_routes_by_status(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         # RUNNING → running/
         run = WorkflowRun(id="route-1", workflow_id="wf-1", status=WorkflowRunStatus.RUNNING,
                           started_at=datetime(2025, 1, 1, tzinfo=timezone.utc))
@@ -1385,7 +1385,7 @@ class TestZombieRecovery:
 
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path):
-        import copilot_agent_console.app.services.workflow_run_service as svc_mod
+        import copilot_console.app.services.workflow_run_service as svc_mod
         self._orig_dir = svc_mod.WORKFLOW_RUNS_DIR
         svc_mod.WORKFLOW_RUNS_DIR = tmp_path / "workflow-runs"
         svc_mod.WORKFLOW_RUNS_DIR.mkdir()
@@ -1395,7 +1395,7 @@ class TestZombieRecovery:
         svc_mod.WORKFLOW_RUNS_DIR = self._orig_dir
 
     def test_recover_zombie_runs(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         # Simulate a crash: create a run in running/ manually
         running_dir = self.runs_dir / "running"
         running_dir.mkdir(exist_ok=True)
@@ -1423,7 +1423,7 @@ class TestZombieRecovery:
         assert svc.recover_zombie_runs() == 0
 
     def test_startup_auto_recovers(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         # Place a zombie before constructing service
         running_dir = self.runs_dir / "running"
         running_dir.mkdir(exist_ok=True)
@@ -1449,7 +1449,7 @@ class TestIncrementalSessionIdCapture:
     """Tests for session ID capture in _create_session."""
 
     def test_session_ids_list_initialized(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         agent = WorkflowCopilotAgent(
             name="test",
             default_options={"system_message": {"mode": "append", "content": "test"}},
@@ -1458,7 +1458,7 @@ class TestIncrementalSessionIdCapture:
 
     @pytest.mark.asyncio
     async def test_create_session_captures_id(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowCopilotAgent
+        from copilot_console.app.services.workflow_engine import WorkflowCopilotAgent
         agent = WorkflowCopilotAgent(
             name="test",
             default_options={"system_message": {"mode": "append", "content": "test"}},

@@ -43,16 +43,16 @@ def wf_client(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     agent_home.mkdir(parents=True, exist_ok=True)
     user_home.mkdir(parents=True, exist_ok=True)
 
-    monkeypatch.setenv("COPILOT_AGENT_CONSOLE_HOME", str(agent_home))
+    monkeypatch.setenv("copilot_console_HOME", str(agent_home))
     monkeypatch.setenv("HOME", str(user_home))
     monkeypatch.setenv("USERPROFILE", str(user_home))
 
     # Force clean import
     for mod in list(sys.modules):
-        if mod.startswith("copilot_agent_console.app"):
+        if mod.startswith("copilot_console.app"):
             sys.modules.pop(mod, None)
 
-    import copilot_agent_console.app.services.copilot_service as cs_mod
+    import copilot_console.app.services.copilot_service as cs_mod
 
     async def _noop():
         return None
@@ -60,10 +60,10 @@ def wf_client(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     monkeypatch.setattr(cs_mod.copilot_service, "_start_main_client", _noop)
 
     # Bypass auth middleware — TestClient's request.client.host is "testclient" not localhost
-    import copilot_agent_console.app.middleware.auth as auth_mod
+    import copilot_console.app.middleware.auth as auth_mod
     monkeypatch.setattr(auth_mod, "_is_localhost", lambda request: True)
 
-    from copilot_agent_console.app.main import app
+    from copilot_console.app.main import app
 
     with TestClient(app) as tc:
         yield tc

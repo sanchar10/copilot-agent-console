@@ -1,9 +1,9 @@
 """Pytest fixtures for Playwright E2E tests.
 
 Prerequisites:
-  1. Backend running: python -m uvicorn copilot_agent_console.app.main:app --port 8765
+  1. Backend running: python -m uvicorn copilot_console.app.main:app --port 8765
   2. Frontend built:  npm run build --prefix frontend
-  3. Static symlink:  src/copilot_agent_console/static -> frontend/dist  (junction on Windows)
+  3. Static symlink:  src/copilot_console/static -> frontend/dist  (junction on Windows)
   4. Playwright:      pip install playwright && python -m playwright install chromium
 """
 

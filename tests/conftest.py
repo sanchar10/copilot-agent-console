@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 
-# Ensure src/ is on sys.path so `import copilot_agent_console` works without installation.
+# Ensure src/ is on sys.path so `import copilot_console` works without installation.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 
@@ -36,16 +36,16 @@ def client(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     agent_home.mkdir(parents=True, exist_ok=True)
     user_home.mkdir(parents=True, exist_ok=True)
 
-    monkeypatch.setenv("COPILOT_AGENT_CONSOLE_HOME", str(agent_home))
+    monkeypatch.setenv("copilot_console_HOME", str(agent_home))
     monkeypatch.setenv("HOME", str(user_home))
     monkeypatch.setenv("USERPROFILE", str(user_home))
 
     # Force a clean import so module-level constants pick up the env vars above.
     for mod in list(sys.modules):
-        if mod.startswith("copilot_agent_console.app"):
+        if mod.startswith("copilot_console.app"):
             sys.modules.pop(mod, None)
 
-    import copilot_agent_console.app.services.copilot_service as copilot_service_module
+    import copilot_console.app.services.copilot_service as copilot_service_module
 
     async def _noop_start_main_client() -> None:
         return None
@@ -58,10 +58,10 @@ def client(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     )
 
     # Bypass auth middleware — TestClient doesn't present as localhost
-    import copilot_agent_console.app.middleware.auth as auth_module
+    import copilot_console.app.middleware.auth as auth_module
     monkeypatch.setattr(auth_module, "_is_localhost", lambda request: True)
 
-    from copilot_agent_console.app.main import app
+    from copilot_console.app.main import app
 
     with TestClient(app) as test_client:
         yield test_client

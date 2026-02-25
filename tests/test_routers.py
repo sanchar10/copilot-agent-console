@@ -80,7 +80,7 @@ class TestViewedRouter:
 
 class TestModelsRouter:
     def test_get_models(self, client, monkeypatch):
-        import copilot_agent_console.app.services.copilot_service as cs_mod
+        import copilot_console.app.services.copilot_service as cs_mod
 
         fake_models = [
             {"id": "gpt-4.1", "name": "GPT 4.1"},
@@ -134,7 +134,7 @@ class TestSettingsRouter:
 
 class TestSessionsRouter:
     def test_list_sessions(self, client, monkeypatch):
-        import copilot_agent_console.app.services.copilot_service as cs_mod
+        import copilot_console.app.services.copilot_service as cs_mod
 
         async def _fake_list():
             return []
@@ -148,7 +148,7 @@ class TestSessionsRouter:
         assert isinstance(data["sessions"], list)
 
     def test_get_session_not_found(self, client, monkeypatch):
-        import copilot_agent_console.app.services.copilot_service as cs_mod
+        import copilot_console.app.services.copilot_service as cs_mod
 
         async def _fake_list():
             return []
@@ -159,7 +159,7 @@ class TestSessionsRouter:
         assert resp.status_code == 404
 
     def test_delete_session(self, client, monkeypatch):
-        import copilot_agent_console.app.services.copilot_service as cs_mod
+        import copilot_console.app.services.copilot_service as cs_mod
 
         session = _create_session(client)
         sid = session["session_id"]
@@ -174,7 +174,7 @@ class TestSessionsRouter:
         assert resp.json()["success"] is True
 
     def test_patch_session_rename(self, client, monkeypatch):
-        import copilot_agent_console.app.services.copilot_service as cs_mod
+        import copilot_console.app.services.copilot_service as cs_mod
 
         async def _fake_list():
             return []
@@ -189,7 +189,7 @@ class TestSessionsRouter:
         assert resp.json()["session_name"] == "Renamed"
 
     def test_patch_session_bad_cwd(self, client, monkeypatch):
-        import copilot_agent_console.app.services.copilot_service as cs_mod
+        import copilot_console.app.services.copilot_service as cs_mod
 
         async def _fake_list():
             return []
@@ -206,7 +206,7 @@ class TestSessionsRouter:
         assert resp.status_code == 400
 
     def test_patch_session_not_found(self, client, monkeypatch):
-        import copilot_agent_console.app.services.copilot_service as cs_mod
+        import copilot_console.app.services.copilot_service as cs_mod
 
         async def _fake_list():
             return []
@@ -231,7 +231,7 @@ class TestSessionsRouter:
 
 class TestLogsRouter:
     def test_server_logs(self, client, monkeypatch):
-        import copilot_agent_console.app.routers.logs as logs_router
+        import copilot_console.app.routers.logs as logs_router
 
         monkeypatch.setattr(
             logs_router, "read_server_logs",
@@ -245,7 +245,7 @@ class TestLogsRouter:
         assert data["lines"] == ["line1", "line2"]
 
     def test_server_logs_with_tail(self, client, monkeypatch):
-        import copilot_agent_console.app.routers.logs as logs_router
+        import copilot_console.app.routers.logs as logs_router
 
         monkeypatch.setattr(
             logs_router, "read_server_logs",
@@ -257,7 +257,7 @@ class TestLogsRouter:
         assert resp.json()["count"] == 5
 
     def test_session_logs(self, client, monkeypatch):
-        import copilot_agent_console.app.routers.logs as logs_router
+        import copilot_console.app.routers.logs as logs_router
 
         monkeypatch.setattr(
             logs_router, "read_session_logs",
@@ -271,7 +271,7 @@ class TestLogsRouter:
         assert data["count"] == 1
 
     def test_ralph_logs(self, client, monkeypatch):
-        import copilot_agent_console.app.routers.logs as logs_router
+        import copilot_console.app.routers.logs as logs_router
 
         monkeypatch.setattr(
             logs_router, "read_ralph_logs",

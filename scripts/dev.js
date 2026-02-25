@@ -4,7 +4,7 @@ const path = require('path');
 
 const ROOT = path.dirname(__dirname);
 const FRONTEND = path.join(ROOT, 'frontend');
-const BACKEND_MODULE = 'copilot_agent_console.app.main';
+const BACKEND_MODULE = 'copilot_console.app.main';
 
 function run(cmd, cwd = ROOT) {
   console.log(`\x1b[36m> ${cmd}\x1b[0m`);

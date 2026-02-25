@@ -24,7 +24,7 @@ class TestWorkflowModels:
     """Test WorkflowMetadata, WorkflowRun, and related models."""
 
     def test_workflow_metadata_defaults(self):
-        from copilot_agent_console.app.models.workflow import WorkflowMetadata
+        from copilot_console.app.models.workflow import WorkflowMetadata
 
         meta = WorkflowMetadata(id="test-1", name="Test", yaml_filename="test-1.yaml")
         assert meta.id == "test-1"
@@ -34,7 +34,7 @@ class TestWorkflowModels:
         assert isinstance(meta.updated_at, datetime)
 
     def test_workflow_run_status_values(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRunStatus
 
         assert WorkflowRunStatus.PENDING == "pending"
         assert WorkflowRunStatus.RUNNING == "running"
@@ -44,7 +44,7 @@ class TestWorkflowModels:
         assert WorkflowRunStatus.ABORTED == "aborted"
 
     def test_workflow_run_defaults(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
 
         run = WorkflowRun(id="run-1", workflow_id="wf-1")
         assert run.status == WorkflowRunStatus.PENDING
@@ -54,7 +54,7 @@ class TestWorkflowModels:
         assert run.session_id is None
 
     def test_workflow_create(self):
-        from copilot_agent_console.app.models.workflow import WorkflowCreate
+        from copilot_console.app.models.workflow import WorkflowCreate
 
         create = WorkflowCreate(name="My Workflow", yaml_content="kind: Workflow")
         assert create.name == "My Workflow"
@@ -62,7 +62,7 @@ class TestWorkflowModels:
         assert create.yaml_content == "kind: Workflow"
 
     def test_workflow_update_optional_fields(self):
-        from copilot_agent_console.app.models.workflow import WorkflowUpdate
+        from copilot_console.app.models.workflow import WorkflowUpdate
 
         update = WorkflowUpdate()
         assert update.name is None
@@ -70,7 +70,7 @@ class TestWorkflowModels:
         assert update.yaml_content is None
 
     def test_workflow_detail(self):
-        from copilot_agent_console.app.models.workflow import WorkflowDetail
+        from copilot_console.app.models.workflow import WorkflowDetail
 
         detail = WorkflowDetail(
             id="wf-1", name="Test", description="desc",
@@ -80,7 +80,7 @@ class TestWorkflowModels:
         assert detail.yaml_content == "kind: Workflow"
 
     def test_workflow_run_summary(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRunSummary, WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRunSummary, WorkflowRunStatus
 
         summary = WorkflowRunSummary(
             id="run-1", workflow_id="wf-1", workflow_name="Test",
@@ -104,7 +104,7 @@ class TestWorkflowStorageService:
         """Redirect storage to tmp_path for hermetic tests."""
         # Clear cached modules to pick up monkeypatched paths
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -112,16 +112,16 @@ class TestWorkflowStorageService:
         workflows_dir.mkdir()
         workflow_runs_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
 
-        from copilot_agent_console.app.services.workflow_storage_service import WorkflowStorageService
+        from copilot_console.app.services.workflow_storage_service import WorkflowStorageService
         self.service = WorkflowStorageService()
         self.workflows_dir = workflows_dir
 
     def test_create_workflow(self):
-        from copilot_agent_console.app.models.workflow import WorkflowCreate
+        from copilot_console.app.models.workflow import WorkflowCreate
 
         req = WorkflowCreate(name="Test Pipeline", yaml_content="kind: Workflow\nname: test-pipeline")
         meta = self.service.create_workflow(req)
@@ -133,7 +133,7 @@ class TestWorkflowStorageService:
         assert not (self.workflows_dir / f"{meta.id}.meta.json").exists()
 
     def test_get_workflow(self):
-        from copilot_agent_console.app.models.workflow import WorkflowCreate
+        from copilot_console.app.models.workflow import WorkflowCreate
 
         req = WorkflowCreate(name="Get Test", yaml_content="kind: Workflow\nname: get-test\ndescription: A test")
         meta = self.service.create_workflow(req)
@@ -147,7 +147,7 @@ class TestWorkflowStorageService:
         assert self.service.get_workflow("nonexistent") is None
 
     def test_list_workflows(self):
-        from copilot_agent_console.app.models.workflow import WorkflowCreate
+        from copilot_console.app.models.workflow import WorkflowCreate
 
         self.service.create_workflow(WorkflowCreate(name="A", yaml_content="kind: Workflow\nname: alpha"))
         self.service.create_workflow(WorkflowCreate(name="B", yaml_content="kind: Workflow\nname: beta"))
@@ -158,7 +158,7 @@ class TestWorkflowStorageService:
         assert names == {"alpha", "beta"}
 
     def test_update_workflow(self):
-        from copilot_agent_console.app.models.workflow import WorkflowCreate, WorkflowUpdate
+        from copilot_console.app.models.workflow import WorkflowCreate, WorkflowUpdate
 
         meta = self.service.create_workflow(WorkflowCreate(name="Original", yaml_content="kind: Workflow\nname: original"))
         updated = self.service.update_workflow(meta.id, WorkflowUpdate(yaml_content="kind: Workflow\nname: updated"))
@@ -169,12 +169,12 @@ class TestWorkflowStorageService:
         assert "name: updated" in detail.yaml_content
 
     def test_update_workflow_not_found(self):
-        from copilot_agent_console.app.models.workflow import WorkflowUpdate
+        from copilot_console.app.models.workflow import WorkflowUpdate
 
         assert self.service.update_workflow("nonexistent", WorkflowUpdate(name="x")) is None
 
     def test_delete_workflow(self):
-        from copilot_agent_console.app.models.workflow import WorkflowCreate
+        from copilot_console.app.models.workflow import WorkflowCreate
 
         meta = self.service.create_workflow(WorkflowCreate(name="Delete Me", yaml_content="kind: Workflow\nname: delete-me"))
         assert self.service.delete_workflow(meta.id) is True
@@ -182,7 +182,7 @@ class TestWorkflowStorageService:
         assert self.service.delete_workflow(meta.id) is False
 
     def test_get_yaml_path(self):
-        from copilot_agent_console.app.models.workflow import WorkflowCreate
+        from copilot_console.app.models.workflow import WorkflowCreate
 
         meta = self.service.create_workflow(WorkflowCreate(name="Path Test", yaml_content="kind: Workflow\nname: path-test"))
         path = self.service.get_yaml_path(meta.id)
@@ -191,7 +191,7 @@ class TestWorkflowStorageService:
         assert self.service.get_yaml_path("nonexistent") is None
 
     def test_get_yaml_content(self):
-        from copilot_agent_console.app.models.workflow import WorkflowCreate
+        from copilot_console.app.models.workflow import WorkflowCreate
 
         meta = self.service.create_workflow(WorkflowCreate(name="Content", yaml_content="kind: Workflow\nname: content-test"))
         assert "name: content-test" in self.service.get_yaml_content(meta.id)
@@ -199,7 +199,7 @@ class TestWorkflowStorageService:
 
     def test_create_duplicate_name_gets_suffix(self):
         """Two workflows with same YAML name get distinct IDs."""
-        from copilot_agent_console.app.models.workflow import WorkflowCreate
+        from copilot_console.app.models.workflow import WorkflowCreate
 
         m1 = self.service.create_workflow(WorkflowCreate(name="Dup", yaml_content="kind: Workflow\nname: dup"))
         m2 = self.service.create_workflow(WorkflowCreate(name="Dup", yaml_content="kind: Workflow\nname: dup"))
@@ -219,7 +219,7 @@ class TestWorkflowRunService:
     def setup_run_service(self, monkeypatch, tmp_path):
         """Redirect storage to tmp_path."""
         for mod in list(sys.modules):
-            if "workflow" in mod and "copilot_agent_console" in mod:
+            if "workflow" in mod and "copilot_console" in mod:
                 sys.modules.pop(mod, None)
 
         workflows_dir = tmp_path / "workflows"
@@ -227,11 +227,11 @@ class TestWorkflowRunService:
         workflows_dir.mkdir()
         workflow_runs_dir.mkdir()
 
-        import copilot_agent_console.app.workflow_config as wf_config
+        import copilot_console.app.workflow_config as wf_config
         monkeypatch.setattr(wf_config, "WORKFLOWS_DIR", workflows_dir)
         monkeypatch.setattr(wf_config, "WORKFLOW_RUNS_DIR", workflow_runs_dir)
 
-        from copilot_agent_console.app.services.workflow_run_service import WorkflowRunService
+        from copilot_console.app.services.workflow_run_service import WorkflowRunService
         self.service = WorkflowRunService()
         self.runs_dir = workflow_runs_dir
 
@@ -291,7 +291,7 @@ class TestWorkflowRunService:
         assert len(wf1_runs) == 2
 
     def test_list_runs_with_status_filter(self):
-        from copilot_agent_console.app.models.workflow import WorkflowRunStatus
+        from copilot_console.app.models.workflow import WorkflowRunStatus
 
         run = self.service.create_run("wf-1", "Test")
         self.service.mark_running(run)
@@ -316,12 +316,12 @@ class TestWorkflowEngine:
     """Test WorkflowEngine import and basic validation."""
 
     def test_engine_import(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
         engine = WorkflowEngine()
         assert engine is not None
 
     def test_validate_yaml_invalid(self):
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
         engine = WorkflowEngine()
         result = engine.validate_yaml("this is not valid yaml for AF")
         assert result["valid"] is False
@@ -329,7 +329,7 @@ class TestWorkflowEngine:
 
     def test_validate_yaml_valid_workflow(self, tmp_path):
         """Test that a valid AF workflow YAML can be loaded and visualized."""
-        from copilot_agent_console.app.services.workflow_engine import WorkflowEngine
+        from copilot_console.app.services.workflow_engine import WorkflowEngine
 
         yaml_content = """
 kind: Workflow

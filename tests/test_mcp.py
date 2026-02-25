@@ -121,7 +121,7 @@ class TestMCPServerLoading:
 class TestMCPServerForSDK:
     def test_sdk_format_local_server(self, client, tmp_path):
         """get_servers_for_sdk returns correct format for local servers."""
-        from copilot_agent_console.app.services.mcp_service import mcp_service
+        from copilot_console.app.services.mcp_service import mcp_service
 
         user_home = tmp_path / "user-home"
         _write_mcp_config(user_home / ".copilot" / "mcp-config.json", {
@@ -143,7 +143,7 @@ class TestMCPServerForSDK:
 
     def test_sdk_format_remote_server(self, client, tmp_path):
         """get_servers_for_sdk returns correct format for remote servers."""
-        from copilot_agent_console.app.services.mcp_service import mcp_service
+        from copilot_console.app.services.mcp_service import mcp_service
 
         agent_home = tmp_path / "agent-console-home"
         _write_mcp_config(agent_home / "mcp-config.json", {
@@ -164,7 +164,7 @@ class TestMCPServerForSDK:
 
     def test_sdk_selections_filter(self, client, tmp_path):
         """Only selected servers are returned in SDK format."""
-        from copilot_agent_console.app.services.mcp_service import mcp_service
+        from copilot_console.app.services.mcp_service import mcp_service
 
         user_home = tmp_path / "user-home"
         _write_mcp_config(user_home / ".copilot" / "mcp-config.json", {

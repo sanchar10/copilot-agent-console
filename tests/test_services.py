@@ -23,12 +23,12 @@ def _fresh_config(monkeypatch, tmp_path: Path):
 
     # Purge cached modules so constants are re-evaluated
     for mod in list(sys.modules):
-        if mod.startswith("copilot_agent_console.app"):
+        if mod.startswith("copilot_console.app"):
             sys.modules.pop(mod, None)
 
-    monkeypatch.setenv("COPILOT_AGENT_CONSOLE_HOME", str(agent_home))
+    monkeypatch.setenv("copilot_console_HOME", str(agent_home))
 
-    import copilot_agent_console.app.config as cfg
+    import copilot_console.app.config as cfg
 
     monkeypatch.setattr(cfg, "APP_HOME", agent_home)
     monkeypatch.setattr(cfg, "SESSIONS_DIR", sessions_dir)
@@ -39,7 +39,7 @@ def _fresh_config(monkeypatch, tmp_path: Path):
 
 
 def _make_session(session_id: str = "sess-1", name: str = "Test Session"):
-    from copilot_agent_console.app.models.session import Session
+    from copilot_console.app.models.session import Session
 
     now = datetime.utcnow()
     return Session(
@@ -60,7 +60,7 @@ class TestStorageService:
 
     def _make_service(self, monkeypatch, tmp_path):
         cfg = _fresh_config(monkeypatch, tmp_path)
-        from copilot_agent_console.app.services.storage_service import StorageService
+        from copilot_console.app.services.storage_service import StorageService
         return StorageService()
 
     # -- save / load --------------------------------------------------
@@ -130,7 +130,7 @@ class TestResponseBuffer:
     """Tests for ResponseBuffer (plain dataclass, no monkeypatching)."""
 
     def _make_buffer(self, session_id: str = "test"):
-        from copilot_agent_console.app.services.response_buffer import ResponseBuffer
+        from copilot_console.app.services.response_buffer import ResponseBuffer
         return ResponseBuffer(session_id=session_id)
 
     def test_add_chunk(self):
@@ -152,14 +152,14 @@ class TestResponseBuffer:
         assert buf.steps[0]["name"] == "grep"
 
     def test_complete(self):
-        from copilot_agent_console.app.services.response_buffer import ResponseStatus
+        from copilot_console.app.services.response_buffer import ResponseStatus
         buf = self._make_buffer()
         buf.complete()
         assert buf.status == ResponseStatus.COMPLETED
         assert buf.completed_at is not None
 
     def test_fail(self):
-        from copilot_agent_console.app.services.response_buffer import ResponseStatus
+        from copilot_console.app.services.response_buffer import ResponseStatus
         buf = self._make_buffer()
         buf.fail("boom")
         assert buf.status == ResponseStatus.ERROR
@@ -190,7 +190,7 @@ class TestResponseBufferManager:
     """Tests for ResponseBufferManager (async)."""
 
     def _make_manager(self):
-        from copilot_agent_console.app.services.response_buffer import ResponseBufferManager
+        from copilot_console.app.services.response_buffer import ResponseBufferManager
         return ResponseBufferManager()
 
     def test_create_and_get_buffer(self):
@@ -272,9 +272,9 @@ class TestSessionServiceUpdate:
     def _setup(self, monkeypatch, tmp_path):
         """Return (session_service, copilot_service) with fresh config."""
         cfg = _fresh_config(monkeypatch, tmp_path)
-        from copilot_agent_console.app.services.session_service import session_service
-        from copilot_agent_console.app.services.copilot_service import copilot_service
-        from copilot_agent_console.app.services.storage_service import storage_service
+        from copilot_console.app.services.session_service import session_service
+        from copilot_console.app.services.copilot_service import copilot_service
+        from copilot_console.app.services.storage_service import storage_service
 
         # Ensure storage dir exists and save a session
         cfg.SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
@@ -293,7 +293,7 @@ class TestSessionServiceUpdate:
             copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
             assert copilot.is_session_active("s1")
 
-            from copilot_agent_console.app.models.session import SessionUpdate
+            from copilot_console.app.models.session import SessionUpdate
             monkeypatch.setattr("os.path.isdir", lambda p: True)  # CWD validation
             await svc.update_session("s1", SessionUpdate(cwd="/new/path"))
 
@@ -306,7 +306,7 @@ class TestSessionServiceUpdate:
             svc, copilot, session = self._setup(monkeypatch, tmp_path)
             copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
 
-            from copilot_agent_console.app.models.session import SessionUpdate
+            from copilot_console.app.models.session import SessionUpdate
             await svc.update_session("s1", SessionUpdate(mcp_servers=["server-b"]))
 
             assert not copilot.is_session_active("s1")
@@ -317,7 +317,7 @@ class TestSessionServiceUpdate:
             svc, copilot, session = self._setup(monkeypatch, tmp_path)
             copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
 
-            from copilot_agent_console.app.models.session import SessionUpdate
+            from copilot_console.app.models.session import SessionUpdate
             await svc.update_session("s1", SessionUpdate(tools={"custom": ["tool-b"], "builtin": []}))
 
             assert not copilot.is_session_active("s1")
@@ -328,7 +328,7 @@ class TestSessionServiceUpdate:
             svc, copilot, session = self._setup(monkeypatch, tmp_path)
             copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
 
-            from copilot_agent_console.app.models.session import SessionUpdate
+            from copilot_console.app.models.session import SessionUpdate
             await svc.update_session("s1", SessionUpdate(name="Renamed"))
 
             # Client should still be active — name change doesn't recreate
@@ -343,7 +343,7 @@ class TestSessionServiceUpdate:
             svc, copilot, session = self._setup(monkeypatch, tmp_path)
             copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
 
-            from copilot_agent_console.app.models.session import SessionUpdate
+            from copilot_console.app.models.session import SessionUpdate
             monkeypatch.setattr("os.path.isdir", lambda p: True)
             # Same CWD as existing — should NOT destroy
             await svc.update_session("s1", SessionUpdate(cwd="/old/path"))
@@ -359,7 +359,7 @@ class TestSessionServiceUpdate:
             svc, copilot, session = self._setup(monkeypatch, tmp_path)
             copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
 
-            from copilot_agent_console.app.models.session import SessionUpdate
+            from copilot_console.app.models.session import SessionUpdate
             await svc.update_session("s1", SessionUpdate(sub_agents=["some-agent"]))
 
             assert not copilot.is_session_active("s1")
@@ -370,12 +370,12 @@ class TestSessionServiceUpdate:
             svc, copilot, session = self._setup(monkeypatch, tmp_path)
             # Set initial sub_agents
             session.sub_agents = ["agent-a"]
-            from copilot_agent_console.app.services.storage_service import storage_service
+            from copilot_console.app.services.storage_service import storage_service
             storage_service.save_session(session)
 
             copilot._session_clients["s1"] = type('FakeClient', (), {'stop': lambda self: asyncio.sleep(0)})()
 
-            from copilot_agent_console.app.models.session import SessionUpdate
+            from copilot_console.app.models.session import SessionUpdate
             await svc.update_session("s1", SessionUpdate(sub_agents=["agent-a"]))
 
             assert copilot.is_session_active("s1")
