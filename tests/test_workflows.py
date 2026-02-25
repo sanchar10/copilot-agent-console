@@ -303,9 +303,9 @@ class TestWorkflowRunService:
 
     def test_delete_run(self):
         run = self.service.create_run("wf-1", "Test")
-        assert self.service.delete_run(run.id) is True
+        assert self.service.delete_run(run.id) is not None
         assert self.service.load_run(run.id) is None
-        assert self.service.delete_run(run.id) is False
+        assert self.service.delete_run(run.id) is None
 
 
 # ---------------------------------------------------------------------------

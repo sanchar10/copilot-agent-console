@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -178,7 +178,7 @@ class TestResponseBuffer:
     def test_is_stale_old_completed(self):
         buf = self._make_buffer()
         buf.complete()
-        buf.completed_at = datetime.utcnow() - timedelta(seconds=600)
+        buf.completed_at = datetime.now(timezone.utc) - timedelta(seconds=600)
         assert buf.is_stale(max_age_seconds=300) is True
 
 

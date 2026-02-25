@@ -4,11 +4,11 @@ from playwright.sync_api import Page, expect
 
 
 def test_app_loads_sidebar(page: Page):
-    """App loads and shows sidebar with Agent Console title and New Session button."""
+    """App loads and shows sidebar with Copilot Console title and New Session button."""
     sidebar = page.locator("aside")
     expect(sidebar).to_be_visible()
 
-    expect(sidebar.locator("h1")).to_have_text("Agent Console")
+    expect(sidebar.locator("h1")).to_have_text("Copilot Console")
 
     new_session_btn = sidebar.get_by_role("button", name="New Session")
     expect(new_session_btn).to_be_visible()

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
@@ -217,7 +217,7 @@ class TestSerializeWorkflowEvent:
     def test_state(self):
         event = self._make_event(type="status", state="WorkflowRunState.IN_PROGRESS")
         result = self.serialize(event, "run-1")
-        assert result["state"] == "WorkflowRunState.IN_PROGRESS"
+        assert result["state"] == "in_progress"
 
     def test_error_details(self):
         details = MagicMock()
@@ -1224,7 +1224,7 @@ class TestWorkflowRunServiceFlatStorage:
         from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         run = WorkflowRun(
             id="run-flat-1", workflow_id="wf-1", status=WorkflowRunStatus.PENDING,
-            started_at=datetime(2025, 1, 1), copilot_session_ids=["s1", "s2"],
+            started_at=datetime(2025, 1, 1, tzinfo=timezone.utc), copilot_session_ids=["s1", "s2"],
         )
         self.svc.save_run(run)
         assert (self.runs_dir / "run-flat-1.json").exists()
@@ -1239,7 +1239,7 @@ class TestWorkflowRunServiceFlatStorage:
         date_dir.mkdir()
         run = WorkflowRun(
             id="run-legacy-1", workflow_id="wf-1", status=WorkflowRunStatus.COMPLETED,
-            started_at=datetime(2025, 1, 15),
+            started_at=datetime(2025, 1, 15, tzinfo=timezone.utc),
         )
         data = run.model_dump(exclude={"node_results"})
         for key in ("started_at", "completed_at"):
@@ -1256,13 +1256,13 @@ class TestWorkflowRunServiceFlatStorage:
         from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         # Flat run
         run1 = WorkflowRun(id="flat-1", workflow_id="wf-1", status=WorkflowRunStatus.COMPLETED,
-                           started_at=datetime(2025, 2, 1))
+                           started_at=datetime(2025, 2, 1, tzinfo=timezone.utc))
         self.svc.save_run(run1)
         # Legacy run
         date_dir = self.runs_dir / "2025-01-15"
         date_dir.mkdir()
         run2 = WorkflowRun(id="legacy-1", workflow_id="wf-1", status=WorkflowRunStatus.COMPLETED,
-                           started_at=datetime(2025, 1, 15))
+                           started_at=datetime(2025, 1, 15, tzinfo=timezone.utc))
         data = run2.model_dump(exclude={"node_results"})
         for key in ("started_at", "completed_at"):
             if data.get(key):
@@ -1279,7 +1279,7 @@ class TestWorkflowRunServiceFlatStorage:
         """delete_run should return the WorkflowRun with session IDs."""
         from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         run = WorkflowRun(id="del-1", workflow_id="wf-1", status=WorkflowRunStatus.COMPLETED,
-                          started_at=datetime(2025, 1, 1), copilot_session_ids=["sess-x"])
+                          started_at=datetime(2025, 1, 1, tzinfo=timezone.utc), copilot_session_ids=["sess-x"])
         self.svc.save_run(run)
         deleted = self.svc.delete_run("del-1")
         assert deleted is not None
@@ -1293,7 +1293,7 @@ class TestWorkflowRunServiceFlatStorage:
         """WorkflowRun.copilot_session_ids defaults to empty list."""
         from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         run = WorkflowRun(id="r1", workflow_id="wf-1", status=WorkflowRunStatus.PENDING,
-                          started_at=datetime(2025, 1, 1))
+                          started_at=datetime(2025, 1, 1, tzinfo=timezone.utc))
         assert run.copilot_session_ids == []
 
 
@@ -1364,7 +1364,7 @@ class TestRunningSubfolder:
         from copilot_agent_console.app.models.workflow import WorkflowRun, WorkflowRunStatus
         # RUNNING → running/
         run = WorkflowRun(id="route-1", workflow_id="wf-1", status=WorkflowRunStatus.RUNNING,
-                          started_at=datetime(2025, 1, 1))
+                          started_at=datetime(2025, 1, 1, tzinfo=timezone.utc))
         self.svc.save_run(run)
         assert (self.runs_dir / "running" / "route-1.json").exists()
         assert not (self.runs_dir / "route-1.json").exists()
@@ -1401,7 +1401,7 @@ class TestZombieRecovery:
         running_dir.mkdir(exist_ok=True)
         run = WorkflowRun(
             id="zombie-1", workflow_id="wf-1", status=WorkflowRunStatus.RUNNING,
-            started_at=datetime(2025, 1, 1), copilot_session_ids=["sid-1", "sid-2"],
+            started_at=datetime(2025, 1, 1, tzinfo=timezone.utc), copilot_session_ids=["sid-1", "sid-2"],
         )
         svc = self.svc_mod.WorkflowRunService()
         svc._save_to(running_dir / "zombie-1.json", run)
@@ -1429,7 +1429,7 @@ class TestZombieRecovery:
         running_dir.mkdir(exist_ok=True)
         run = WorkflowRun(
             id="auto-zombie", workflow_id="wf-1", status=WorkflowRunStatus.RUNNING,
-            started_at=datetime(2025, 1, 1),
+            started_at=datetime(2025, 1, 1, tzinfo=timezone.utc),
         )
         data = run.model_dump(exclude={"node_results"})
         for key in ("started_at", "completed_at"):

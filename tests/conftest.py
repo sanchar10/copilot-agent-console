@@ -57,6 +57,10 @@ def client(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         _noop_start_main_client,
     )
 
+    # Bypass auth middleware — TestClient doesn't present as localhost
+    import copilot_agent_console.app.middleware.auth as auth_module
+    monkeypatch.setattr(auth_module, "_is_localhost", lambda request: True)
+
     from copilot_agent_console.app.main import app
 
     with TestClient(app) as test_client:
