@@ -32,7 +32,7 @@ export function MobileSessionList({ onNotification }: Props) {
         mobileApiClient.get<Record<string, number>>('/viewed'),
         mobileApiClient.get<ActiveAgentsResponse>('/sessions/active-agents'),
       ]);
-      const filtered = sessionsData.sessions.filter(s => s.trigger !== 'schedule');
+      const filtered = sessionsData.sessions.filter(s => s.trigger !== 'automation');
       setSessions(filtered);
       // Populate viewedStore with timestamps from backend
       useViewedStore.setState({ lastViewed: viewedData, isLoaded: true });

@@ -2,18 +2,18 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 const mockOpenTab = vi.fn();
-const mockFetchSchedules = vi.fn();
+const mockFetchAutomations = vi.fn();
 const mockFetchAgents = vi.fn();
 
 vi.mock('../../utils/formatters', () => ({
   formatDateTime: (d: string) => `dt-${d}`,
 }));
 
-vi.mock('../../stores/scheduleStore', () => ({
-  useScheduleStore: vi.fn(() => ({
-    schedules: [],
+vi.mock('../../stores/automationStore', () => ({
+  useAutomationStore: vi.fn(() => ({
+    automations: [],
     loading: false,
-    fetchSchedules: mockFetchSchedules,
+    fetchAutomations: mockFetchAutomations,
   })),
 }));
 
@@ -35,23 +35,23 @@ vi.mock('../../stores/tabStore', () => ({
   },
 }));
 
-vi.mock('../../api/schedules', () => ({
-  createSchedule: vi.fn(),
-  updateSchedule: vi.fn(),
-  deleteSchedule: vi.fn(),
-  toggleSchedule: vi.fn(),
-  runScheduleNow: vi.fn(),
+vi.mock('../../api/automations', () => ({
+  createAutomation: vi.fn(),
+  updateAutomation: vi.fn(),
+  deleteAutomation: vi.fn(),
+  toggleAutomation: vi.fn(),
+  runAutomationNow: vi.fn(),
 }));
 
 vi.mock('../common/FolderBrowserModal', () => ({
   FolderBrowserModal: () => <div data-testid="folder-browser-modal" />,
 }));
 
-import { ScheduleManager } from './ScheduleManager';
-import { useScheduleStore } from '../../stores/scheduleStore';
-import type { ScheduleWithNextRun } from '../../types/schedule';
+import { AutomationManager } from './AutomationManager';
+import { useAutomationStore } from '../../stores/automationStore';
+import type { AutomationWithNextRun } from '../../types/automation';
 
-function makeSchedule(overrides: Partial<ScheduleWithNextRun> = {}): ScheduleWithNextRun {
+function makeAutomation(overrides: Partial<AutomationWithNextRun> = {}): AutomationWithNextRun {
   return {
     id: 'sch-1',
     agent_id: 'agent-1',
@@ -69,51 +69,51 @@ function makeSchedule(overrides: Partial<ScheduleWithNextRun> = {}): ScheduleWit
   };
 }
 
-describe('ScheduleManager', () => {
+describe('AutomationManager', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders empty state when no schedules', () => {
-    render(<ScheduleManager />);
-    expect(screen.getByText('No schedules yet')).toBeInTheDocument();
+  it('renders empty state when no automations', () => {
+    render(<AutomationManager />);
+    expect(screen.getByText('No automations yet')).toBeInTheDocument();
   });
 
-  it('renders "New Schedule" button', () => {
-    render(<ScheduleManager />);
-    expect(screen.getByRole('button', { name: /New Schedule/ })).toBeInTheDocument();
+  it('renders "New Automation" button', () => {
+    render(<AutomationManager />);
+    expect(screen.getByRole('button', { name: /New Automation/ })).toBeInTheDocument();
   });
 
-  it('renders schedule names when schedules exist', () => {
-    vi.mocked(useScheduleStore).mockReturnValue({
-      schedules: [makeSchedule(), makeSchedule({ id: 'sch-2', name: 'Evening Report' })],
+  it('renders automation names when automations exist', () => {
+    vi.mocked(useAutomationStore).mockReturnValue({
+      automations: [makeAutomation(), makeAutomation({ id: 'sch-2', name: 'Evening Report' })],
       loading: false,
-      fetchSchedules: mockFetchSchedules,
-    } as ReturnType<typeof useScheduleStore>);
+      fetchAutomations: mockFetchAutomations,
+    } as ReturnType<typeof useAutomationStore>);
 
-    render(<ScheduleManager />);
+    render(<AutomationManager />);
     expect(screen.getByText('Morning Check')).toBeInTheDocument();
     expect(screen.getByText('Evening Report')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
-    vi.mocked(useScheduleStore).mockReturnValue({
-      schedules: [],
+    vi.mocked(useAutomationStore).mockReturnValue({
+      automations: [],
       loading: true,
-      fetchSchedules: mockFetchSchedules,
-    } as ReturnType<typeof useScheduleStore>);
+      fetchAutomations: mockFetchAutomations,
+    } as ReturnType<typeof useAutomationStore>);
 
-    render(<ScheduleManager />);
+    render(<AutomationManager />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('renders header title', () => {
-    render(<ScheduleManager />);
+    render(<AutomationManager />);
     expect(screen.getByText('Automations')).toBeInTheDocument();
   });
 
   it('renders agent filter when agents exist', () => {
-    render(<ScheduleManager />);
+    render(<AutomationManager />);
     expect(screen.getByText('Filter by agent:')).toBeInTheDocument();
   });
 });

@@ -1,21 +1,21 @@
 /**
- * Schedule Manager — list and manage cron schedules for agents.
+ * Automation Manager — list and manage cron automations for agents.
  */
 
 import { useEffect, useState } from 'react';
 import { formatDateTime } from '../../utils/formatters';
 import { useAgentStore } from '../../stores/agentStore';
-import { useScheduleStore } from '../../stores/scheduleStore';
+import { useAutomationStore } from '../../stores/automationStore';
 import { useTabStore, tabId } from '../../stores/tabStore';
 import {
-  createSchedule,
-  updateSchedule,
-  deleteSchedule,
-  toggleSchedule,
-  runScheduleNow,
-} from '../../api/schedules';
+  createAutomation,
+  updateAutomation,
+  deleteAutomation,
+  toggleAutomation,
+  runAutomationNow,
+} from '../../api/automations';
 import { FolderBrowserModal } from '../common/FolderBrowserModal';
-import type { ScheduleWithNextRun, CreateScheduleRequest, UpdateScheduleRequest } from '../../types/schedule';
+import type { AutomationWithNextRun, CreateAutomationRequest, UpdateAutomationRequest } from '../../types/automation';
 import type { Agent } from '../../types/agent';
 
 // --- Cron presets for common patterns ---
@@ -52,7 +52,7 @@ function StatusBadge({ enabled }: { enabled: boolean }) {
 }
 
 // --- Create / Edit Dialog ---
-function ScheduleDialog({
+function AutomationDialog({
   agents,
   existing,
   defaultAgentId,
@@ -60,9 +60,9 @@ function ScheduleDialog({
   onCancel,
 }: {
   agents: Agent[];
-  existing?: ScheduleWithNextRun;
+  existing?: AutomationWithNextRun;
   defaultAgentId?: string;
-  onSave: (req: CreateScheduleRequest | UpdateScheduleRequest, id?: string) => void;
+  onSave: (req: CreateAutomationRequest | UpdateAutomationRequest, id?: string) => void;
   onCancel: () => void;
 }) {
   const isEdit = !!existing;
@@ -93,7 +93,7 @@ function ScheduleDialog({
         prompt: prompt.trim(),
         cwd: cwd.trim() || null,
         max_runtime_minutes: maxRuntime,
-      } as UpdateScheduleRequest, existing!.id);
+      } as UpdateAutomationRequest, existing!.id);
     } else {
       if (!agentId) return;
       onSave({
@@ -103,7 +103,7 @@ function ScheduleDialog({
         prompt: prompt.trim(),
         cwd: cwd.trim() || null,
         max_runtime_minutes: maxRuntime,
-      } as CreateScheduleRequest);
+      } as CreateAutomationRequest);
     }
   };
 
@@ -111,7 +111,7 @@ function ScheduleDialog({
     <>
       <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
         <form onSubmit={handleSubmit} className="bg-white/80 dark:bg-[#252536]/95 backdrop-blur-xl border border-white/30 dark:border-[#3a3a4e] rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-lg font-semibold dark:text-gray-100">{isEdit ? 'Edit Schedule' : 'New Schedule'}</h2>
+          <h2 className="text-lg font-semibold dark:text-gray-100">{isEdit ? 'Edit Automation' : 'New Automation'}</h2>
 
           {!isEdit && (
             <div>
@@ -129,7 +129,7 @@ function ScheduleDialog({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Schedule Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Automation Name</label>
             <input
               type="text"
               value={name}
@@ -214,7 +214,7 @@ function ScheduleDialog({
               type="submit"
               className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              {isEdit ? 'Save Changes' : 'Create Schedule'}
+              {isEdit ? 'Save Changes' : 'Create Automation'}
             </button>
           </div>
         </form>
@@ -230,16 +230,16 @@ function ScheduleDialog({
   );
 }
 
-// --- Schedule Card ---
-function ScheduleCard({
-  schedule,
+// --- Automation Card ---
+function AutomationCard({
+  automation,
   onEdit,
   onToggle,
   onDelete,
   onRunNow,
   onViewRuns,
 }: {
-  schedule: ScheduleWithNextRun;
+  automation: AutomationWithNextRun;
   onEdit: () => void;
   onToggle: () => void;
   onDelete: () => void;
@@ -255,25 +255,25 @@ function ScheduleCard({
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{schedule.name}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{automation.name}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {schedule.agent_name} · {humanizeCron(schedule.cron)}
+            {automation.agent_name} · {humanizeCron(automation.cron)}
           </p>
         </div>
-        <StatusBadge enabled={schedule.enabled} />
+        <StatusBadge enabled={automation.enabled} />
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">{schedule.prompt}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">{automation.prompt}</p>
 
-      {schedule.cwd && (
-        <p className="text-xs text-gray-400 dark:text-gray-500 font-mono mb-3 truncate" title={schedule.cwd}>
-          📁 {schedule.cwd}
+      {automation.cwd && (
+        <p className="text-xs text-gray-400 dark:text-gray-500 font-mono mb-3 truncate" title={automation.cwd}>
+          📁 {automation.cwd}
         </p>
       )}
 
-      {schedule.next_run && schedule.enabled && (
+      {automation.next_run && automation.enabled && (
         <p className="text-xs text-blue-600 dark:text-blue-400 mb-3">
-          Next run: {formatDateTime(schedule.next_run)}
+          Next run: {formatDateTime(automation.next_run)}
         </p>
       )}
 
@@ -281,12 +281,12 @@ function ScheduleCard({
         <button
           onClick={onToggle}
           className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-            schedule.enabled
+            automation.enabled
               ? 'bg-amber-50/80 text-amber-700 hover:bg-amber-100/80 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
               : 'bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100/80 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50'
           }`}
         >
-          {schedule.enabled ? '⏸ Pause' : '▶ Enable'}
+          {automation.enabled ? '⏸ Pause' : '▶ Enable'}
         </button>
         <button
           onClick={onRunNow}
@@ -324,15 +324,15 @@ function ScheduleCard({
 }
 
 // --- Main Component ---
-interface ScheduleManagerProps {
+interface AutomationManagerProps {
   agentId?: string;     // optional initial agent filter
   agentName?: string;   // display name for filtered view
 }
 
-export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProps) {
-  const { schedules, loading, fetchSchedules } = useScheduleStore();
+export function AutomationManager({ agentId: initialAgentId }: AutomationManagerProps) {
+  const { automations, loading, fetchAutomations } = useAutomationStore();
   const [dialogMode, setDialogMode] = useState<'closed' | 'create' | 'edit'>('closed');
-  const [editingSchedule, setEditingSchedule] = useState<ScheduleWithNextRun | undefined>();
+  const [editingAutomation, setEditingAutomation] = useState<AutomationWithNextRun | undefined>();
   const [filterAgentId, setFilterAgentId] = useState<string>(initialAgentId || '');
   const { agents, fetchAgents } = useAgentStore();
   const { openTab } = useTabStore();
@@ -344,72 +344,72 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
 
   useEffect(() => {
     fetchAgents();
-    fetchSchedules();
-  }, [fetchAgents, fetchSchedules]);
+    fetchAutomations();
+  }, [fetchAgents, fetchAutomations]);
 
-  const filteredSchedules = filterAgentId
-    ? schedules.filter((s) => s.agent_id === filterAgentId)
-    : schedules;
+  const filteredAutomations = filterAgentId
+    ? automations.filter((s) => s.agent_id === filterAgentId)
+    : automations;
 
-  const handleSave = async (req: CreateScheduleRequest | UpdateScheduleRequest, id?: string) => {
+  const handleSave = async (req: CreateAutomationRequest | UpdateAutomationRequest, id?: string) => {
     try {
       if (id) {
-        await updateSchedule(id, req as UpdateScheduleRequest);
+        await updateAutomation(id, req as UpdateAutomationRequest);
       } else {
-        await createSchedule(req as CreateScheduleRequest);
+        await createAutomation(req as CreateAutomationRequest);
       }
       setDialogMode('closed');
-      setEditingSchedule(undefined);
-      fetchSchedules();
+      setEditingAutomation(undefined);
+      fetchAutomations();
     } catch (e) {
-      console.error('Failed to save schedule:', e);
+      console.error('Failed to save automation:', e);
     }
   };
 
-  const handleEdit = (schedule: ScheduleWithNextRun) => {
-    setEditingSchedule(schedule);
+  const handleEdit = (automation: AutomationWithNextRun) => {
+    setEditingAutomation(automation);
     setDialogMode('edit');
   };
 
   const handleToggle = async (id: string) => {
     try {
-      await toggleSchedule(id);
-      fetchSchedules();
+      await toggleAutomation(id);
+      fetchAutomations();
     } catch (e) {
-      console.error('Failed to toggle schedule:', e);
+      console.error('Failed to toggle automation:', e);
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteSchedule(id);
-      fetchSchedules();
+      await deleteAutomation(id);
+      fetchAutomations();
     } catch (e) {
-      console.error('Failed to delete schedule:', e);
+      console.error('Failed to delete automation:', e);
     }
   };
 
   const handleRunNow = async (id: string) => {
     try {
-      await runScheduleNow(id);
-      const schedule = schedules.find((s) => s.id === id);
+      await runAutomationNow(id);
+      const automation = automations.find((s) => s.id === id);
       openTab({
         id: tabId.taskBoard(id),
         type: 'task-board',
-        label: `Runs: ${schedule?.name || 'Schedule'}`,
-        scheduleId: id,
+        label: `Runs: ${automation?.name || 'Automation'}`,
+        automationId: id,
       });
     } catch (e) {
-      console.error('Failed to run schedule:', e);
+      console.error('Failed to run automation:', e);
     }
   };
 
-  const handleViewRuns = (schedule: ScheduleWithNextRun) => {
+  const handleViewRuns = (automation: AutomationWithNextRun) => {
     openTab({
-      id: tabId.taskBoard(schedule.id),
+      id: tabId.taskBoard(automation.id),
       type: 'task-board',
-      label: `Runs: ${schedule.name}`,
-      scheduleId: schedule.id,
+      label: `Runs: ${automation.name}`,
+      automationId: automation.id,
     });
   };
 
@@ -420,15 +420,15 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Automations</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Automated agent runs on cron schedules
+              Automated agent runs on cron expressions
             </p>
           </div>
           <button
-            onClick={() => { setEditingSchedule(undefined); setDialogMode('create'); }}
+            onClick={() => { setEditingAutomation(undefined); setDialogMode('create'); }}
             disabled={agents.length === 0}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50"
           >
-            + New Schedule
+            + New Automation
           </button>
         </div>
 
@@ -448,7 +448,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
             </select>
             {filterAgentId && (
               <span className="text-xs text-gray-400 dark:text-gray-500">
-                {filteredSchedules.length} schedule{filteredSchedules.length !== 1 ? 's' : ''}
+                {filteredAutomations.length} automation{filteredAutomations.length !== 1 ? 's' : ''}
               </span>
             )}
           </div>
@@ -456,22 +456,22 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
 
         {loading ? (
           <div className="text-center py-12 text-gray-400 dark:text-gray-500">Loading...</div>
-        ) : filteredSchedules.length === 0 ? (
+        ) : filteredAutomations.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-4xl mb-3">⏰</div>
             <p className="text-gray-500 dark:text-gray-400">
-              {filterAgentId ? 'No schedules for this agent' : 'No schedules yet'}
+              {filterAgentId ? 'No automations for this agent' : 'No automations yet'}
             </p>
             <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-              Create a schedule to run agents automatically
+              Create an automation to run agents automatically
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredSchedules.map((s) => (
-              <ScheduleCard
+            {filteredAutomations.map((s) => (
+              <AutomationCard
                 key={s.id}
-                schedule={s}
+                automation={s}
                 onEdit={() => handleEdit(s)}
                 onToggle={() => handleToggle(s.id)}
                 onDelete={() => handleDelete(s.id)}
@@ -484,12 +484,12 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
       </div>
 
       {dialogMode !== 'closed' && (
-        <ScheduleDialog
+        <AutomationDialog
           agents={agents}
-          existing={dialogMode === 'edit' ? editingSchedule : undefined}
+          existing={dialogMode === 'edit' ? editingAutomation : undefined}
           defaultAgentId={filterAgentId || undefined}
           onSave={handleSave}
-          onCancel={() => { setDialogMode('closed'); setEditingSchedule(undefined); }}
+          onCancel={() => { setDialogMode('closed'); setEditingAutomation(undefined); }}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
-/** Schedule and TaskRun types matching backend models. */
+/** Automation and TaskRun types matching backend models. */
 
-export interface Schedule {
+export interface Automation {
   id: string;
   agent_id: string;
   name: string;
@@ -13,12 +13,12 @@ export interface Schedule {
   updated_at: string;
 }
 
-export interface ScheduleWithNextRun extends Schedule {
+export interface AutomationWithNextRun extends Automation {
   next_run: string | null;
   agent_name: string;
 }
 
-export interface CreateScheduleRequest {
+export interface CreateAutomationRequest {
   agent_id: string;
   name: string;
   cron: string;
@@ -28,7 +28,7 @@ export interface CreateScheduleRequest {
   max_runtime_minutes?: number;
 }
 
-export interface UpdateScheduleRequest {
+export interface UpdateAutomationRequest {
   name?: string;
   cron?: string;
   prompt?: string;
@@ -41,7 +41,7 @@ export type TaskRunStatus = 'pending' | 'running' | 'completed' | 'failed' | 'ti
 
 export interface TaskRunSummary {
   id: string;
-  schedule_id: string | null;
+  automation_id: string | null;
   agent_id: string;
   agent_name: string;
   prompt: string;

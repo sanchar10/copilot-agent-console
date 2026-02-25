@@ -11,7 +11,7 @@ import { Header } from '../layout/Header';
 import { RalphMonitor } from '../ralph/RalphMonitor';
 import { AgentLibrary } from '../agents/AgentLibrary';
 import { AgentEditor } from '../agents/AgentEditor';
-import { ScheduleManager } from '../schedules/ScheduleManager';
+import { AutomationManager } from '../automations/AutomationManager';
 import { TaskBoard } from '../taskboard/TaskBoard';
 import { TaskRunDetail } from '../taskboard/TaskRunDetail';
 import { WorkflowLibrary } from '../workflows/WorkflowLibrary';
@@ -474,11 +474,11 @@ export function ChatPane() {
       {!showNewSession && activeTab?.type === 'agent-detail' && activeTab.agentId && (
         <AgentEditor agentId={activeTab.agentId} />
       )}
-      {!showNewSession && activeTab?.type === 'schedule-manager' && (
-        <ScheduleManager agentId={activeTab.agentId} />
+      {!showNewSession && activeTab?.type === 'automation-manager' && (
+        <AutomationManager agentId={activeTab.agentId} />
       )}
       {!showNewSession && activeTab?.type === 'task-board' && (
-        <TaskBoard scheduleId={activeTab.scheduleId} scheduleName={activeTab.scheduleId ? activeTab.label.replace('Runs: ', '') : undefined} />
+        <TaskBoard automationId={activeTab.automationId} automationName={activeTab.automationId ? activeTab.label.replace('Runs: ', '') : undefined} />
       )}
       {!showNewSession && activeTab?.type === 'task-run-detail' && activeTab.runId && (
         <TaskRunDetail runId={activeTab.runId} />

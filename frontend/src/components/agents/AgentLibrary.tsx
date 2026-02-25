@@ -51,8 +51,8 @@ function AgentCard({ agent }: { agent: Agent }) {
   const handleAutomations = (e: React.MouseEvent) => {
     e.stopPropagation();
     openTab({
-      id: tabId.scheduleManager(),
-      type: 'schedule-manager',
+      id: tabId.automationManager(),
+      type: 'automation-manager',
       label: `⏰ ${agent.name}`,
       agentId: agent.id,
     });

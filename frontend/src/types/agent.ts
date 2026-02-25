@@ -1,7 +1,7 @@
 /** Agent definition types matching backend models.
  * 
- * An agent is a pure capability template. Schedules are separate
- * (one agent can have multiple schedules with different CWDs and inputs).
+ * An agent is a pure capability template. Automations are separate
+ * (one agent can have multiple automations with different CWDs and inputs).
  */
 
 export interface SystemMessage {

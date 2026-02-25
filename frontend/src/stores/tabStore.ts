@@ -5,17 +5,17 @@
 
 import { create } from 'zustand';
 
-export type TabType = 'session' | 'ralph-monitor' | 'file' | 'agent-library' | 'agent-detail' | 'schedule-manager' | 'task-board' | 'task-run-detail' | 'workflow-library' | 'workflow-editor' | 'workflow-run';
+export type TabType = 'session' | 'ralph-monitor' | 'file' | 'agent-library' | 'agent-detail' | 'automation-manager' | 'task-board' | 'task-run-detail' | 'workflow-library' | 'workflow-editor' | 'workflow-run';
 
 export interface Tab {
-  id: string;           // "session:<uuid>", "ralph-monitor", "file:<path>", "agent-library", "agent:<id>", "schedule-manager", "task-board", "task-run:<id>", "workflow-library", "workflow:<id>", "workflow-run:<id>"
+  id: string;           // "session:<uuid>", "ralph-monitor", "file:<path>", "agent-library", "agent:<id>", "automation-manager", "task-board", "task-run:<id>", "workflow-library", "workflow:<id>", "workflow-run:<id>"
   type: TabType;
   label: string;
   sessionId?: string;   // for type='session'
   filePath?: string;    // for type='file'
   agentId?: string;     // for type='agent-detail'
   runId?: string;       // for type='task-run-detail' or 'workflow-run'
-  scheduleId?: string;  // for type='task-board' (optional filter)
+  automationId?: string;  // for type='task-board' (optional filter)
   workflowId?: string;  // for type='workflow-editor' or 'workflow-run'
 }
 
@@ -44,8 +44,8 @@ export const tabId = {
   file: (filePath: string) => `file:${filePath}`,
   agentLibrary: () => 'agent-library',
   agentDetail: (agentId: string) => `agent:${agentId}`,
-  scheduleManager: () => 'schedule-manager',
-  taskBoard: (scheduleId?: string) => scheduleId ? `task-board:${scheduleId}` : 'task-board',
+  automationManager: () => 'automation-manager',
+  taskBoard: (automationId?: string) => automationId ? `task-board:${automationId}` : 'task-board',
   taskRunDetail: (runId: string) => `task-run:${runId}`,
   workflowLibrary: () => 'workflow-library',
   workflowEditor: (workflowId: string) => `workflow:${workflowId}`,

@@ -39,7 +39,7 @@ vi.mock('../../stores/tabStore', () => ({
     ralphMonitor: () => 'ralph-monitor',
     agentLibrary: () => 'agent-library',
     workflowLibrary: () => 'workflow-library',
-    scheduleManager: () => 'schedule-manager',
+    automationManager: () => 'automation-manager',
     taskBoard: () => 'task-board',
   },
 }));
@@ -66,10 +66,10 @@ vi.mock('../../stores/workflowStore', () => ({
   }),
 }));
 
-vi.mock('../../stores/scheduleStore', () => ({
-  useScheduleStore: () => ({
-    schedules: [{ id: 'sch1' }],
-    fetchSchedules: vi.fn(),
+vi.mock('../../stores/automationStore', () => ({
+  useAutomationStore: () => ({
+    automations: [{ id: 'sch1' }],
+    fetchAutomations: vi.fn(),
   }),
 }));
 

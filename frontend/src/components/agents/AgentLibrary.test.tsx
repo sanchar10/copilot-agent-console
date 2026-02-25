@@ -34,7 +34,7 @@ vi.mock('../../stores/tabStore', () => ({
   ),
   tabId: {
     agentDetail: (id: string) => `agent:${id}`,
-    scheduleManager: () => 'schedule-manager',
+    automationManager: () => 'automation-manager',
   },
 }));
 

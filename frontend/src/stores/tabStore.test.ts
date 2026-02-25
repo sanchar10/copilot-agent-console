@@ -47,7 +47,7 @@ describe('tabStore', () => {
       expect(tabId.workflowRun('r1')).toBe('workflow-run:r1');
     });
 
-    it('builds task-board tab id with and without scheduleId', () => {
+    it('builds task-board tab id with and without automationId', () => {
       expect(tabId.taskBoard()).toBe('task-board');
       expect(tabId.taskBoard('s1')).toBe('task-board:s1');
     });

@@ -6,7 +6,7 @@ import { useTabStore, tabId } from '../../stores/tabStore';
 import { useAgentMonitorStore } from '../../stores/agentMonitorStore';
 import { useAgentStore } from '../../stores/agentStore';
 import { useWorkflowStore } from '../../stores/workflowStore';
-import { useScheduleStore } from '../../stores/scheduleStore';
+import { useAutomationStore } from '../../stores/automationStore';
 import { listSessions } from '../../api/sessions';
 import { fetchModels } from '../../api/models';
 import { getSettings } from '../../api/settings';
@@ -23,7 +23,7 @@ export function Sidebar() {
   const { setOpen: setAgentMonitorOpen, activeCount, setActiveCount } = useAgentMonitorStore();
   const { agents, fetchAgents } = useAgentStore();
   const { workflows, fetchWorkflows } = useWorkflowStore();
-  const { schedules, fetchSchedules } = useScheduleStore();
+  const { automations, fetchAutomations } = useAutomationStore();
   const { hasFlag } = useFeatureFlags();
   const showRalph = hasFlag('ralph');
   const [sessionSearch, setSessionSearch] = useState('');
@@ -64,7 +64,7 @@ export function Sidebar() {
         }
         fetchAgents();
         fetchWorkflows();
-        fetchSchedules();
+        fetchAutomations();
       } catch (err) {
         // Backend may not be ready yet (dev mode race) — retry once after 2s
         console.warn('Initial load failed, retrying in 2s...', err);
@@ -83,7 +83,7 @@ export function Sidebar() {
           }
           fetchAgents();
           fetchWorkflows();
-          fetchSchedules();
+          fetchAutomations();
         } catch (retryErr) {
           setError(retryErr instanceof Error ? retryErr.message : 'Failed to load data');
         }
@@ -92,7 +92,7 @@ export function Sidebar() {
       }
     }
     loadData();
-  }, [setSessions, setAvailableModels, setDefaultModel, setDefaultCwd, setLoading, setError, fetchAgents, fetchWorkflows, fetchSchedules]);
+  }, [setSessions, setAvailableModels, setDefaultModel, setDefaultCwd, setLoading, setError, fetchAgents, fetchWorkflows, fetchAutomations]);
 
   const handleNewSession = async () => {
     // startNewSession now refreshes MCP servers automatically and enables all by default
@@ -208,19 +208,19 @@ export function Sidebar() {
         </button>
         <button
           onClick={() => {
-            fetchSchedules();
-            openTab({ id: tabId.scheduleManager(), type: 'schedule-manager', label: 'Automations' });
+            fetchAutomations();
+            openTab({ id: tabId.automationManager(), type: 'automation-manager', label: 'Automations' });
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
-            activeTabId?.startsWith('schedule-manager')
+            activeTabId?.startsWith('automation-manager')
               ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
           }`}
         >
           <span>⏰</span>
           Automations
-          {schedules.length > 0 && (
-            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{schedules.length}</span>
+          {automations.length > 0 && (
+            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{automations.length}</span>
           )}
         </button>
         <button
@@ -267,7 +267,7 @@ export function Sidebar() {
         )}
         <div className="flex-1 overflow-hidden">
           <SessionList sessions={sessions.filter(s => {
-            if (s.trigger === 'schedule') return false;
+            if (s.trigger === 'automation') return false;
             if (!sessionSearch) return true;
             const q = sessionSearch.toLowerCase();
             return (s.session_name || '').toLowerCase().includes(q);

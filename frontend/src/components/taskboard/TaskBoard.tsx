@@ -9,9 +9,9 @@ import { useSessionStore } from '../../stores/sessionStore';
 import { useAgentStore } from '../../stores/agentStore';
 import { useChatStore } from '../../stores/chatStore';
 import { formatDateTime } from '../../utils/formatters';
-import { listTaskRuns, abortTaskRun, deleteTaskRun } from '../../api/schedules';
+import { listTaskRuns, abortTaskRun, deleteTaskRun } from '../../api/automations';
 import { getSession, connectSession, getResponseStatus, resumeResponseStream } from '../../api/sessions';
-import type { TaskRunSummary, TaskRunStatus } from '../../types/schedule';
+import type { TaskRunSummary, TaskRunStatus } from '../../types/automation';
 
 const STATUS_CONFIG: Record<TaskRunStatus, { label: string; color: string; bg: string; darkColor: string; darkBg: string }> = {
   pending: { label: 'Pending', color: 'text-amber-700', bg: 'bg-amber-100', darkColor: 'dark:text-amber-400', darkBg: 'dark:bg-amber-900/30' },
@@ -132,7 +132,7 @@ function TaskRunCard({
   );
 }
 
-export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; scheduleName?: string }) {
+export function TaskBoard({ automationId, automationName }: { automationId?: string; automationName?: string }) {
   const [runs, setRuns] = useState<TaskRunSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
@@ -146,14 +146,14 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
 
   const refresh = useCallback(async () => {
     try {
-      const data = await listTaskRuns({ limit: 100, schedule_id: scheduleId, agent_id: agentFilter || undefined });
+      const data = await listTaskRuns({ limit: 100, automation_id: automationId, agent_id: agentFilter || undefined });
       setRuns(data);
     } catch (e) {
       console.error('Failed to load task runs:', e);
     } finally {
       setLoading(false);
     }
-  }, [scheduleId, agentFilter]);
+  }, [automationId, agentFilter]);
 
   useEffect(() => {
     refresh();
@@ -189,7 +189,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
         const sessionData = await getSession(run.session_id);
         setMessages(run.session_id, sessionData.messages);
         if (!sessions.find(s => s.session_id === run.session_id)) {
-          setSessions([...sessions, { ...sessionData, trigger: 'schedule' }]);
+          setSessions([...sessions, { ...sessionData, trigger: 'automation' }]);
         }
       } catch (e) {
         console.error('Failed to load session:', e);
@@ -241,7 +241,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {scheduleName ? `Runs: ${scheduleName}` : '📋 Runs'}
+              {automationName ? `Runs: ${automationName}` : '📋 Runs'}
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {runningCount > 0 && <span className="text-blue-600 dark:text-blue-400">{runningCount} running</span>}
@@ -251,7 +251,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {scheduleId && (
+            {automationId && (
               <button
                 onClick={() => openTab({ id: tabId.taskBoard(), type: 'task-board', label: 'Runs' })}
                 className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
@@ -269,7 +269,7 @@ export function TaskBoard({ scheduleId, scheduleName }: { scheduleId?: string; s
         </div>
 
         {/* Agent filter */}
-        {!scheduleId && agents.length > 0 && (
+        {!automationId && agents.length > 0 && (
           <div className="flex items-center gap-3 mb-4">
             <label className="text-sm text-gray-500 dark:text-gray-400">Filter by agent:</label>
             <select

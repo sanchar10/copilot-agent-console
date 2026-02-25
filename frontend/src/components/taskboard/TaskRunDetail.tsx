@@ -4,8 +4,8 @@
 
 import { useEffect, useState } from 'react';
 import { formatDateTime } from '../../utils/formatters';
-import { getTaskRun, abortTaskRun } from '../../api/schedules';
-import type { TaskRun, TaskRunStatus } from '../../types/schedule';
+import { getTaskRun, abortTaskRun } from '../../api/automations';
+import type { TaskRun, TaskRunStatus } from '../../types/automation';
 
 const STATUS_CONFIG: Record<TaskRunStatus, { label: string; color: string; bg: string; darkColor: string; darkBg: string }> = {
   pending: { label: 'Pending', color: 'text-amber-700', bg: 'bg-amber-100', darkColor: 'dark:text-amber-400', darkBg: 'dark:bg-amber-900/30' },
