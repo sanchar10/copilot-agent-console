@@ -36,7 +36,7 @@ class SessionBase(BaseModel):
     )
     # Reference fields (informational only, no behavioral impact)
     agent_id: str | None = Field(default=None, description="Agent ID this session was created from (reference only)")
-    trigger: str | None = Field(default=None, description="How this session was triggered: 'manual', 'schedule', or null for regular chat")
+    trigger: str | None = Field(default=None, description="How this session was triggered: 'manual', 'automation', or null for regular chat")
 
 
 class SessionCreate(BaseModel):

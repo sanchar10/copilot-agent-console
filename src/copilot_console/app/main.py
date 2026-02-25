@@ -12,11 +12,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from copilot_console.app.config import API_PREFIX, ensure_directories
-from copilot_console.app.routers import agents, filesystem, logs, mcp, models, ralph, schedules, sessions, settings, tools, task_runs, viewed, push, workflows
+from copilot_console.app.routers import agents, filesystem, logs, mcp, models, ralph, automations, sessions, settings, tools, task_runs, viewed, push, workflows
 from copilot_console.app.services.copilot_service import copilot_service
 from copilot_console.app.services.response_buffer import response_buffer_manager
 from copilot_console.app.services.task_runner_service import TaskRunnerService
-from copilot_console.app.services.scheduler_service import SchedulerService
+from copilot_console.app.services.automation_service import AutomationService
 from copilot_console.app.services.logging_service import setup_logging, get_logger
 from copilot_console.app.middleware.auth import TokenAuthMiddleware
 
@@ -56,13 +56,13 @@ async def lifespan(app: FastAPI):
     await copilot_service._start_main_client()
     # Start buffer cleanup task
     response_buffer_manager.start_cleanup_task()
-    # Start task runner and scheduler
+    # Start task runner and automation service
     task_runner = TaskRunnerService(copilot_service, response_buffer_manager)
-    scheduler = SchedulerService(task_runner)
-    scheduler.start()
+    automation_svc = AutomationService(task_runner)
+    automation_svc.start()
     # Store on app state for access from routers
     app.state.task_runner = task_runner
-    app.state.scheduler = scheduler
+    app.state.automation_service = automation_svc
     # Enable sleep prevention if --no-sleep flag was passed
     no_sleep = os.environ.get("COPILOT_NO_SLEEP") == "1"
     if no_sleep:
@@ -76,7 +76,7 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down Copilot Console...")
     if no_sleep:
         _set_sleep_prevention(False)
-    scheduler.shutdown()
+    automation_svc.shutdown()
     await copilot_service.stop()
 
 
@@ -115,7 +115,7 @@ app.include_router(logs.router, prefix=API_PREFIX)
 app.include_router(mcp.router, prefix=API_PREFIX)
 app.include_router(models.router, prefix=API_PREFIX)
 app.include_router(ralph.router, prefix=API_PREFIX)
-app.include_router(schedules.router, prefix=API_PREFIX)
+app.include_router(automations.router, prefix=API_PREFIX)
 app.include_router(sessions.router, prefix=API_PREFIX)
 app.include_router(settings.router, prefix=API_PREFIX)
 app.include_router(tools.router, prefix=API_PREFIX)

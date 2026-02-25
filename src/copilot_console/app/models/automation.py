@@ -1,7 +1,7 @@
-"""Schedule models for the autonomous agent platform.
+"""Automation models for the autonomous agent platform.
 
-A schedule connects an agent to a cron trigger with a fixed prompt and optional CWD.
-One agent can have multiple schedules.
+An automation connects an agent to a cron trigger with a fixed prompt and optional CWD.
+One agent can have multiple automations.
 """
 
 from datetime import datetime, timezone
@@ -20,22 +20,22 @@ class TaskRunStatus(str, Enum):
     ABORTED = "aborted"
 
 
-class Schedule(BaseModel):
-    """A recurring schedule that triggers an agent run."""
-    id: str = Field(..., description="Unique schedule ID (UUID)")
+class Automation(BaseModel):
+    """A recurring automation that triggers an agent run."""
+    id: str = Field(..., description="Unique automation ID (UUID)")
     agent_id: str = Field(..., description="Agent to run")
     name: str = Field(..., description="Display name (e.g. 'Morning news check')")
     cron: str = Field(..., description="Cron expression (e.g. '0 8 * * *')")
     prompt: str = Field(..., description="Fixed prompt sent to agent each run")
     cwd: str | None = Field(default=None, description="Working directory for the run")
-    enabled: bool = Field(default=True, description="Whether schedule is active")
+    enabled: bool = Field(default=True, description="Whether automation is active")
     max_runtime_minutes: int = Field(default=30, description="Kill task after N minutes")
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
-class ScheduleCreate(BaseModel):
-    """Request to create a schedule."""
+class AutomationCreate(BaseModel):
+    """Request to create an automation."""
     agent_id: str
     name: str
     cron: str
@@ -45,8 +45,8 @@ class ScheduleCreate(BaseModel):
     max_runtime_minutes: int = 30
 
 
-class ScheduleUpdate(BaseModel):
-    """Request to update a schedule. All fields optional."""
+class AutomationUpdate(BaseModel):
+    """Request to update an automation. All fields optional."""
     agent_id: str | None = None
     name: str | None = None
     cron: str | None = None
@@ -57,9 +57,9 @@ class ScheduleUpdate(BaseModel):
 
 
 class TaskRun(BaseModel):
-    """A single execution of a scheduled (or manual) agent run."""
+    """A single execution of an automated (or manual) agent run."""
     id: str = Field(..., description="Unique run ID (UUID)")
-    schedule_id: str | None = Field(default=None, description="Source schedule (null for manual Run Now)")
+    automation_id: str | None = Field(default=None, description="Source automation (null for manual Run Now)")
     agent_id: str = Field(..., description="Agent that was run")
     agent_name: str = Field(default="", description="Agent name snapshot for display")
     prompt: str = Field(default="", description="Prompt sent to agent")
@@ -77,7 +77,7 @@ class TaskRun(BaseModel):
 class TaskRunSummary(BaseModel):
     """Lightweight task run for listing (no output body)."""
     id: str
-    schedule_id: str | None
+    automation_id: str | None
     agent_id: str
     agent_name: str
     prompt: str
@@ -91,7 +91,7 @@ class TaskRunSummary(BaseModel):
     token_usage: dict | None = None
 
 
-class ScheduleWithNextRun(Schedule):
-    """Schedule with computed next-run-time for API responses."""
-    next_run: datetime | None = Field(default=None, description="Next scheduled run time")
+class AutomationWithNextRun(Automation):
+    """Automation with computed next-run-time for API responses."""
+    next_run: datetime | None = Field(default=None, description="Next automation run time")
     agent_name: str = Field(default="", description="Resolved agent name for display")

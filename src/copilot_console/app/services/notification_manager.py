@@ -68,7 +68,7 @@ class NotificationManager:
     def on_agent_completed(self, session_id: str, session_name: str, preview: str = "") -> None:
         """Called when an agent finishes responding.
         
-        Schedules a delayed check to see if the user has viewed the session.
+        Triggers a delayed check to see if the user has viewed the session.
         If still unread after the delay, sends a push notification.
         """
         if not push_subscription_service.get_all():

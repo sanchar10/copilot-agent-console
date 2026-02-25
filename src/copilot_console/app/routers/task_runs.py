@@ -14,14 +14,14 @@ router = APIRouter(prefix="/task-runs", tags=["task-runs"])
 async def list_task_runs(
     limit: int = 50,
     agent_id: str | None = None,
-    schedule_id: str | None = None,
+    automation_id: str | None = None,
     status: str | None = None,
 ):
     """List task runs, most recent first."""
     return task_run_storage_service.list_runs(
         limit=limit,
         agent_id=agent_id,
-        schedule_id=schedule_id,
+        automation_id=automation_id,
         status=status,
     )
 

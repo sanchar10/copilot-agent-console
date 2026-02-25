@@ -1,7 +1,7 @@
 """Agent definition models for the autonomous agent platform.
 
 An agent is a pure capability template: system prompt, model, tools, MCP servers.
-Schedules are separate — one agent can have multiple schedules with different CWDs and inputs.
+Automations are separate — one agent can have multiple automations with different CWDs and inputs.
 """
 
 from datetime import datetime, timezone

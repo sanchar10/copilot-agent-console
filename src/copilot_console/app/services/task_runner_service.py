@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timezone
 
 from copilot_console.app.models.agent import Agent
-from copilot_console.app.models.schedule import TaskRun, TaskRunStatus
+from copilot_console.app.models.automation import TaskRun, TaskRunStatus
 from copilot_console.app.models.session import SessionCreate
 from copilot_console.app.services.copilot_service import CopilotService
 from copilot_console.app.services.response_buffer import ResponseBuffer, ResponseBufferManager, ResponseStatus
@@ -44,13 +44,13 @@ class TaskRunnerService:
         agent: Agent,
         prompt: str,
         cwd: str | None = None,
-        schedule_id: str | None = None,
+        automation_id: str | None = None,
         max_runtime_minutes: int = 10,
     ) -> TaskRun:
         """Submit a new task run. Returns the TaskRun immediately; execution is async."""
         run = TaskRun(
             id=str(uuid.uuid4())[:8],
-            schedule_id=schedule_id,
+            automation_id=automation_id,
             agent_id=agent.id,
             agent_name=agent.name,
             prompt=prompt,
@@ -78,7 +78,7 @@ class TaskRunnerService:
             task_run_storage_service.save_run(run)
             logger.info(f"[task-run:{run.id}] Starting agent={agent.id} prompt={run.prompt[:80]!r}")
 
-            # Create a proper session with metadata (trigger=schedule, agent_id set)
+            # Create a proper session with metadata (trigger=automation, agent_id set)
             session_request = SessionCreate(
                 model=agent.model,
                 name=run.prompt[:80],
@@ -87,7 +87,7 @@ class TaskRunnerService:
                 tools=agent.tools,
                 system_message=agent.system_message.model_dump() if agent.system_message and agent.system_message.content else None,
                 agent_id=agent.id,
-                trigger="schedule",
+                trigger="automation",
             )
             session = await session_service.create_session(session_request)
             session_id = session.session_id

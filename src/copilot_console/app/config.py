@@ -14,7 +14,7 @@ SESSIONS_DIR = APP_HOME / "sessions"
 TOOLS_DIR = APP_HOME / "tools"
 MCP_SERVERS_DIR = APP_HOME / "mcp-servers"
 AGENTS_DIR = APP_HOME / "agents"
-SCHEDULES_DIR = APP_HOME / "schedules"
+AUTOMATIONS_DIR = APP_HOME / "automations"
 TASK_RUNS_DIR = APP_HOME / "task-runs"
 
 # Metadata file
@@ -44,5 +44,5 @@ API_PREFIX = "/api"
 
 def ensure_directories() -> None:
     """Create required directories if they don't exist."""
-    for directory in [APP_HOME, SESSIONS_DIR, TOOLS_DIR, MCP_SERVERS_DIR, AGENTS_DIR, SCHEDULES_DIR, TASK_RUNS_DIR]:
+    for directory in [APP_HOME, SESSIONS_DIR, TOOLS_DIR, MCP_SERVERS_DIR, AGENTS_DIR, AUTOMATIONS_DIR, TASK_RUNS_DIR]:
         directory.mkdir(parents=True, exist_ok=True)

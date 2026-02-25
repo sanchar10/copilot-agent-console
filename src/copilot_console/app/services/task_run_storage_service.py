@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from copilot_console.app.config import TASK_RUNS_DIR, ensure_directories
-from copilot_console.app.models.schedule import TaskRun, TaskRunSummary
+from copilot_console.app.models.automation import TaskRun, TaskRunSummary
 
 
 class TaskRunStorageService:
@@ -86,7 +86,7 @@ class TaskRunStorageService:
         self,
         limit: int = 50,
         agent_id: str | None = None,
-        schedule_id: str | None = None,
+        automation_id: str | None = None,
         status: str | None = None,
     ) -> list[TaskRunSummary]:
         """List task runs, most recent first. Returns summaries (no output body)."""
@@ -102,7 +102,7 @@ class TaskRunStorageService:
                     data = json.loads(f.read_text(encoding="utf-8"))
                     if agent_id and data.get("agent_id") != agent_id:
                         continue
-                    if schedule_id and data.get("schedule_id") != schedule_id:
+                    if automation_id and data.get("automation_id") != automation_id:
                         continue
                     if status and data.get("status") != status:
                         continue

@@ -73,7 +73,7 @@ def main():
     parser.add_argument(
         "--no-sleep",
         action="store_true",
-        help="Prevent Windows from sleeping while the app is running (useful for scheduled tasks)"
+        help="Prevent Windows from sleeping while the app is running (useful for automated tasks)"
     )
     parser.add_argument(
         "--expose",
