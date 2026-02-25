@@ -1,12 +1,8 @@
-# Agent Teams
+# What Are Agent Teams?
 
-Sub-agents let your main agent delegate tasks to specialized agents that run in **separate contexts**. Instead of one agent doing everything, you can compose a team — each sub-agent has its own prompt, tools, and MCP servers.
+When you chat with an agent in Copilot Console, it runs as the main agent for that session. Sub-agents are additional agents loaded alongside it. The main agent can **automatically delegate** tasks to a sub-agent when it determines one is better suited for the job. Copilot Console allows formation of a team with a main agent configuration and set of custom sub-agents that are part of the team.
 
-## What Are Sub-Agents?
-
-When you chat with an agent in Copilot Agent Console, it runs as the main agent for that session. Sub-agents are additional agents loaded alongside it. The main agent can **automatically delegate** tasks to a sub-agent when it determines one is better suited for the job.
-
-Each sub-agent runs in its own context — it has its own prompt, its own tool access, and returns results back to the main agent. This is fundamentally different from system prompts, which just change the main agent's behavior in the same context.
+Each sub-agent runs in its own context — it has its own prompt, its own tool access, and returns results back to the main agent. 
 
 **Example:** A "Dev Lead" agent that orchestrates the software development lifecycle across four specialists:
 
@@ -56,82 +52,53 @@ Sub-agents have `infer: true` by default — the main agent automatically decide
 - **No per-agent model override** — Sub-agents use the session's model, not their own model setting.
 - **CLI agents are always present** — Agents defined in `~/.copilot/agents/` are always available in every session regardless of sub-agent selection.
 
-Agents eligible as sub-agents are marked with a 🤝 indicator in the Agent Library. You can filter the library to show only composable agents.
+Agents eligible as sub-agents are marked with a 🧩 indicator in the Agent Library. You can filter the library to show only composable agents.
 
-## Example
+## Example: Dev Lead Team
 
-### Agent: Dev Lead
+These agents are included as samples in Copilot Console. You can find them in the **Agent Library** (sidebar → Agents) and use them as-is or customize them.
 
-```json
-{
-  "name": "Dev Lead",
-  "description": "Orchestrates feature development by coordinating design, coding, review, and testing",
-  "system_message": {
-    "mode": "replace",
-    "content": "You are a dev lead orchestrating the software development lifecycle. For feature requests: first delegate to the Designer for design and file structure, then hand the design to the Developer for implementation, send the code to the Code Reviewer for quality checks, and finally pass it to the Test Engineer for test coverage. Synthesize feedback at each stage before proceeding to the next."
-  },
-  "model": "claude-sonnet-4",
-  "mcp_servers": ["github"],
-  "sub_agents": ["designer", "developer", "code-reviewer", "test-engineer"]
-}
-```
+### Dev Lead (Parent Agent)
 
-### Sub-Agent: Designer
+| Field | Value |
+|---|---|
+| **Name** | Dev Lead |
+| **Description** | Orchestrates feature development by coordinating design, coding, review, and testing |
+| **Model** | claude-sonnet-4 |
+| **Prompt** | You are a dev lead orchestrating the software development lifecycle. For feature requests: first delegate to the Designer for design and file structure, then hand the design to the Developer for implementation, send the code to the Code Reviewer for quality checks, and finally pass it to the Test Engineer for test coverage. Synthesize feedback at each stage before proceeding to the next. |
+| **MCP Servers** | github |
+| **Sub-Agents** | Designer, Developer, Code Reviewer, Test Engineer |
 
-```json
-{
-  "name": "Designer",
-  "description": "Designs solutions, evaluates trade-offs, and proposes file structure",
-  "system_message": {
-    "mode": "replace",
-    "content": "You are a software designer. Analyze requirements, evaluate design trade-offs, propose file/module structure, and identify patterns to follow. Keep designs practical and aligned with the existing codebase."
-  },
-  "tools": {
-    "builtin": ["grep", "glob", "view"]
-  }
-}
-```
+### Designer (Sub-Agent)
 
-### Sub-Agent: Developer
+| Field | Value |
+|---|---|
+| **Name** | Designer |
+| **Description** | Designs solutions, evaluates trade-offs, and proposes file structure |
+| **Prompt** | You are a software designer. Analyze requirements, evaluate design trade-offs, propose file/module structure, and identify patterns to follow. Keep designs practical and aligned with the existing codebase. |
+| **Tools** | grep, glob, view (Only mode) |
 
-```json
-{
-  "name": "Developer",
-  "description": "Implements features, writes code, and fixes bugs following the given design",
-  "system_message": {
-    "mode": "replace",
-    "content": "You are a software developer. Implement features following the provided design. Write clean, minimal code. Use existing patterns in the codebase. Make surgical changes — don't refactor unrelated code."
-  }
-}
-```
+### Developer (Sub-Agent)
 
-### Sub-Agent: Code Reviewer
+| Field | Value |
+|---|---|
+| **Name** | Developer |
+| **Description** | Implements features, writes code, and fixes bugs following the given design |
+| **Prompt** | You are a software developer. Implement features following the provided design. Write clean, minimal code. Use existing patterns in the codebase. Make surgical changes — don't refactor unrelated code. |
 
-```json
-{
-  "name": "Code Reviewer",
-  "description": "Reviews code for bugs, security issues, and adherence to best practices",
-  "system_message": {
-    "mode": "replace",
-    "content": "You are a code reviewer. Review changes for bugs, security vulnerabilities, and logic errors. Only flag issues that genuinely matter — never comment on style or formatting. Suggest concrete fixes."
-  },
-  "tools": {
-    "builtin": ["grep", "view"]
-  }
-}
-```
+### Code Reviewer (Sub-Agent)
 
-### Sub-Agent: Test Engineer
+| Field | Value |
+|---|---|
+| **Name** | Code Reviewer |
+| **Description** | Reviews code for bugs, security issues, and adherence to best practices |
+| **Prompt** | You are a code reviewer. Review changes for bugs, security vulnerabilities, and logic errors. Only flag issues that genuinely matter — never comment on style or formatting. Suggest concrete fixes. |
+| **Tools** | grep, view (Only mode) |
 
-```json
-{
-  "name": "Test Engineer",
-  "description": "Writes tests, identifies edge cases, and validates coverage",
-  "system_message": {
-    "mode": "replace",
-    "content": "You are a test engineer. Write unit and integration tests for the given code. Identify edge cases, boundary conditions, and failure modes. Ensure tests are deterministic and cover the critical paths."
-  }
-}
-```
+### Test Engineer (Sub-Agent)
 
-When the Dev Lead receives *"Implement a user authentication module"*, it delegates to each sub-agent in sequence — design → implement → review → test — collecting and incorporating feedback at each stage to deliver a complete, tested feature.
+| Field | Value |
+|---|---|
+| **Name** | Test Engineer |
+| **Description** | Writes tests, identifies edge cases, and validates coverage |
+| **Prompt** | You are a test engineer. Write unit and integration tests for the given code. Identify edge cases, boundary conditions, and failure modes. Ensure tests are deterministic and cover the critical paths. |

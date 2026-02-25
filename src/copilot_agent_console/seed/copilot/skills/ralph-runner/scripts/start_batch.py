@@ -108,7 +108,7 @@ Examples:
     print("=" * 50)
     
     print("\n✅ BACKEND IS NOW EXECUTING JOBS")
-    print("→ Monitor progress in Ralph Monitor (Agent Console sidebar)")
+    print("→ Monitor progress in Ralph Monitor (Copilot Console sidebar)")
     print("→ Each job runs with a FRESH agent (not this chat)")
     print("→ The calling agent's work is DONE - do not execute jobs yourself")
     

@@ -2,11 +2,11 @@
 
 ## The Big Picture
 
-Transform the Copilot Agent Console from a **chat interface** into a **personal AI operations platform** — an always-running local assistant that manages professional and personal tasks autonomously, with human oversight through the web UI.
+Transform the Copilot Console from a **chat interface** into a **personal AI operations platform** — an always-running local assistant that manages professional and personal tasks autonomously, with human oversight through the web UI.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   Copilot Agent Console                      │
+│                     Copilot Console                          │
 │                                                              │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
 │  │  Chat    │  │  Agent   │  │  Task    │  │ Schedule │    │
@@ -390,7 +390,7 @@ Click "View" on a task → see full output, logs, duration.
 
 ```
 ┌──────────────────┐
-│ 🤖 Agent Console │
+│ 🤖 Copilot Console │
 ├──────────────────┤
 │                  │
 │ CHAT             │

@@ -2,7 +2,7 @@
 """
 Weather MCP Server - Provides weather information using Open-Meteo API.
 
-A sample MCP (Model Context Protocol) server that ships with Copilot Agent Console.
+A sample MCP (Model Context Protocol) server that ships with Copilot Console.
 Free to use — no API key required.
 """
 

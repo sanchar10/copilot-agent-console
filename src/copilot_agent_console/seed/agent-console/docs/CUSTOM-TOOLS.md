@@ -42,5 +42,3 @@ TOOL_SPECS = [
     }
 ]
 ```
-
-Tools auto-reload when files change — new sessions pick them up without restarting.

@@ -1,7 +1,7 @@
 # Feature: Seed Content
 
 ## Summary
-Seed content is a set of bundled defaults that ship with Copilot Agent Console. On install or update, the app copies starter agents, tools, MCP configuration, and documentation into the user's home directories so the app is immediately useful out of the box.
+Seed content is a set of bundled defaults that ship with Copilot Console. On install or update, the app copies starter agents, tools, MCP configuration, and documentation into the user's home directories so the app is immediately useful out of the box.
 
 ## What Gets Seeded
 

@@ -6,7 +6,7 @@ description: Sequential batch job execution with human oversight. Use for "start
 # ralph-runner
 
 ## Summary
-Runs batch jobs sequentially with human oversight via the Agent Console backend. Each job runs in a fresh agent session that inherits your current session's configuration (model, MCP servers, tools, workspace).
+Runs batch jobs sequentially with human oversight via the Copilot Console backend. Each job runs in a fresh agent session that inherits your current session's configuration (model, MCP servers, tools, workspace).
 
 ## When to use
 - "start ralph", "ralph on [file]", "run a batch", "process backlog"
@@ -37,7 +37,7 @@ py $env:USERPROFILE\.copilot\skills\ralph-runner\scripts\start_batch.py --batch-
    - Replace `YOUR_SESSION_ID` with your actual session UUID
    - Replace jobs JSON with actual job descriptions
 8. Run **Step 2** command with BATCH_ID
-9. Say "🚀 Batch started! Batch Id: {BATCH_ID}. Check Ralph Monitor in Agent Console for Progress." and STOP
+9. Say "🚀 Batch started! Batch Id: {BATCH_ID}. Check Ralph Monitor in Copilot Console for Progress." and STOP
 
 ## CRITICAL
 - **Session ID must be your actual UUID** - do NOT make up names

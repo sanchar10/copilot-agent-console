@@ -35,7 +35,7 @@ npm run build
 pip install build
 python -m build --wheel
 
-# Output: dist\copilot_agent_console-0.2.0-py3-none-any.whl
+# Output: dist\copilot_agent_console-0.4.0-py3-none-any.whl
 ```
 
 ## Running Tests
@@ -47,6 +47,22 @@ python -m pytest
 # Frontend tests
 npm test --prefix frontend
 ```
+
+## Mobile Companion (Dev Mode)
+
+To test the mobile companion during development:
+
+```powershell
+# Start with tunnel (secure — same Microsoft account only)
+npm run dev -- --expose
+
+# Or with anonymous access (no login required on phone)
+npm run dev -- --expose --allow-anonymous
+```
+
+This starts the backend, frontend, and devtunnel automatically. Open Settings in the desktop UI to see the QR code, then scan it from your phone.
+
+> **Note:** `npm run dev` sets `PYTHONPATH=src/` automatically, so no `pip install -e .` is needed. Third-party dependencies (fastapi, uvicorn, etc.) are auto-installed on first run if missing.
 
 ## Architecture
 
