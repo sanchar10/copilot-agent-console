@@ -38,7 +38,7 @@ class TestMCPServerLoading:
         assert github[0]["command"] == "node"
 
     def test_agent_only_servers_loaded(self, client, tmp_path):
-        """Agent-only servers from ~/.copilot-agent-console/mcp-config.json are returned."""
+        """Agent-only servers from ~/.copilot-console/mcp-config.json are returned."""
         agent_home = tmp_path / "agent-console-home"
         _write_mcp_config(agent_home / "mcp-config.json", {
             "custom-db": {

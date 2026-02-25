@@ -1,6 +1,6 @@
 """Schedule storage service for CRUD operations on schedules.
 
-Stores schedule definitions as JSON files in ~/.copilot-agent-console/schedules/.
+Stores schedule definitions as JSON files in ~/.copilot-console/schedules/.
 """
 
 import json

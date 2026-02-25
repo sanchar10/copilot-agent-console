@@ -1,6 +1,6 @@
 """Service for tracking when sessions were last viewed.
 
-Stores timestamps in ~/.copilot-agent-console/viewed.json to track which sessions
+Stores timestamps in ~/.copilot-console/viewed.json to track which sessions
 have unread content (new messages since last viewed).
 """
 

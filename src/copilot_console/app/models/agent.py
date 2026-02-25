@@ -22,7 +22,7 @@ class AgentTools(BaseModel):
     """Tool configuration for an agent."""
     custom: list[str] = Field(
         default_factory=list,
-        description="List of custom/local tool names from ~/.copilot-agent-console/tools/"
+        description="List of custom/local tool names from ~/.copilot-console/tools/"
     )
     builtin: list[str] = Field(
         default_factory=list,

@@ -1,7 +1,7 @@
 """Sample custom tool — get system information.
 
 Demonstrates the TOOL_SPECS format for creating custom tools.
-Drop .py files like this into ~/.copilot-agent-console/tools/ to extend agent capabilities.
+Drop .py files like this into ~/.copilot-console/tools/ to extend agent capabilities.
 """
 
 

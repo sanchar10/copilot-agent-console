@@ -133,7 +133,7 @@ async function main() {
     }
 
     // Persistent tunnel: create once, reuse across restarts for stable URL
-    const settingsPath = path.join(process.env.USERPROFILE || process.env.HOME || '', '.copilot-agent-console', 'settings.json');
+    const settingsPath = path.join(process.env.USERPROFILE || process.env.HOME || '', '.copilot-console', 'settings.json');
     let tunnelId = null;
 
     // Try to load saved tunnel ID

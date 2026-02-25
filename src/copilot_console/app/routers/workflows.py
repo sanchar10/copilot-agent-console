@@ -270,7 +270,7 @@ async def _execute_workflow(
 
 def _default_workflow_cwd(run_id: str) -> str:
     """Default working directory for workflow runs."""
-    return str(Path.home() / ".copilot-agent-console" / "workflow-runs" / run_id)
+    return str(Path.home() / ".copilot-console" / "workflow-runs" / run_id)
 
 
 def _serialize_event_data(data) -> str | dict | list | None:
@@ -417,7 +417,7 @@ async def delete_workflow_run(run_id: str) -> dict:
 
     # Clean up associated Copilot sessions:
     #   copilot_service.delete_session → SDK destroy + ~/.copilot/session-state/{id}/
-    #   storage_service.delete_session → ~/.copilot-agent-console/sessions/{id}/
+    #   storage_service.delete_session → ~/.copilot-console/sessions/{id}/
     for sid in run.copilot_session_ids:
         try:
             await copilot_service.delete_session(sid)

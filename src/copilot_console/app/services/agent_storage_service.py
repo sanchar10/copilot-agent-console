@@ -1,6 +1,6 @@
 """Agent storage service for CRUD operations on agent definitions.
 
-Stores agent definitions as JSON files in ~/.copilot-agent-console/agents/.
+Stores agent definitions as JSON files in ~/.copilot-console/agents/.
 """
 
 import json

@@ -1,7 +1,7 @@
 """Workflow storage service for CRUD operations on workflow definitions.
 
 Single-file storage — one YAML file per workflow:
-  ~/.copilot-agent-console/workflows/{id}.yaml
+  ~/.copilot-console/workflows/{id}.yaml
 
 The YAML ``name`` field is the workflow ID (dashed, URL-safe).
 ``name`` and ``description`` are parsed from the YAML on read.

@@ -3,7 +3,7 @@
 Reads MCP server configurations from three sources:
 1. Global config: ~/.copilot/mcp-config.json (shared with CLI)
 2. Plugin configs: ~/.copilot/installed-plugins/copilot-plugins/[plugin]/.mcp.json
-3. Agent-only config: ~/.copilot-agent-console/mcp-config.json (only visible to this app)
+3. Agent-only config: ~/.copilot-console/mcp-config.json (only visible to this app)
 """
 
 import json

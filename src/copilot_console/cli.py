@@ -20,7 +20,7 @@ def initialize_app_directory():
     import json
     import shutil
     
-    app_home = Path.home() / ".copilot-agent-console"
+    app_home = Path.home() / ".copilot-console"
     
     # Create directories
     (app_home / "sessions").mkdir(parents=True, exist_ok=True)

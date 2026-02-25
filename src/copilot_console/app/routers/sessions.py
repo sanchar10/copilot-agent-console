@@ -531,7 +531,7 @@ async def resume_response_stream(
 
 
 # Upload destination: per-session files directory under app home
-# Files are stored at ~/.copilot-agent-console/sessions/{session_id}/files/
+# Files are stored at ~/.copilot-console/sessions/{session_id}/files/
 
 
 @router.post("/upload")

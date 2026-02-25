@@ -6,7 +6,7 @@ Supports two server types matching the Copilot SDK:
 
 Servers come from two pools:
 - Global: ~/.copilot/mcp-config.json (shared with CLI)
-- Agent-only: ~/.copilot-agent-console/mcp-config.json (only visible to this app)
+- Agent-only: ~/.copilot-console/mcp-config.json (only visible to this app)
 """
 
 from pydantic import BaseModel, Field

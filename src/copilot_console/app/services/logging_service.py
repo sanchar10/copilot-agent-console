@@ -4,7 +4,7 @@ Provides file-based logging organized by session, with both console
 and persistent file output.
 
 Log structure:
-    ~/.copilot-agent-console/logs/
+    ~/.copilot-console/logs/
     ├── server.log              # Global server events
     ├── sessions/
     │   └── {session_id}.log    # Per-session logs

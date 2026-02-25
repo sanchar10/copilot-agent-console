@@ -1,8 +1,8 @@
 """Task run storage service for persisting task execution history.
 
 Stores task runs as JSON files organized by date:
-  ~/.copilot-agent-console/task-runs/{YYYY-MM-DD}/{run-id}.json
-  ~/.copilot-agent-console/task-runs/{YYYY-MM-DD}/{run-id}.md  (output)
+  ~/.copilot-console/task-runs/{YYYY-MM-DD}/{run-id}.json
+  ~/.copilot-console/task-runs/{YYYY-MM-DD}/{run-id}.md  (output)
 """
 
 import json

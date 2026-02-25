@@ -1,8 +1,8 @@
 """Seed content service — syncs bundled content to user directories on install/update.
 
 Bundled content lives in src/copilot_console/seed/ and mirrors two destination roots:
-  seed/agent-console/  → ~/.copilot-agent-console/  (app-managed content)
-  seed/copilot/        → ~/.copilot/                (CLI-level content)
+  seed/copilot-console/  → ~/.copilot-console/  (app-managed content)
+  seed/copilot/          → ~/.copilot/           (CLI-level content)
 
 Sync behaviors:
   - app/ items: copy-if-missing (don't overwrite user edits)
@@ -204,14 +204,14 @@ def seed_bundled_content(force: bool = False) -> None:
     logger.info(f"Seeding bundled content (version: {seeded_version} → {app_version})")
     total = 0
 
-    # seed/agent-console/ → ~/.copilot-agent-console/ (copy-if-missing)
-    app_seed = SEED_DIR / "agent-console"
+    # seed/copilot-console/ → ~/.copilot-console/ (copy-if-missing)
+    app_seed = SEED_DIR / "copilot-console"
     if app_seed.exists():
         count = _sync_tree(app_seed, APP_HOME, overwrite=False)
         total += count
 
     # Docs are always overwritten — they're not user-customizable
-    docs_seed = SEED_DIR / "agent-console" / "docs"
+    docs_seed = SEED_DIR / "copilot-console" / "docs"
     if docs_seed.exists():
         count = _sync_tree(docs_seed, APP_HOME / "docs", overwrite=True)
         total += count

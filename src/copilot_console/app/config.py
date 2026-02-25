@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 # Base storage directory
-APP_HOME = Path(os.environ.get("copilot_console_HOME", Path.home() / ".copilot-agent-console"))
+APP_HOME = Path(os.environ.get("COPILOT_CONSOLE_HOME", Path.home() / ".copilot-console"))
 
 # SDK session state directory (where Copilot CLI stores sessions)
 COPILOT_SESSION_STATE = Path.home() / ".copilot" / "session-state"

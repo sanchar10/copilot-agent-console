@@ -1,9 +1,9 @@
 """Workflow run service for managing WorkflowRun lifecycle.
 
 Stores workflow runs as JSON files:
-  ~/.copilot-agent-console/workflow-runs/{run-id}.json          (completed/failed/pending)
-  ~/.copilot-agent-console/workflow-runs/running/{run-id}.json  (in-progress)
-  ~/.copilot-agent-console/workflow-runs/{run-id}-output.md
+  ~/.copilot-console/workflow-runs/{run-id}.json          (completed/failed/pending)
+  ~/.copilot-console/workflow-runs/running/{run-id}.json  (in-progress)
+  ~/.copilot-console/workflow-runs/{run-id}-output.md
 
 In-progress runs live in a `running/` subfolder so that startup recovery
 only needs to scan that single directory (not hundreds of completed runs).
