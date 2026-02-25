@@ -46,7 +46,7 @@ dependencies = [
     "github-copilot-sdk>=0.1.25",
     "apscheduler>=3.10.0,<4.0.0",
     "pywebpush>=2.0.0",
-    "agent-framework>=1.0.0b1",
+    "agent-framework>=1.0.0rc1",
 ]
 
 [project.optional-dependencies]
