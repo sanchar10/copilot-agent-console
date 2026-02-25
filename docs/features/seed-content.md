@@ -24,7 +24,7 @@ src/copilot_console/seed/
 │   ├── agents/              # Starter agent definitions
 │   ├── docs/                # App documentation (read by Console Guide agent)
 │   ├── local-mcp-servers/   # Bundled MCP server scripts
-│   ├── schedules/           # Default automation schedules
+│   ├── automations/         # Default automation definitions
 │   ├── tools/               # Starter custom tools
 │   └── mcp-config.json.template
 └── copilot/                 → ~/.copilot/

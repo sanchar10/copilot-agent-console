@@ -9,7 +9,7 @@ Transform the Copilot Console from a **chat interface** into a **personal AI ope
 │                     Copilot Console                          │
 │                                                              │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
-│  │  Chat    │  │  Agent   │  │  Task    │  │ Schedule │    │
+│  │  Chat    │  │  Agent   │  │  Task    │  │ Automate │    │
 │  │  (today) │  │  Library │  │  Board   │  │  Manager │    │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
 │                                                              │
@@ -41,10 +41,10 @@ Can be triggered manually (on-demand) or by the scheduler.
 The actual execution — maps to a Copilot SDK session under the hood.
 Has status (pending, running, completed, failed), output, logs.
 
-### Schedule
+### Automation
 A separate entity (Phase 3) that connects an agent to a cron trigger.
-One agent can have multiple schedules with different CWDs and inputs.
-Schedules are NOT part of the agent definition.
+One agent can have multiple automations with different CWDs and inputs.
+Automations are NOT part of the agent definition.
 
 ---
 
@@ -135,26 +135,26 @@ Schedules are NOT part of the agent definition.
 
 ### Layer 2: Scheduler Service (Backend)
 
-New service: `scheduler_service.py`
+New service: `automation_service.py`
 
 - Uses `APScheduler` (Python library) for cron-based scheduling
-- Persists schedules to disk (survives restarts)
+- Persists automations to disk (survives restarts)
 - On trigger: creates a Task, enqueues it
 - Runs as part of the FastAPI backend (not a separate process)
 
 ```python
-class SchedulerService:
+class AutomationService:
     def start(self):
-        """Load all agent schedules and start the scheduler."""
+        """Load all automations and start the scheduler."""
     
-    def schedule_agent(self, agent_id: str, cron: str, default_input: str):
-        """Add/update a scheduled agent."""
+    def create_automation(self, agent_id: str, cron: str, default_input: str):
+        """Add/update an automation."""
     
-    def remove_schedule(self, agent_id: str):
-        """Remove a schedule."""
+    def remove_automation(self, agent_id: str):
+        """Remove an automation."""
     
-    def list_schedules(self) -> list[ScheduleInfo]:
-        """List all active schedules with next run times."""
+    def list_automations(self) -> list[AutomationInfo]:
+        """List all active automations with next run times."""
     
     async def _trigger_task(self, agent_id: str, input: str):
         """Called by scheduler — creates and runs a task."""
@@ -239,8 +239,8 @@ class NotificationService:
 │   │   ├── task-abc123.json   # Task metadata + status
 │   │   └── task-abc123.md     # Task output
 │   └── 2026-02-14/
-├── schedules/                 # Persisted schedule state
-│   └── schedules.json
+├── automations/               # Persisted automation state
+│   └── automations.json
 ├── notifications/             # Unread notifications
 │   └── notifications.json
 ├── sessions/                  # Existing session storage
@@ -401,7 +401,7 @@ Click "View" on a task → see full output, logs, duration.
 │ AGENTS           │
 │  📚 Library      │
 │  📋 Task Board   │
-│  ⏰ Schedules    │
+│  ⏰ Automations   │
 │                  │
 │ RECENT RUNS      │
 │  ✅ News 8:00am  │
@@ -473,11 +473,11 @@ Click "View" on a task → see full output, logs, duration.
 
 - Scheduler service (APScheduler)
 - Cron expression support
-- Schedule persistence across restarts
+- Automation persistence across restarts
 - Task Runner service (headless — creates SDK session, sends prompt, captures output, destroys session)
 - Task Board UI (list of scheduled runs with status)
 - Task Detail UI (view output, logs, duration)
-- Schedule management UI
+- Automation management UI
 - Next-run-time display
 
 ### Phase 4: Notifications
@@ -522,7 +522,7 @@ Click "View" on a task → see full output, logs, duration.
 
 - **Manual runs are attended** — user is interacting, so they belong in chat sidebar
 - **Scheduled runs are unattended** — no user interaction, so Task Board only
-- Sidebar filter: show if `trigger !== "schedule"`
+- Sidebar filter: show if `trigger !== "automation"`
 
 ### 3. Session Metadata Model ✅ DECIDED
 Only two fields needed on session metadata:
@@ -530,7 +530,7 @@ Only two fields needed on session metadata:
 | Field | Regular chat | Manual "Run Now" | Scheduled run |
 |-------|:---:|:---:|:---:|
 | `agent_id` | `null` | `"news-monitor"` | `"news-monitor"` |
-| `trigger` | `null` | `"manual"` | `"schedule"` |
+| `trigger` | `null` | `"manual"` | `"automation"` |
 
 No separate `type` field needed — `agent_id` presence tells us it's an agent run, `trigger` tells us manual vs scheduled.
 
@@ -577,16 +577,16 @@ Everything locks to read-only **except CWD** (which remains editable, same as re
 - CWD is snapshotted in `agent_snapshot` for reference but NOT locked (unlike model/prompt/tools/MCP)
 
 **Scheduled runs:**
-- CWD is set **on the schedule**, not on the agent definition
-- Same agent can have multiple schedules targeting different folders:
-  - Schedule 1: "Repo Guardian" → `E:\repos\project-a` — daily at midnight
-  - Schedule 2: "Repo Guardian" → `E:\repos\project-b` — daily at 2am
-- Schedule editor has a CWD field with folder browser
+- CWD is set **on the automation**, not on the agent definition
+- Same agent can have multiple automations targeting different folders:
+  - Automation 1: "Repo Guardian" → `E:\repos\project-a` — daily at midnight
+  - Automation 2: "Repo Guardian" → `E:\repos\project-b` — daily at 2am
+- Automation editor has a CWD field with folder browser
 - Default: app default CWD (or `~` if none)
 
 **Why not in agent definition:**
 - One agent, many folders — "Code Tester" works on any repo
-- One agent, many schedules — each schedule targets a different folder
+- One agent, many automations — each automation targets a different folder
 - No duplication — no need for "Code Tester (Project A)" and "Code Tester (Project B)"
 - Matches mental model — the agent is a skill, the folder is a workspace
 
@@ -613,7 +613,7 @@ When the first message is sent in an agent session, the **entire agent config is
 - **Before first message:** Model, tools, MCP pre-filled from agent definition but fully editable. CWD pre-filled from app default, editable.
 - **On first message:** Snapshot taken, SDK session created with these values. Model, system_message, tools, MCP lock. CWD stays editable.
 - **After first message:** Model, prompt, tools, MCP are read-only. CWD remains editable (on change: backend destroys SessionClient, next message creates new one with updated CWD — existing behavior).
-- **Agent edits never affect existing sessions** — only future "Run Now" or scheduled runs pick up changes
+- **Agent edits never affect existing sessions** — only future "Run Now" or automation runs pick up changes
 - **Prompt iteration workflow:** Edit agent → Run Now → test → close tab → Edit → Run Now → repeat. Each test is a clean session (better for prompt testing — no conversation history pollution)
 - **Drift banner:** If agent definition changed since snapshot, show informational banner with "Run Now for latest config" link
 
@@ -666,7 +666,7 @@ The chat sidebar should only show sessions the user directly interacts with. Oth
 |---|---|---|---|
 | Regular chat | `null` | ✅ | Sidebar |
 | Manual agent "Run Now" | `"manual"` | ✅ | Sidebar |
-| Scheduled agent run | `"schedule"` | ❌ | Task Board |
+| Scheduled agent run | `"automation"` | ❌ | Task Board |
 | Ralph loop job | `"ralph"` | ❌ | Ralph Monitor |
 
 **Implementation:** Currently Ralph sessions appear in the sidebar (they create SDK sessions that show up in the session list). When we later add `trigger: "ralph"` tagging to ralph-created sessions, they'll be automatically filtered out by the same filter logic — accessed only from Ralph Monitor instead.
@@ -726,7 +726,7 @@ Works fine for 5-6 types. No refactoring needed for Phase 1-3.
 
 ### Tab Registry Spec (implement when 8+ types)
 
-**When to refactor:** When we add types beyond `agent-library`, `agent-detail`, `task-board` (e.g. `settings`, `agent-history`, `marketplace`, `schedule-editor`).
+**When to refactor:** When we add types beyond `agent-library`, `agent-detail`, `task-board` (e.g. `settings`, `agent-history`, `marketplace`, `automation-editor`).
 
 **Design:**
 
@@ -855,14 +855,14 @@ The current `Session` model has: `session_id`, `session_name`, `agent_type` ("co
 
 **New fields to add:**
 - `agent_id: str | None` — which custom agent this session was created from (null for regular chat)
-- `trigger: str | None` — `"manual"` or `"schedule"` (null for regular chat)
+- `trigger: str | None` — `"manual"` or `"automation"` (null for regular chat)
 - `agent_snapshot: dict | None` — frozen config at session creation time (null for regular chat)
 
 **Note:** The existing `agent_type` ("copilot"/"domain") is about SDK backend type, NOT our custom agents. Keep it as-is. Our `agent_id` is separate.
 
 ### Migration Rules
 - Old sessions (no `agent_id`/`trigger`/`agent_snapshot`) load with all three as `null` — treated as regular chat
-- Sidebar filter: `trigger !== "schedule"` — old sessions have `trigger: null`, passes filter ✅
+- Sidebar filter: `trigger !== "automation"` — old sessions have `trigger: null`, passes filter ✅
 - Header: `agent_id === null` → full interactive mode (existing behavior) ✅
 - No data migration needed — new fields are all nullable with sensible defaults
 
@@ -904,7 +904,7 @@ The current `Session` model has: `session_id`, `session_name`, `agent_type` ("co
 
 **Sidebar:**
 - `test_sidebar_shows_manual_agent_runs` — trigger="manual" visible
-- `test_sidebar_hides_scheduled_runs` — trigger="schedule" filtered out
+- `test_sidebar_hides_scheduled_runs` — trigger="automation" filtered out
 - `test_sidebar_shows_regular_sessions` — trigger=null visible (backward compat)
 
 **"Run Now" Flow:**

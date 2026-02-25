@@ -22,13 +22,13 @@ Users need to compose multi-step, multi-agent workflows where agents, tools, MCP
 
 ## Implementation Principles (Phase 1)
 
-> **No existing pages are modified.** Phase 1 only adds new things — it does NOT touch ChatView, Schedule Manager, or Task Board.
+> **No existing pages are modified.** Phase 1 only adds new things — it does NOT touch ChatView, Automation Manager, or Task Board.
 
 > **SDK-first: use Microsoft Agent Framework, don't reinvent.** All workflow execution, edge routing, fan-out/fan-in, checkpointing, `as_agent()`, streaming, and human-in-the-loop must use AF's built-in capabilities. If a feature appears missing from the SDK, **stop and confirm with user before building a custom implementation.** Never build SDK-level functionality ourselves.
 
-- **Sidebar**: restructure from `AGENTS: [Library, Automations, Runs]` → flat `[Agents, Workflows, Automations, Runs]`. The sidebar entries still open the SAME existing tabs (Agent Library, Schedule Manager, Task Board) — just the menu layout changes.
+- **Sidebar**: restructure from `AGENTS: [Library, Automations, Runs]` → flat `[Agents, Workflows, Automations, Runs]`. The sidebar entries still open the SAME existing tabs (Agent Library, Automation Manager, Task Board) — just the menu layout changes.
 - **ChatView**: untouched. No changes to agent chat sessions.
-- **Schedule Manager (Automations)**: untouched. Unified agent+workflow scheduling is a later phase.
+- **Automation Manager**: untouched. Unified agent+workflow scheduling is a later phase.
 - **Task Board (Runs)**: untouched. Unified agent+workflow run list with type filters is a later phase.
 - **New pages only**: Workflow Library, Workflow Editor (YAML + Mermaid + Chat), Workflow Run View — all new tabs, no modifications to existing ones.
 - Workflow runs are stored contextually (accessible from Workflow Editor's run history panel). Global Runs page integration is deferred.
@@ -264,7 +264,7 @@ Workflow runs use our own WorkflowRun model (not TaskRun) in Phase 1:
 ```
 🤖 Agents (23)       → Agent Library tab (card view of all agents)
 🔀 Workflows (5)     → Workflow Library tab (card view of all workflows)
-⏰ Automations        → Unified schedule list (agents + workflows, with filters)
+⏰ Automations        → Unified automation list (agents + workflows, with filters)
 📋 Runs               → Unified run list (agents + workflows, with filters)
 ```
 
@@ -289,22 +289,22 @@ Runs (unified list)
   → Click workflow run → Workflow Run tab (graph + node-by-node)
 
 Automations (unified list)
-  → Click schedule → edit form (type-specific: agent prompt/CWD vs workflow input params)
+  → Click automation → edit form (type-specific: agent prompt/CWD vs workflow input params)
 ```
 
-#### Automations (Unified Schedule Manager) — FUTURE PHASE, not Phase 1
+#### Automations (Unified Automation Manager) — FUTURE PHASE, not Phase 1
 
-> Phase 1: Automations sidebar entry opens the existing Schedule Manager tab unchanged.
+> Phase 1: Automations sidebar entry opens the existing Automation Manager tab unchanged.
 
-Future design — extends the Schedule Manager to handle both agents and workflows:
+Future design — extends the Automation Manager to handle both agents and workflows:
 
-- **Unified list** with type column: shows all schedules (agent + workflow) in one table
+- **Unified list** with type column: shows all automations (agent + workflow) in one table
 - **Filter bar**: `[All] [Agent ▾] [Workflow ▾]`
   - Agent selected → secondary filter: specific agent dropdown
   - Workflow selected → secondary filter: specific workflow dropdown
-- **"New Schedule" button** → **Step 1: pick target type** (Agent or Workflow) — this selection drives the entire form layout
-  - **Agent schedule form**: agent selector, prompt, CWD, cron expression, output format
-  - **Workflow schedule form**: workflow selector, input parameters (dynamic form from workflow's `input_schema`), cron expression
+- **"New Automation" button** → **Step 1: pick target type** (Agent or Workflow) — this selection drives the entire form layout
+  - **Agent automation form**: agent selector, prompt, CWD, cron expression, output format
+  - **Workflow automation form**: workflow selector, input parameters (dynamic form from workflow's `input_schema`), cron expression
   - Type selection is first because it determines which fields, selectors, and validation rules apply
 - **Shared columns**: Name, Type, Schedule (cron), Enabled, Next Run, Last Status
 - **Click row** → opens type-specific edit form
@@ -493,7 +493,7 @@ Opened when user clicks Run (from editor toolbar or library card). Opens as a ne
 
 ## Scale Considerations
 
-Designed for: **100s of agents/workflows, 1000s of runs, 10s of schedules**
+Designed for: **100s of agents/workflows, 1000s of runs, 10s of automations**
 
 | View | Expected Scale | Strategy |
 |---|---|---|

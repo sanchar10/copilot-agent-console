@@ -158,7 +158,7 @@ All data is stored in `C:\Users\<username>\.copilot-console\`:
 ├── agents\              # Agent library definitions
 ├── workflows\           # Workflow YAML definitions
 ├── workflow-runs\       # Workflow run history and working directories
-├── schedules\           # Automation schedules
+├── automations\         # Automation definitions
 ├── task-runs\           # Automation run history
 ├── tools\               # Custom Python tools (drop .py files here)
 ├── mcp-servers\         # MCP server configurations
