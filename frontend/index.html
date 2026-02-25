@@ -14,7 +14,7 @@
     <script>
       // Apply theme before render to prevent flash
       (function() {
-        var t = localStorage.getItem('agent-console-theme');
+        var t = localStorage.getItem('copilot-console-theme');
         if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
           document.documentElement.classList.add('dark');
         }

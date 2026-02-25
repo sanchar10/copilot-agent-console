@@ -9,8 +9,8 @@ import type { ApiClientInterface } from '../api/apiInterface';
  * - Connection state management
  */
 
-const STORAGE_KEY_TOKEN = 'agentconsole_api_token';
-const STORAGE_KEY_BASE_URL = 'agentconsole_base_url';
+const STORAGE_KEY_TOKEN = 'copilotconsole_api_token';
+const STORAGE_KEY_BASE_URL = 'copilotconsole_base_url';
 
 /** Get the stored API token */
 export function getStoredToken(): string | null {

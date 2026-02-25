@@ -265,7 +265,7 @@ export function ToolsSelector({
           {/* Footer */}
           <div className="px-3 py-2 border-t border-white/40 dark:border-gray-700 bg-white/30 dark:bg-gray-800/30 rounded-b-lg">
             <div className="text-[10px] text-gray-500">
-              Custom: ~/.copilot-agent-console/tools/ {draftMode !== 'all' && `· Built-in: ${draftMode === 'include' ? 'opt-in' : 'opt-out'}`}
+              Custom: ~/.copilot-console/tools/ {draftMode !== 'all' && `· Built-in: ${draftMode === 'include' ? 'opt-in' : 'opt-out'}`}
             </div>
           </div>
         </div>

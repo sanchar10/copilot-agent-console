@@ -156,7 +156,7 @@ class PushSubscriptionService:
                     subscription_info=sub,
                     data=payload,
                     vapid_private_key=str(VAPID_PEM_FILE),
-                    vapid_claims={"sub": "mailto:noreply@agentconsole.dev"},
+                    vapid_claims={"sub": "mailto:noreply@copilotconsole.dev"},
                 )
                 sent += 1
             except WebPushException as e:

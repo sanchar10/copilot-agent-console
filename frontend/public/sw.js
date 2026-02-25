@@ -1,7 +1,7 @@
 // Service Worker for Copilot Console PWA
 // Handles push notifications and caching for mobile companion
 
-const CACHE_NAME = 'agent-console-v10';
+const CACHE_NAME = 'copilot-console-v1';
 
 self.addEventListener('install', () => self.skipWaiting());
 
@@ -63,7 +63,7 @@ self.addEventListener('push', (event) => {
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
     data: payload.data || {},
-    tag: payload.data?.session_id || 'agent-console',
+    tag: payload.data?.session_id || 'copilot-console',
     renotify: true,
   };
 

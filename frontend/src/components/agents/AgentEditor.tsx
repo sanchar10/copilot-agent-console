@@ -364,7 +364,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             ) : (
               <p className="text-sm text-gray-400 dark:text-gray-500 italic">
                 No MCP servers configured. Add global servers in ~/.copilot/mcp-config.json
-                or agent-only servers in ~/.copilot-agent-console/mcp-config.json
+                or agent-only servers in ~/.copilot-console/mcp-config.json
               </p>
             )}
           </section>
