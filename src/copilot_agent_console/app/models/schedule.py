@@ -4,7 +4,7 @@ A schedule connects an agent to a cron trigger with a fixed prompt and optional 
 One agent can have multiple schedules.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from pydantic import BaseModel, Field
@@ -30,8 +30,8 @@ class Schedule(BaseModel):
     cwd: str | None = Field(default=None, description="Working directory for the run")
     enabled: bool = Field(default=True, description="Whether schedule is active")
     max_runtime_minutes: int = Field(default=30, description="Kill task after N minutes")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ScheduleCreate(BaseModel):

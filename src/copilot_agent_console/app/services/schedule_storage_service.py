@@ -5,7 +5,7 @@ Stores schedule definitions as JSON files in ~/.copilot-agent-console/schedules/
 
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from copilot_agent_console.app.config import SCHEDULES_DIR, ensure_directories
@@ -55,7 +55,7 @@ class ScheduleStorageService:
 
     def create_schedule(self, request: ScheduleCreate) -> Schedule:
         """Create a new schedule."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         schedule = Schedule(
             id=str(uuid.uuid4())[:8],
             created_at=now,
@@ -73,7 +73,7 @@ class ScheduleStorageService:
         update_data = request.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(schedule, field, value)
-        schedule.updated_at = datetime.utcnow()
+        schedule.updated_at = datetime.now(timezone.utc)
         self.save_schedule(schedule)
         return schedule
 

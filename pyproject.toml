@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "copilot-agent-console"
-version = "0.3.0"
+version = "0.4.0"
 description = "Copilot Agent Console - A feature-rich console for GitHub Copilot agents"
 readme = "README.md"
 license = "MIT"
@@ -60,8 +60,7 @@ dev = [
 ]
 
 [project.scripts]
-agentconsole = "copilot_agent_console.cli:main"
-AgentConsole = "copilot_agent_console.cli:main"
+copilot-console = "copilot_agent_console.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/sanchar10/copilot-agent-console"

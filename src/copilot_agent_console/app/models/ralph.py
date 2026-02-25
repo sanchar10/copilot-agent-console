@@ -1,6 +1,6 @@
 """Ralph AI Runner models."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
@@ -75,7 +75,7 @@ class ExecutionBatch(BaseModel):
     source_description: str = Field(default="", description="Description of where jobs came from")
     model: str = Field(..., description="Model to use for execution")
     auto_approve: bool = Field(default=False, description="Auto-approve jobs without human review")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     jobs: list[Job] = Field(default_factory=list, description="List of jobs to execute")
     # Inherited from parent chat session - stored as selection dicts (name -> enabled)
     # These are converted to SDK objects at execution time using the same services as main session

@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { formatRelativeTime } from '../../utils/formatters';
 import { useWorkflowStore } from '../../stores/workflowStore';
 import { useTabStore, tabId } from '../../stores/tabStore';
 import type { WorkflowMetadata } from '../../types/workflow';
@@ -31,8 +32,7 @@ function WorkflowCard({ workflow }: { workflow: WorkflowMetadata }) {
     });
   };
 
-  const updatedAt = new Date(workflow.updated_at);
-  const timeAgo = getTimeAgo(updatedAt);
+  const timeAgo = formatRelativeTime(workflow.updated_at);
 
   return (
     <button
@@ -62,18 +62,6 @@ function WorkflowCard({ workflow }: { workflow: WorkflowMetadata }) {
       </div>
     </button>
   );
-}
-
-function getTimeAgo(date: Date): string {
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (seconds < 60) return 'just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return date.toLocaleDateString();
 }
 
 type SortKey = 'name' | 'updated';

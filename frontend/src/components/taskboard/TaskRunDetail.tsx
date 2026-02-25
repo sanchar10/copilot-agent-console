@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { formatDateTime } from '../../utils/formatters';
 import { getTaskRun, abortTaskRun } from '../../api/schedules';
 import type { TaskRun, TaskRunStatus } from '../../types/schedule';
 
@@ -114,8 +115,8 @@ export function TaskRunDetail({ runId }: { runId: string }) {
         <div className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-5 mb-6 space-y-2">
           <MetaRow label="Prompt" value={run.prompt} />
           <MetaRow label="Working Dir" value={run.cwd} />
-          <MetaRow label="Started" value={run.started_at ? new Date(run.started_at).toLocaleString() : null} />
-          <MetaRow label="Completed" value={run.completed_at ? new Date(run.completed_at).toLocaleString() : null} />
+          <MetaRow label="Started" value={run.started_at ? formatDateTime(run.started_at) : null} />
+          <MetaRow label="Completed" value={run.completed_at ? formatDateTime(run.completed_at) : null} />
           <MetaRow label="Duration" value={formatDuration(run.duration_seconds)} />
           {run.token_usage && (
             <MetaRow

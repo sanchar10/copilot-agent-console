@@ -1,13 +1,16 @@
 /**
- * Format a date string for display.
+ * Format a date string as a full date-time (e.g., "Feb 25, 2026, 1:42 PM").
  */
-export function formatDate(dateStr: string): string {
+export function formatDateTime(dateStr: string): string {
   const date = new Date(dateStr);
-  return date.toLocaleString();
+  return date.toLocaleString(undefined, {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit',
+  });
 }
 
 /**
- * Format a relative time (e.g., "2 minutes ago").
+ * Format a relative time (e.g., "2m ago", "3d ago").
  */
 export function formatRelativeTime(dateStr: string): string {
   const date = new Date(dateStr);
@@ -23,7 +26,25 @@ export function formatRelativeTime(dateStr: string): string {
   if (diffHour < 24) return `${diffHour}h ago`;
   if (diffDay < 7) return `${diffDay}d ago`;
   
-  return date.toLocaleDateString();
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+/**
+ * Smart date for sidebar — time if today, weekday if this week, "Mon 25" if older.
+ */
+export function formatSmartDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+
+  if (diffHours < 24 && date.getDate() === now.getDate()) {
+    return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+  if (diffHours < 24 * 7) {
+    return date.toLocaleDateString(undefined, { weekday: 'short' });
+  }
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 /**

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSessionStore } from '../../stores/sessionStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useRalphStore } from '../../stores/ralphStore';
@@ -6,6 +6,7 @@ import { useTabStore, tabId } from '../../stores/tabStore';
 import { useAgentMonitorStore } from '../../stores/agentMonitorStore';
 import { useAgentStore } from '../../stores/agentStore';
 import { useWorkflowStore } from '../../stores/workflowStore';
+import { useScheduleStore } from '../../stores/scheduleStore';
 import { listSessions } from '../../api/sessions';
 import { fetchModels } from '../../api/models';
 import { getSettings } from '../../api/settings';
@@ -16,18 +17,17 @@ import { useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 export function Sidebar() {
   const { sessions, setSessions, startNewSession, setLoading, setError } = useSessionStore();
-  const { setAvailableModels, setDefaultModel, setDefaultCwd, openSettingsModal, defaultModel, defaultCwd, availableModels } = useUIStore();
+  const { setAvailableModels, setDefaultModel, setDefaultCwd, openSettingsModal, defaultModel, defaultCwd } = useUIStore();
   const { runs, refreshRuns } = useRalphStore();
   const { activeTabId, openTab } = useTabStore();
   const { setOpen: setAgentMonitorOpen, activeCount, setActiveCount } = useAgentMonitorStore();
   const { agents, fetchAgents } = useAgentStore();
   const { workflows, fetchWorkflows } = useWorkflowStore();
+  const { schedules, fetchSchedules } = useScheduleStore();
   const { hasFlag } = useFeatureFlags();
   const showRalph = hasFlag('ralph');
+  const [sessionSearch, setSessionSearch] = useState('');
 
-  // Get display name for current model
-  const currentModelName = availableModels.find(m => m.id === defaultModel)?.name || defaultModel;
-  
   // Count active Ralph runs
   const activeRunCount = runs.filter(r => ['pending', 'running', 'paused'].includes(r.status)).length;
 
@@ -64,6 +64,7 @@ export function Sidebar() {
         }
         fetchAgents();
         fetchWorkflows();
+        fetchSchedules();
       } catch (err) {
         // Backend may not be ready yet (dev mode race) — retry once after 2s
         console.warn('Initial load failed, retrying in 2s...', err);
@@ -82,6 +83,7 @@ export function Sidebar() {
           }
           fetchAgents();
           fetchWorkflows();
+          fetchSchedules();
         } catch (retryErr) {
           setError(retryErr instanceof Error ? retryErr.message : 'Failed to load data');
         }
@@ -90,7 +92,7 @@ export function Sidebar() {
       }
     }
     loadData();
-  }, [setSessions, setAvailableModels, setDefaultModel, setDefaultCwd, setLoading, setError, fetchAgents, fetchWorkflows]);
+  }, [setSessions, setAvailableModels, setDefaultModel, setDefaultCwd, setLoading, setError, fetchAgents, fetchWorkflows, fetchSchedules]);
 
   const handleNewSession = async () => {
     // startNewSession now refreshes MCP servers automatically and enables all by default
@@ -105,7 +107,7 @@ export function Sidebar() {
           <svg className="w-8 h-8 text-emerald-500" viewBox="0 0 24 24" fill="currentColor">
             <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
           </svg>
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Agent Console</h1>
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Copilot Console</h1>
         </div>
         <Button
           variant="primary"
@@ -206,6 +208,7 @@ export function Sidebar() {
         </button>
         <button
           onClick={() => {
+            fetchSchedules();
             openTab({ id: tabId.scheduleManager(), type: 'schedule-manager', label: 'Automations' });
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
@@ -216,6 +219,9 @@ export function Sidebar() {
         >
           <span>⏰</span>
           Automations
+          {schedules.length > 0 && (
+            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{schedules.length}</span>
+          )}
         </button>
         <button
           onClick={() => {
@@ -233,8 +239,40 @@ export function Sidebar() {
       </div>
 
       {/* Session List - grows to fill space, overflow hidden for virtual scroll */}
-      <div className="flex-1 overflow-hidden p-3">
-        <SessionList sessions={sessions.filter(s => s.trigger !== 'schedule')} />
+      <div className="flex-1 overflow-hidden p-3 flex flex-col">
+        {sessions.length > 0 && (
+          <div className="relative mb-2 flex-shrink-0">
+            <svg className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder={`Search ${sessions.length} sessions...`}
+              value={sessionSearch}
+              onChange={(e) => setSessionSearch(e.target.value)}
+              className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#2a2a3c] text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            />
+            {sessionSearch && (
+              <button
+                onClick={() => setSessionSearch('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                title="Clear search"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        )}
+        <div className="flex-1 overflow-hidden">
+          <SessionList sessions={sessions.filter(s => {
+            if (s.trigger === 'schedule') return false;
+            if (!sessionSearch) return true;
+            const q = sessionSearch.toLowerCase();
+            return (s.session_name || '').toLowerCase().includes(q);
+          })} />
+        </div>
       </div>
 
       {/* User Settings Footer - sticky at bottom */}
@@ -243,12 +281,10 @@ export function Sidebar() {
           onClick={openSettingsModal}
           className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-[#32324a] transition-colors"
         >
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-medium text-white">
-            U
-          </div>
+          <span className="text-lg">⚙️</span>
           <div className="flex-1 text-left">
             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Settings</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">{currentModelName}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">v0.4.0</div>
           </div>
           <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />

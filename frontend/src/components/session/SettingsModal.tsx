@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
+import { FolderBrowserModal } from '../common/FolderBrowserModal';
 import { useUIStore } from '../../stores/uiStore';
 import { updateSettings } from '../../api/settings';
 import { apiClient } from '../../api/client';
@@ -24,6 +25,7 @@ export function SettingsModal() {
   const [selectedCwd, setSelectedCwd] = useState(defaultCwd);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
 
   useEffect(() => {
     setSelectedModel(defaultModel);
@@ -105,29 +107,41 @@ export function SettingsModal() {
           </div>
         </div>
 
-        <Select
-          label="Default Model"
-          options={modelOptions}
-          value={selectedModel}
-          onChange={(e) => setSelectedModel(e.target.value)}
-        />
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          This model will be used for all new sessions.
-        </p>
+        <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4">
+          <Select
+            label="Default Model"
+            options={modelOptions}
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+          />
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            This model will be used for all new sessions.
+          </p>
+        </div>
 
-        <div>
+        <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Default Working Directory
           </label>
-          <input
-            type="text"
-            value={selectedCwd}
-            onChange={(e) => setSelectedCwd(e.target.value)}
-            className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
-            placeholder="e.g., C:\Users\you\projects"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={selectedCwd}
+              onChange={(e) => setSelectedCwd(e.target.value)}
+              className="flex-1 px-3 py-2 border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+              placeholder="e.g., C:\Users\you\projects"
+            />
+            <button
+              type="button"
+              onClick={() => setShowFolderPicker(true)}
+              className="px-3 py-2 border border-white/40 bg-white/50 rounded-md text-sm text-gray-600 hover:bg-gray-100 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-400 dark:hover:bg-[#32324a] transition-colors"
+              title="Browse folders"
+            >
+              📁
+            </button>
+          </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            New sessions will start in this directory. Can be changed per-session.
+            New sessions will start in this directory.
           </p>
         </div>
 
@@ -140,6 +154,13 @@ export function SettingsModal() {
         {/* Mobile Companion */}
         <MobileCompanionSection isOpen={isSettingsModalOpen} />
       </div>
+
+      <FolderBrowserModal
+        isOpen={showFolderPicker}
+        onClose={() => setShowFolderPicker(false)}
+        onSelect={(path) => setSelectedCwd(path)}
+        initialPath={selectedCwd || undefined}
+      />
     </Modal>
   );
 }

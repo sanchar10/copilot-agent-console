@@ -5,7 +5,7 @@ Stores agent definitions as JSON files in ~/.copilot-agent-console/agents/.
 
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -73,7 +73,7 @@ class AgentStorageService:
     def create_agent(self, request: AgentCreate) -> Agent:
         """Create a new agent definition."""
         agent_id = self._generate_id(request.name)
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         agent = Agent(
             id=agent_id,
             created_at=now,
@@ -90,7 +90,7 @@ class AgentStorageService:
             return None
 
         update_data = request.model_dump(exclude_unset=True)
-        update_data["updated_at"] = datetime.utcnow().isoformat()
+        update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
         # Re-validate to properly coerce nested models (SystemMessage, AgentTools)
         merged = {**agent.model_dump(), **update_data}
         agent = Agent.model_validate(merged)

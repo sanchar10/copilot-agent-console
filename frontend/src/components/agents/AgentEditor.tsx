@@ -42,7 +42,7 @@ function selectionsToList(selections: Record<string, boolean>): string[] {
 
 export function AgentEditor({ agentId }: AgentEditorProps) {
   const { agents, createAgent, updateAgent, deleteAgent, fetchAgents } = useAgentStore();
-  const { closeTab, updateTabLabel, openTab } = useTabStore();
+  const { closeTab, updateTabLabel, replaceTab } = useTabStore();
   const { availableModels, defaultModel } = useUIStore();
   const isNew = agentId === 'new';
 
@@ -135,9 +135,8 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
     try {
       if (isNew) {
         const created = await createAgent(buildRequest() as CreateAgentRequest);
-        // Close the "new" tab and open the created agent's tab
-        closeTab(tabId.agentDetail('new'));
-        openTab({
+        // Replace the "new" tab in-place with the created agent's tab
+        replaceTab(tabId.agentDetail('new'), {
           id: tabId.agentDetail(created.id),
           type: 'agent-detail',
           label: created.name,

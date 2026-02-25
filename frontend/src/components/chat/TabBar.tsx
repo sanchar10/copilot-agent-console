@@ -66,7 +66,7 @@ export function TabBar() {
             useTabStore.setState({ activeTabId: null });
           }}
           className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 dark:border-gray-700 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
-            ${activeTabId === null ? 'bg-white dark:bg-[#2a2a3c] border-b-2 border-b-blue-500' : 'hover:bg-gray-50 dark:hover:bg-[#2a2a3c]'}`}
+            ${activeTabId === null ? 'bg-white dark:bg-[#32324a] border-b-2 border-b-blue-500 dark:border-b-blue-400' : 'hover:bg-gray-50 dark:hover:bg-[#2a2a3c]'}`}
         >
           <span className="text-sm font-medium text-gray-700 dark:text-gray-100">New Session</span>
           <button
@@ -101,7 +101,7 @@ export function TabBar() {
             onClick={() => handleTabClick(tab)}
             className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 dark:border-gray-700 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
               ${activeTabId === tab.id
-                ? 'bg-white dark:bg-[#2a2a3c] border-b-2 border-b-blue-500' 
+                ? 'bg-white dark:bg-[#32324a] border-b-2 border-b-blue-500 dark:border-b-blue-400' 
                 : 'hover:bg-gray-50 dark:hover:bg-[#2a2a3c]'}`}
           >
             <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate flex-1">

@@ -1,4 +1,4 @@
-// Service Worker for Agent Console PWA
+// Service Worker for Copilot Console PWA
 // Handles push notifications and caching for mobile companion
 
 const CACHE_NAME = 'agent-console-v10';
@@ -54,10 +54,10 @@ self.addEventListener('push', (event) => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: 'Agent Console', body: event.data.text() };
+    payload = { title: 'Copilot Console', body: event.data.text() };
   }
 
-  const title = payload.title || '🤖 Agent Console';
+  const title = payload.title || '🤖 Copilot Console';
   const options = {
     body: payload.body || 'An agent has finished responding',
     icon: '/icons/icon-192.png',

@@ -7,7 +7,7 @@ Uses WorkflowFactory (from agent_framework_declarative) for YAML → Workflow lo
 Agents are pre-registered via sync_agents_from_library() — YAML references them by name,
 WorkflowFactory resolves them from the registry.
 
-WorkflowCopilotAgent extends GitHubCopilotAgent to bridge Agent Console definitions
+WorkflowCopilotAgent extends GitHubCopilotAgent to bridge Copilot Console definitions
 (custom tools, MCP servers, built-in tool filtering, model, sub-agents) into the AF
 workflow. Custom tools are passed as FunctionTool instances via the native tools= param.
 System message mode (append/replace) is mapped from agent definition to AF's format.
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 class WorkflowCopilotAgent(GitHubCopilotAgent):
-    """GitHubCopilotAgent extended with Agent Console session config fields.
+    """GitHubCopilotAgent extended with Copilot Console session config fields.
 
     Native AF constructor params handle: tools, mcp_servers, model, system_message.
     This subclass injects fields AF doesn't pass through to SessionConfig/
@@ -428,9 +428,19 @@ class WorkflowEngine:
             state.clear = original_clear  # type: ignore[method-assign]
 
     def visualize(self, workflow: Workflow) -> str:
-        """Generate Mermaid diagram from AF's built-in visualization."""
+        """Generate Mermaid diagram from AF's built-in visualization.
+
+        Post-processes the output to replace AF's internal _workflow_entry
+        node with a clean "Start" circle.
+        """
         viz = WorkflowViz(workflow)
-        return viz.to_mermaid()
+        mermaid = viz.to_mermaid()
+        # Replace AF's internal entry node with a clean Start circle
+        mermaid = mermaid.replace(
+            'n__workflow_entry["_workflow_entry (Start)"]',
+            'n__workflow_entry(("Start"))',
+        )
+        return mermaid
 
     def validate_yaml(self, yaml_content: str) -> dict:
         """Validate YAML content by attempting to load it.

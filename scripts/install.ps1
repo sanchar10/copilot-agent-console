@@ -1,10 +1,10 @@
-# Copilot Agent Console - One-click installer for Windows
+# Copilot Console - One-click installer for Windows
 # Usage: irm https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1 | iex
 
-$WHL_URL = "https://github.com/sanchar10/copilot-agent-console/releases/download/v0.3.0/copilot_agent_console-0.3.0-py3-none-any.whl"
+$WHL_URL = "https://github.com/sanchar10/copilot-agent-console/releases/download/v0.4.0/copilot_agent_console-0.4.0-py3-none-any.whl"
 
 Write-Host ""
-Write-Host "  Copilot Agent Console Installer" -ForegroundColor Cyan
+Write-Host "  Copilot Console Installer" -ForegroundColor Cyan
 Write-Host "  ====================================" -ForegroundColor DarkGray
 Write-Host ""
 
@@ -76,9 +76,9 @@ if ($needsLogin) {
     Write-Host "  [OK] Copilot authenticated" -ForegroundColor Green
 }
 
-# --- Install Agent Console ---
+# --- Install Copilot Console ---
 Write-Host ""
-Write-Host "  Installing Copilot Agent Console..." -ForegroundColor Yellow
+Write-Host "  Installing Copilot Console..." -ForegroundColor Yellow
 
 # Install Agent Framework (pre-release) — required for workflow orchestration
 # Installed separately because AF is pre-release and needs --pre flag.
@@ -147,7 +147,7 @@ if ($usedPipx -and $afInstalled) {
 }
 
 # --- Verify ---
-$ac = Get-Command agentconsole -ErrorAction SilentlyContinue
+$ac = Get-Command copilot-console -ErrorAction SilentlyContinue
 if (-not $ac) {
     # pip --user installs to user Scripts dir - find and add to PATH
     $userScripts = $null
@@ -159,7 +159,7 @@ if (-not $ac) {
         $pyVer = (python -c "import sys; print(f'Python{sys.version_info.major}{sys.version_info.minor}')" 2>&1).Trim()
         $userScripts = "$env:APPDATA\Python\$pyVer\Scripts"
     }
-    if (Test-Path "$userScripts\agentconsole.exe") {
+    if (Test-Path "$userScripts\copilot-console.exe") {
         $currentPath = [Environment]::GetEnvironmentVariable('Path', 'User')
         if ($currentPath -notlike "*$userScripts*") {
             [Environment]::SetEnvironmentVariable('Path', "$currentPath;$userScripts", 'User')
@@ -167,21 +167,21 @@ if (-not $ac) {
             Write-Host "  [NOTE] Restart your terminal for PATH to take effect." -ForegroundColor Yellow
         }
         $env:Path = "$env:Path;$userScripts"
-        $ac = Get-Command agentconsole -ErrorAction SilentlyContinue
+        $ac = Get-Command copilot-console -ErrorAction SilentlyContinue
     }
 }
 if ($ac) {
-    $acVer = (agentconsole --version 2>&1)
+    $acVer = (copilot-console --version 2>&1)
     Write-Host "  [OK] $acVer" -ForegroundColor Green
 } else {
     Write-Host "  [OK] Installed" -ForegroundColor Green
-    Write-Host "  [NOTE] Restart your terminal, then run 'agentconsole'." -ForegroundColor Yellow
+    Write-Host "  [NOTE] Restart your terminal, then run 'copilot-console'." -ForegroundColor Yellow
 }
 
 # --- Optional: Mobile Companion (devtunnel) ---
 Write-Host ""
 Write-Host "  Optional: Mobile Companion" -ForegroundColor Cyan
-Write-Host "  Access Agent Console from your phone via secure tunnel." -ForegroundColor DarkGray
+Write-Host "  Access Copilot Console from your phone via secure tunnel." -ForegroundColor DarkGray
 Write-Host ""
 $setupMobile = Read-Host "  Enable Mobile Companion? Requires devtunnel (y/N)"
 if ($setupMobile -eq 'y' -or $setupMobile -eq 'Y') {
@@ -220,16 +220,16 @@ if ($setupMobile -eq 'y' -or $setupMobile -eq 'Y') {
         }
         Write-Host ""
         Write-Host "  Mobile Companion ready! Start with:" -ForegroundColor Green
-        Write-Host "     agentconsole --expose" -ForegroundColor Cyan
+        Write-Host "     copilot-console --expose" -ForegroundColor Cyan
         Write-Host "  Then open Settings in the UI and scan the QR code from your phone." -ForegroundColor DarkGray
     }
 } else {
     Write-Host "  Skipped. You can set up later:" -ForegroundColor DarkGray
     Write-Host "     winget install Microsoft.devtunnel" -ForegroundColor DarkGray
     Write-Host "     devtunnel user login" -ForegroundColor DarkGray
-    Write-Host "     agentconsole --expose" -ForegroundColor DarkGray
+    Write-Host "     copilot-console --expose" -ForegroundColor DarkGray
 }
 
 Write-Host ""
-Write-Host "  Ready! Run 'agentconsole' to start." -ForegroundColor Cyan
+Write-Host "  Ready! Run 'copilot-console' to start." -ForegroundColor Cyan
 Write-Host ""

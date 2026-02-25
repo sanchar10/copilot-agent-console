@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
+import { formatDateTime } from '../../utils/formatters';
 import { MermaidDiagram } from '../chat/MermaidDiagram';
 import * as workflowsApi from '../../api/workflows';
 import type { WorkflowRun } from '../../types/workflow';
@@ -178,7 +179,7 @@ export function WorkflowRunView({ workflowId, runId }: WorkflowRunViewProps) {
         <div className="flex-1" />
         {run?.started_at && (
           <span className="text-xs text-gray-400 dark:text-gray-500">
-            Started {new Date(run.started_at).toLocaleString()}
+            Started {formatDateTime(run.started_at)}
           </span>
         )}
         {run?.duration_seconds != null && (
@@ -188,23 +189,10 @@ export function WorkflowRunView({ workflowId, runId }: WorkflowRunViewProps) {
         )}
       </div>
 
-      {/* Main content: Mermaid (left) + Events (right) */}
+      {/* Main content: Events (left) + Mermaid (right) */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left pane: Mermaid diagram */}
-        <div className="w-2/5 border-r border-gray-200 dark:border-[#3a3a4e] flex flex-col overflow-hidden">
-          <div className="flex-1 min-h-0">
-            {mermaid ? (
-              <MermaidDiagram code={mermaid} className="h-full" />
-            ) : (
-              <div className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">
-                Loading diagram...
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right pane: Events feed */}
-        <div className="w-3/5 flex flex-col overflow-hidden">
+        {/* Left pane: Events feed */}
+        <div className="w-3/5 border-r border-gray-200 dark:border-[#3a3a4e] flex flex-col overflow-hidden">
           <div className="px-3 py-2 bg-gray-50 dark:bg-[#2a2a3c] border-b border-gray-200 dark:border-[#3a3a4e] text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             Events ({events.length})
           </div>
@@ -228,6 +216,19 @@ export function WorkflowRunView({ workflowId, runId }: WorkflowRunViewProps) {
               />
             ))}
             <div ref={eventsEndRef} />
+          </div>
+        </div>
+
+        {/* Right pane: Mermaid diagram */}
+        <div className="w-2/5 flex flex-col overflow-hidden">
+          <div className="flex-1 min-h-0">
+            {mermaid ? (
+              <MermaidDiagram code={mermaid} className="h-full" />
+            ) : (
+              <div className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">
+                Loading diagram...
+              </div>
+            )}
           </div>
         </div>
       </div>

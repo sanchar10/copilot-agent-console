@@ -29,6 +29,7 @@ interface TabState {
   closeTab: (tabId: string) => void;
   switchTab: (tabId: string) => void;
   updateTabLabel: (tabId: string, label: string) => void;
+  replaceTab: (oldTabId: string, newTab: Tab) => void;
 
   // Convenience helpers
   getActiveSessionId: () => string | null;
@@ -108,6 +109,13 @@ export const useTabStore = create<TabState>((set, get) => ({
   updateTabLabel: (targetTabId, label) =>
     set((state) => ({
       tabs: state.tabs.map((t) => (t.id === targetTabId ? { ...t, label } : t)),
+    })),
+
+  replaceTab: (oldTabId, newTab) =>
+    set((state) => ({
+      tabs: state.tabs.map((t) => (t.id === oldTabId ? newTab : t)),
+      activeTabId: state.activeTabId === oldTabId ? newTab.id : state.activeTabId,
+      mruStack: state.mruStack.map((id) => (id === oldTabId ? newTab.id : id)),
     })),
 
   getActiveSessionId: () => {

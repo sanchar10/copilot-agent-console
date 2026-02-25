@@ -147,7 +147,7 @@ export function MobileSettings({ onConnectionChange }: Props) {
       <div className="px-4 pt-4 pb-2 bg-white dark:bg-[#252536] border-b border-gray-200 dark:border-[#3a3a4e]">
         <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Settings</h1>
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-          Connect to your Agent Console
+          Connect to your Copilot Console
         </p>
       </div>
 
@@ -160,7 +160,7 @@ export function MobileSettings({ onConnectionChange }: Props) {
             <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg p-3 mb-4 text-sm">
               <p className="font-medium">Quick Setup</p>
               <p className="text-xs mt-1 mb-3">
-                Scan the QR code from your desktop Agent Console settings.
+                Scan the QR code from your desktop Copilot Console settings.
               </p>
               <button
                 onClick={() => setShowScanner(true)}
@@ -293,7 +293,7 @@ export function MobileSettings({ onConnectionChange }: Props) {
         <section className="bg-white dark:bg-[#2a2a3c] rounded-xl p-4 shadow-sm border border-gray-100 dark:border-[#3a3a4e]">
           <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">How to connect</h2>
           <ol className="text-xs text-gray-600 dark:text-gray-400 space-y-2 list-decimal list-inside">
-            <li>On your desktop, start Agent Console with <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 py-0.5 rounded">--expose</code></li>
+            <li>On your desktop, start Copilot Console with <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 py-0.5 rounded">--expose</code></li>
             <li>Open Settings in the desktop UI → Mobile Companion section</li>
             <li>Tap <strong>Copy setup link</strong> below the QR code</li>
             <li>Paste the link into the Quick Setup field above</li>

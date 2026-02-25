@@ -8,6 +8,7 @@ import { useTabStore, tabId } from '../../stores/tabStore';
 import { useSessionStore } from '../../stores/sessionStore';
 import { useAgentStore } from '../../stores/agentStore';
 import { useChatStore } from '../../stores/chatStore';
+import { formatDateTime } from '../../utils/formatters';
 import { listTaskRuns, abortTaskRun, deleteTaskRun } from '../../api/schedules';
 import { getSession, connectSession, getResponseStatus, resumeResponseStream } from '../../api/sessions';
 import type { TaskRunSummary, TaskRunStatus } from '../../types/schedule';
@@ -37,11 +38,6 @@ function formatDuration(seconds: number | null): string {
   const mins = Math.floor(seconds / 60);
   const secs = Math.round(seconds % 60);
   return `${mins}m ${secs}s`;
-}
-
-function formatTime(iso: string | null): string {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleString();
 }
 
 function formatTokens(usage: Record<string, number> | null): string | null {
@@ -91,7 +87,7 @@ function TaskRunCard({
       </div>
 
       <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-gray-500 mt-2">
-        {run.started_at && <span>{formatTime(run.started_at)}</span>}
+        {run.started_at && <span>{formatDateTime(run.started_at)}</span>}
         {run.duration_seconds !== null && <span>{formatDuration(run.duration_seconds)}</span>}
         {tokenStr && <span>🎟 {tokenStr}</span>}
       </div>

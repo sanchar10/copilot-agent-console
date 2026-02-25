@@ -13,7 +13,7 @@ import json
 import logging
 import shutil
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from copilot_agent_console.app.models.workflow import (
@@ -72,7 +72,7 @@ class WorkflowRunService:
             workflow_name=workflow_name,
             status=WorkflowRunStatus.PENDING,
             input=input_params,
-            started_at=datetime.utcnow(),
+            started_at=datetime.now(timezone.utc),
         )
         self.save_run(run)
         return run
@@ -86,14 +86,14 @@ class WorkflowRunService:
 
         run.status = WorkflowRunStatus.RUNNING
         if not run.started_at:
-            run.started_at = datetime.utcnow()
+            run.started_at = datetime.now(timezone.utc)
         self._save_to(self._running_file(run.id), run)
         return run
 
     def mark_completed(self, run: WorkflowRun, node_results: dict | None = None, events: list[dict] | None = None) -> WorkflowRun:
         """Mark a run as completed — moves JSON from running/ to main dir."""
         run.status = WorkflowRunStatus.COMPLETED
-        run.completed_at = datetime.utcnow()
+        run.completed_at = datetime.now(timezone.utc)
         if run.started_at:
             run.duration_seconds = (run.completed_at - run.started_at).total_seconds()
         if node_results:
@@ -106,7 +106,7 @@ class WorkflowRunService:
     def mark_failed(self, run: WorkflowRun, error: str, node_results: dict | None = None, events: list[dict] | None = None) -> WorkflowRun:
         """Mark a run as failed — moves JSON from running/ to main dir."""
         run.status = WorkflowRunStatus.FAILED
-        run.completed_at = datetime.utcnow()
+        run.completed_at = datetime.now(timezone.utc)
         run.error = error
         if run.started_at:
             run.duration_seconds = (run.completed_at - run.started_at).total_seconds()
@@ -210,7 +210,7 @@ class WorkflowRunService:
                 continue
             _scan_dir(date_dir)
 
-        runs.sort(key=lambda r: r.started_at or datetime.min, reverse=True)
+        runs.sort(key=lambda r: r.started_at or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
         return runs[:limit]
 
     def delete_run(self, run_id: str) -> WorkflowRun | None:
@@ -260,7 +260,7 @@ class WorkflowRunService:
                     f"Recovering zombie run '{run.id}' (was {run.status}) — marking as failed"
                 )
                 run.status = WorkflowRunStatus.FAILED
-                run.completed_at = datetime.utcnow()
+                run.completed_at = datetime.now(timezone.utc)
                 run.error = "Server terminated unexpectedly"
                 if run.started_at:
                     run.duration_seconds = (run.completed_at - run.started_at).total_seconds()

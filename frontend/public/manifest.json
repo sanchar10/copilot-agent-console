@@ -1,7 +1,7 @@
 {
-  "name": "Agent Console",
-  "short_name": "AgentConsole",
-  "description": "Mobile companion for Copilot Agent Console",
+  "name": "Copilot Console",
+  "short_name": "CopilotConsole",
+  "description": "Mobile companion for Copilot Console",
   "start_url": "/mobile",
   "scope": "/mobile",
   "display": "standalone",

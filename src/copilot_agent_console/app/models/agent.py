@@ -4,7 +4,7 @@ An agent is a pure capability template: system prompt, model, tools, MCP servers
 Schedules are separate — one agent can have multiple schedules with different CWDs and inputs.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
 
@@ -89,8 +89,8 @@ class AgentUpdate(BaseModel):
 class Agent(AgentBase):
     """Full agent model with metadata."""
     id: str = Field(..., description="Unique agent ID (slug)")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Config:
         from_attributes = True

@@ -507,7 +507,7 @@ class SessionService:
                             id=str(uuid.uuid4()),
                             role="user",
                             content=content or "",
-                            timestamp=datetime.utcnow(),
+                            timestamp=datetime.now(timezone.utc),
                             attachments=msg_attachments,
                         ))
 
@@ -571,7 +571,7 @@ class SessionService:
                             id=str(uuid.uuid4()),
                             role="assistant",
                             content=content,
-                            timestamp=datetime.utcnow(),
+                            timestamp=datetime.now(timezone.utc),
                             steps=steps,
                         ))
                         pending_steps.clear()
@@ -729,7 +729,7 @@ class SessionService:
             id=str(uuid.uuid4()),
             role="user",
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
     def add_assistant_message(self, session_id: str, content: str) -> Message:
@@ -738,7 +738,7 @@ class SessionService:
             id=str(uuid.uuid4()),
             role="assistant",
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
 

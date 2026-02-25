@@ -1,3 +1,4 @@
+import { formatSmartDate, formatDateTime } from '../../utils/formatters';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useSessionStore } from '../../stores/sessionStore';
@@ -226,26 +227,6 @@ export function SessionItem({ session }: SessionItemProps) {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (days === 0) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else if (days === 1) {
-      return 'Yesterday';
-    } else if (days < 7) {
-      return date.toLocaleDateString([], { weekday: 'short' });
-    }
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-  };
-
-  const formatFullDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleString();
-  };
-
   return (
     <>
       <div
@@ -263,7 +244,7 @@ export function SessionItem({ session }: SessionItemProps) {
             {session.session_name}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {formatDate(session.updated_at)}
+            {formatSmartDate(session.updated_at)}
           </p>
         </div>
 
@@ -348,12 +329,12 @@ export function SessionItem({ session }: SessionItemProps) {
 
             <div>
               <span className="text-gray-500 dark:text-gray-400 text-xs">Created</span>
-              <p className="text-gray-700 dark:text-gray-300">{formatFullDate(session.created_at)}</p>
+              <p className="text-gray-700 dark:text-gray-300">{formatDateTime(session.created_at)}</p>
             </div>
 
             <div>
               <span className="text-gray-500 dark:text-gray-400 text-xs">Last Updated</span>
-              <p className="text-gray-700 dark:text-gray-300">{formatFullDate(session.updated_at)}</p>
+              <p className="text-gray-700 dark:text-gray-300">{formatDateTime(session.updated_at)}</p>
             </div>
           </div>
         </div>,

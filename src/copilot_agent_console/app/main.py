@@ -50,7 +50,7 @@ def _set_sleep_prevention(enable: bool) -> None:
 async def lifespan(app: FastAPI):
     """Application lifespan - startup and shutdown."""
     # Startup
-    logger.info("Starting Copilot Agent Console...")
+    logger.info("Starting Copilot Console...")
     ensure_directories()
     # Pre-start main SDK client for reliable operation
     await copilot_service._start_main_client()
@@ -70,10 +70,10 @@ async def lifespan(app: FastAPI):
     # Check for unread sessions and send push notifications
     from copilot_agent_console.app.services.notification_manager import notification_manager
     await notification_manager.check_unread_on_startup()
-    logger.info("Copilot Agent Console started successfully")
+    logger.info("Copilot Console started successfully")
     yield
     # Shutdown
-    logger.info("Shutting down Copilot Agent Console...")
+    logger.info("Shutting down Copilot Console...")
     if no_sleep:
         _set_sleep_prevention(False)
     scheduler.shutdown()
@@ -81,9 +81,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Copilot Agent Console API",
-    description="Backend API for Copilot Agent Console - A feature-rich console for GitHub Copilot agents",
-    version="0.3.0",
+    title="Copilot Console API",
+    description="Backend API for Copilot Console - A feature-rich console for GitHub Copilot agents",
+    version="0.4.0",
     lifespan=lifespan,
 )
 

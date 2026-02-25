@@ -6,7 +6,7 @@ Stores task runs as JSON files organized by date:
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from copilot_agent_console.app.config import TASK_RUNS_DIR, ensure_directories
@@ -23,13 +23,13 @@ class TaskRunStorageService:
         return TASK_RUNS_DIR / dt.strftime("%Y-%m-%d")
 
     def _run_file(self, run: TaskRun) -> Path:
-        dt = run.started_at or run.completed_at or datetime.now()
+        dt = run.started_at or run.completed_at or datetime.now(timezone.utc)
         d = self._date_dir(dt)
         d.mkdir(parents=True, exist_ok=True)
         return d / f"{run.id}.json"
 
     def _output_file(self, run: TaskRun) -> Path:
-        dt = run.started_at or run.completed_at or datetime.now()
+        dt = run.started_at or run.completed_at or datetime.now(timezone.utc)
         d = self._date_dir(dt)
         d.mkdir(parents=True, exist_ok=True)
         return d / f"{run.id}.md"
@@ -111,7 +111,7 @@ class TaskRunStorageService:
                     pass
 
         # Sort by started_at descending (most recent first)
-        runs.sort(key=lambda r: r.started_at or r.completed_at or datetime.min, reverse=True)
+        runs.sort(key=lambda r: r.started_at or r.completed_at or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
         return runs[:limit]
 
     def delete_run(self, run_id: str) -> bool:

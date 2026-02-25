@@ -6,21 +6,26 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { formatDateTime } from '../../utils/formatters';
 import { useWorkflowStore } from '../../stores/workflowStore';
 import { useTabStore, tabId } from '../../stores/tabStore';
 import { MermaidDiagram } from '../chat/MermaidDiagram';
 import { FolderBrowserModal } from '../common/FolderBrowserModal';
+import { ConfirmModal } from '../common/ConfirmModal';
 import * as workflowsApi from '../../api/workflows';
 import type { WorkflowDetail, WorkflowRunSummary } from '../../types/workflow';
 
 const DEFAULT_YAML = `kind: Workflow
 name: my-workflow
+description: A new workflow
 trigger:
   kind: OnConversationStart
-steps:
-  - kind: InvokeAzureAgent
-    agent:
-      name: agent-1
+  id: start
+  actions:
+    - kind: InvokeAzureAgent
+      id: step-1
+      agent:
+        name: agent-name
 `;
 
 interface WorkflowEditorProps {
@@ -28,13 +33,13 @@ interface WorkflowEditorProps {
 }
 
 export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
-  const { openTab, updateTabLabel } = useTabStore();
+  const { openTab, closeTab, replaceTab } = useTabStore();
   const { fetchWorkflows } = useWorkflowStore();
 
   const [workflow, setWorkflow] = useState<WorkflowDetail | null>(null);
   const [yamlContent, setYamlContent] = useState(DEFAULT_YAML);
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(workflowId === 'new' ? 'A new workflow' : '');
   const [mermaid, setMermaid] = useState<string | null>(null);
   const [mermaidError, setMermaidError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -48,6 +53,7 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
   const [runMessage, setRunMessage] = useState('');
   const [runCwd, setRunCwd] = useState('');
   const [showFolderBrowser, setShowFolderBrowser] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isNew = workflowId === 'new';
@@ -55,6 +61,8 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
   // Load existing workflow
   useEffect(() => {
     if (isNew) return;
+    // Skip re-fetch if data was already populated (e.g., after create/save)
+    if (workflow && workflow.id === workflowId) return;
     setLoading(true);
     workflowsApi.getWorkflow(workflowId)
       .then((detail) => {
@@ -114,14 +122,22 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
           name: 'new-workflow',
           yaml_content: yamlContent,
         });
+        // Pre-populate local state so useEffect doesn't re-fetch
+        setWorkflow(created);
         setName(created.name);
         setDescription(created.description);
-        // Update tab to reflect saved workflow
-        const newTabId = tabId.workflowEditor(created.id);
-        updateTabLabel(tabId.workflowEditor('new'), created.name);
-        // Re-open as the real workflow
-        openTab({
-          id: newTabId,
+        setDirty(false);
+        // Fetch mermaid for the newly created workflow
+        workflowsApi.visualizeWorkflow(created.id)
+          .then((r) => { setMermaid(r.mermaid); setMermaidError(null); })
+          .catch(() => setMermaidError('Failed to generate diagram'));
+        // Load run history
+        workflowsApi.listWorkflowRuns(created.id, 10)
+          .then(setRuns)
+          .catch(() => {});
+        // Replace the "new" tab in-place with the saved workflow's tab
+        replaceTab(tabId.workflowEditor('new'), {
+          id: tabId.workflowEditor(created.id),
           type: 'workflow-editor',
           label: created.name,
           workflowId: created.id,
@@ -173,7 +189,6 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
 
   const handleDelete = async () => {
     if (isNew) return;
-    if (!confirm(`Delete workflow "${name}"?`)) return;
     try {
       await workflowsApi.deleteWorkflow(workflowId);
       fetchWorkflows();
@@ -278,7 +293,7 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
                 )}
               </div>
               <button
-                onClick={handleDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 className="px-3 py-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-sm transition-colors"
                 title="Delete workflow"
               >
@@ -298,10 +313,26 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
         </div>
       )}
 
-      {/* Main content: Mermaid (left) + YAML Editor (right) */}
+      {/* Main content: YAML Editor (left) + Mermaid (right) */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left pane: Mermaid diagram */}
-        <div className="w-1/2 border-r border-gray-200 dark:border-[#3a3a4e] flex flex-col overflow-hidden">
+        {/* Left pane: YAML editor */}
+        <div className="w-3/5 border-r border-gray-200 dark:border-[#3a3a4e] flex flex-col overflow-hidden">
+          <div className="px-3 py-2 bg-gray-50 dark:bg-[#2a2a3c] border-b border-gray-200 dark:border-[#3a3a4e] text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            YAML Definition
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <textarea
+              value={yamlContent}
+              onChange={(e) => handleYamlChange(e.target.value)}
+              spellCheck={false}
+              className="w-full h-full p-4 font-mono text-sm bg-gray-900 text-gray-100 resize-none outline-none border-none"
+              style={{ tabSize: 2 }}
+            />
+          </div>
+        </div>
+
+        {/* Right pane: Mermaid diagram */}
+        <div className="w-2/5 flex flex-col overflow-hidden">
           <div className="flex-1 min-h-0">
             {mermaid ? (
               <MermaidDiagram code={mermaid} className="h-full" />
@@ -314,22 +345,6 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
                 {isNew ? 'Save the workflow to see a preview' : 'Loading preview...'}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Right pane: YAML editor */}
-        <div className="w-1/2 flex flex-col overflow-hidden">
-          <div className="px-3 py-2 bg-gray-50 dark:bg-[#2a2a3c] border-b border-gray-200 dark:border-[#3a3a4e] text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            YAML Definition
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <textarea
-              value={yamlContent}
-              onChange={(e) => handleYamlChange(e.target.value)}
-              spellCheck={false}
-              className="w-full h-full p-4 font-mono text-sm bg-gray-900 text-gray-100 resize-none outline-none border-none"
-              style={{ tabSize: 2 }}
-            />
           </div>
         </div>
       </div>
@@ -389,6 +404,17 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
       }}
       initialPath={runCwd || undefined}
     />
+    <ConfirmModal
+      isOpen={showDeleteConfirm}
+      title="Delete Workflow"
+      message={`Are you sure you want to delete "${name}"? This cannot be undone.`}
+      confirmLabel="Delete"
+      onConfirm={() => {
+        setShowDeleteConfirm(false);
+        handleDelete();
+      }}
+      onCancel={() => setShowDeleteConfirm(false)}
+    />
     </>
   );
 }
@@ -447,7 +473,7 @@ function RunRow({ run, onClick, onDeleted }: {
         <StatusBadge status={run.status} />
       </td>
       <td className="py-1.5 text-gray-500 dark:text-gray-400">
-        {run.started_at ? new Date(run.started_at).toLocaleString() : '—'}
+        {run.started_at ? formatDateTime(run.started_at) : '—'}
       </td>
       <td className="py-1.5 text-gray-500 dark:text-gray-400">
         {run.duration_seconds != null ? `${run.duration_seconds.toFixed(1)}s` : '—'}

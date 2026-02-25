@@ -1,4 +1,4 @@
-"""CLI entry point for Copilot Agent Console."""
+"""CLI entry point for Copilot Console."""
 
 import argparse
 import os
@@ -49,10 +49,10 @@ def open_browser_delayed(url: str, delay: float = 1.5):
     Timer(delay, _open).start()
 
 def main():
-    """Main entry point for Agent Console."""
+    """Main entry point for Copilot Console."""
     parser = argparse.ArgumentParser(
-        prog="AgentConsole",
-        description="Agent Console - A feature-rich console for GitHub Copilot agents",
+        prog="copilot-console",
+        description="Copilot Console - A feature-rich console for GitHub Copilot agents",
     )
     parser.add_argument(
         "--port", "-p",
@@ -95,7 +95,7 @@ def main():
     
     if args.version:
         from copilot_agent_console import __version__
-        print(f"Copilot Agent Console v{__version__}")
+        print(f"Copilot Console v{__version__}")
         return 0
     
     # Check dependencies
@@ -114,7 +114,7 @@ def main():
     
     print(f"""
 ╔══════════════════════════════════════════════════════════════╗
-║                   Agent Console                              ║
+║                   Copilot Console                            ║
 ║      A feature-rich console for GitHub Copilot agents        ║
 ╚══════════════════════════════════════════════════════════════╝
 

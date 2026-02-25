@@ -29,7 +29,7 @@ function checkCommand(cmd) {
 }
 
 async function main() {
-  console.log('\x1b[33m=== Agent Console - Checking Prerequisites ===\x1b[0m\n');
+  console.log('\x1b[33m=== Copilot Console - Checking Prerequisites ===\x1b[0m\n');
 
   // Check Python
   if (!checkCommand('python')) {

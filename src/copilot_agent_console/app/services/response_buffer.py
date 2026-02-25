@@ -7,7 +7,7 @@ and streamed to connected SSE clients.
 
 import asyncio
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
@@ -32,7 +32,7 @@ class ResponseBuffer:
     usage_info: Optional[dict] = None
     notifications: list[dict] = field(default_factory=list)
     error: Optional[str] = None
-    started_at: datetime = field(default_factory=datetime.utcnow)
+    started_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     completed_at: Optional[datetime] = None
     # Auto-naming: updated session name (set by background task if name was auto-generated)
     updated_session_name: Optional[str] = None
@@ -63,7 +63,7 @@ class ResponseBuffer:
     def complete(self) -> None:
         """Mark response as completed."""
         self.status = ResponseStatus.COMPLETED
-        self.completed_at = datetime.utcnow()
+        self.completed_at = datetime.now(timezone.utc)
         self._new_data_event.set()
         logger.info(f"[{self.session_id}] Response completed, {len(self.chunks)} chunks")
     
@@ -71,7 +71,7 @@ class ResponseBuffer:
         """Mark response as failed."""
         self.status = ResponseStatus.ERROR
         self.error = error
-        self.completed_at = datetime.utcnow()
+        self.completed_at = datetime.now(timezone.utc)
         self._new_data_event.set()
         logger.error(f"[{self.session_id}] Response failed: {error}")
     
@@ -85,7 +85,7 @@ class ResponseBuffer:
             return False
         if self.completed_at is None:
             return False
-        age = (datetime.utcnow() - self.completed_at).total_seconds()
+        age = (datetime.now(timezone.utc) - self.completed_at).total_seconds()
         return age > max_age_seconds
     
     async def wait_for_update(self, timeout: float = 30.0) -> bool:

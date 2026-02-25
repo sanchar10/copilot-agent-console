@@ -7,7 +7,7 @@ Sessions persist and can be opened in the chat UI for continuation.
 
 import asyncio
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from copilot_agent_console.app.models.agent import Agent
 from copilot_agent_console.app.models.schedule import TaskRun, TaskRunStatus
@@ -74,7 +74,7 @@ class TaskRunnerService:
         """Execute a single task run under the concurrency semaphore."""
         async with self._semaphore:
             run.status = TaskRunStatus.RUNNING
-            run.started_at = datetime.now()
+            run.started_at = datetime.now(timezone.utc)
             task_run_storage_service.save_run(run)
             logger.info(f"[task-run:{run.id}] Starting agent={agent.id} prompt={run.prompt[:80]!r}")
 
@@ -153,7 +153,7 @@ class TaskRunnerService:
                 # Trigger delayed push notification check
                 from copilot_agent_console.app.services.notification_manager import notification_manager
                 preview = buffer.get_full_content()[:120] if buffer.chunks else ""
-                notification_manager.on_agent_completed(session_id, run.name or session_id[:8], preview)
+                notification_manager.on_agent_completed(session_id, run.agent_name or session_id[:8], preview)
 
                 # Collect result
                 if buffer.status == ResponseStatus.COMPLETED:
@@ -182,7 +182,7 @@ class TaskRunnerService:
                 run.output = buffer.get_full_content() if buffer else None
                 logger.error(f"[task-run:{run.id}] Failed: {e}")
             finally:
-                run.completed_at = datetime.now()
+                run.completed_at = datetime.now(timezone.utc)
                 if run.started_at:
                     run.duration_seconds = (run.completed_at - run.started_at).total_seconds()
                 task_run_storage_service.save_run(run)
@@ -204,7 +204,7 @@ class TaskRunnerService:
         run = task_run_storage_service.load_run(run_id)
         if run:
             run.status = TaskRunStatus.ABORTED
-            run.completed_at = datetime.now()
+            run.completed_at = datetime.now(timezone.utc)
             if run.started_at:
                 run.duration_seconds = (run.completed_at - run.started_at).total_seconds()
             run.error = "Aborted by user"

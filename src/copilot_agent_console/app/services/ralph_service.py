@@ -7,7 +7,7 @@ import asyncio
 import json
 import re
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, Callable
 
@@ -335,7 +335,7 @@ class RalphService:
 
     def create_batch(self, request: CreateBatchRequest) -> ExecutionBatch:
         """Create a new execution batch."""
-        batch_id = f"batch_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
+        batch_id = f"batch_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
         
         batch = ExecutionBatch(
             id=batch_id,
@@ -384,7 +384,7 @@ class RalphService:
         if len(active_runs) >= 10:
             raise ValueError("Maximum 10 concurrent runs reached")
         
-        run_id = f"run_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
+        run_id = f"run_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
         
         run = RalphRun(
             id=run_id,
@@ -640,7 +640,7 @@ class RalphService:
         if force:
             # Force stop - cancel immediately
             run.status = RunStatus.CANCELLED
-            run.completed_at = datetime.utcnow()
+            run.completed_at = datetime.now(timezone.utc)
             self._storage.save_run(run)
             
             # Cleanup client
@@ -904,7 +904,7 @@ class RalphService:
             # Update run status
             if run.status == RunStatus.PENDING:
                 run.status = RunStatus.RUNNING
-                run.started_at = datetime.utcnow()
+                run.started_at = datetime.now(timezone.utc)
                 self._storage.save_run(run)
                 logger.info(f"Run {run_id} status changed to RUNNING")
             
@@ -992,7 +992,7 @@ class RalphService:
             run = self._storage.load_run(run_id)
             if run and run.current_job_index >= len(batch.jobs) and run.status == RunStatus.RUNNING:
                 run.status = RunStatus.COMPLETED
-                run.completed_at = datetime.utcnow()
+                run.completed_at = datetime.now(timezone.utc)
                 self._storage.save_run(run)
                 
                 # Cleanup client

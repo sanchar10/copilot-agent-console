@@ -44,7 +44,7 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
       {/* Modal */}
       <div
         ref={modalRef}
-        className="relative bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-[#3a3a4e] rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden"
+        className="relative bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-[#3a3a4e] rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] flex flex-col"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/30 dark:border-[#3a3a4e]">
@@ -60,7 +60,7 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
         </div>
 
         {/* Content */}
-        <div className="px-6 py-4 overflow-y-auto">
+        <div className="px-6 py-4 overflow-y-auto flex-1 min-h-0">
           {children}
         </div>
 

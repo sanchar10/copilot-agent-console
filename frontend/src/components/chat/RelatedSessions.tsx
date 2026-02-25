@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { formatRelativeTime } from '../../utils/formatters';
 import type { Session } from '../../types/session';
 
 interface RelatedSessionsProps {
@@ -12,22 +13,6 @@ interface RelatedSessionsProps {
 /** Normalize path for comparison: lowercase, forward slashes, no trailing slash. */
 function normalizePath(p: string): string {
   return p.replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase();
-}
-
-function formatRelativeTime(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const mins = Math.floor(diffMs / 60000);
-  const hours = Math.floor(diffMs / 3600000);
-  const days = Math.floor(diffMs / 86400000);
-
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
 export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onSessionClick }: RelatedSessionsProps) {

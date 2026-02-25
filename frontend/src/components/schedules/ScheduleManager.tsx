@@ -2,11 +2,12 @@
  * Schedule Manager — list and manage cron schedules for agents.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
+import { formatDateTime } from '../../utils/formatters';
 import { useAgentStore } from '../../stores/agentStore';
+import { useScheduleStore } from '../../stores/scheduleStore';
 import { useTabStore, tabId } from '../../stores/tabStore';
 import {
-  listSchedules,
   createSchedule,
   updateSchedule,
   deleteSchedule,
@@ -272,7 +273,7 @@ function ScheduleCard({
 
       {schedule.next_run && schedule.enabled && (
         <p className="text-xs text-blue-600 dark:text-blue-400 mb-3">
-          Next run: {new Date(schedule.next_run).toLocaleString()}
+          Next run: {formatDateTime(schedule.next_run)}
         </p>
       )}
 
@@ -329,8 +330,7 @@ interface ScheduleManagerProps {
 }
 
 export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProps) {
-  const [schedules, setSchedules] = useState<ScheduleWithNextRun[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { schedules, loading, fetchSchedules } = useScheduleStore();
   const [dialogMode, setDialogMode] = useState<'closed' | 'create' | 'edit'>('closed');
   const [editingSchedule, setEditingSchedule] = useState<ScheduleWithNextRun | undefined>();
   const [filterAgentId, setFilterAgentId] = useState<string>(initialAgentId || '');
@@ -342,21 +342,10 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
     setFilterAgentId(initialAgentId || '');
   }, [initialAgentId]);
 
-  const refresh = useCallback(async () => {
-    try {
-      const data = await listSchedules();
-      setSchedules(data);
-    } catch (e) {
-      console.error('Failed to load schedules:', e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     fetchAgents();
-    refresh();
-  }, [fetchAgents, refresh]);
+    fetchSchedules();
+  }, [fetchAgents, fetchSchedules]);
 
   const filteredSchedules = filterAgentId
     ? schedules.filter((s) => s.agent_id === filterAgentId)
@@ -371,7 +360,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
       }
       setDialogMode('closed');
       setEditingSchedule(undefined);
-      refresh();
+      fetchSchedules();
     } catch (e) {
       console.error('Failed to save schedule:', e);
     }
@@ -385,7 +374,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
   const handleToggle = async (id: string) => {
     try {
       await toggleSchedule(id);
-      refresh();
+      fetchSchedules();
     } catch (e) {
       console.error('Failed to toggle schedule:', e);
     }
@@ -394,7 +383,7 @@ export function ScheduleManager({ agentId: initialAgentId }: ScheduleManagerProp
   const handleDelete = async (id: string) => {
     try {
       await deleteSchedule(id);
-      refresh();
+      fetchSchedules();
     } catch (e) {
       console.error('Failed to delete schedule:', e);
     }

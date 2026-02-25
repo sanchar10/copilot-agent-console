@@ -210,6 +210,12 @@ def seed_bundled_content(force: bool = False) -> None:
         count = _sync_tree(app_seed, APP_HOME, overwrite=False)
         total += count
 
+    # Docs are always overwritten — they're not user-customizable
+    docs_seed = SEED_DIR / "agent-console" / "docs"
+    if docs_seed.exists():
+        count = _sync_tree(docs_seed, APP_HOME / "docs", overwrite=True)
+        total += count
+
     # seed/copilot/ → ~/.copilot/ (copy-or-update, we own these)
     copilot_seed = SEED_DIR / "copilot"
     if copilot_seed.exists():

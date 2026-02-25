@@ -6,7 +6,7 @@ for the workflow graph; we only store metadata (name, description, id) alongside
 WorkflowRun tracks execution of a workflow instance.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from pydantic import BaseModel, Field
@@ -28,8 +28,8 @@ class WorkflowMetadata(BaseModel):
     name: str = Field(..., description="Display name")
     description: str = Field(default="", description="What this workflow does")
     yaml_filename: str = Field(..., description="Filename of the YAML definition (e.g. 'content-pipeline.yaml')")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class WorkflowCreate(BaseModel):

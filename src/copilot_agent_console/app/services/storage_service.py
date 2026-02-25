@@ -4,7 +4,7 @@ Only stores session name mappings and user settings - SDK handles all message hi
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from copilot_agent_console.app.config import DEFAULT_CWD, DEFAULT_MODEL, DEFAULT_WORKFLOW_STEP_TIMEOUT, METADATA_FILE, SESSIONS_DIR, SETTINGS_FILE, ensure_directories
@@ -24,7 +24,7 @@ class StorageService:
         if not METADATA_FILE.exists():
             metadata = {
                 "version": "1.0",
-                "created_at": datetime.utcnow().isoformat() + "Z",
+                "created_at": datetime.now(timezone.utc).isoformat(),
             }
             METADATA_FILE.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
