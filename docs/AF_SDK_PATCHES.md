@@ -14,7 +14,7 @@ Python SDK. Review this list when upgrading `agent-framework` or
 
 | | |
 |---|---|
-| **File** | `src/copilot_agent_console/app/services/workflow_engine.py` |
+| **File** | `src/copilot_console/app/services/workflow_engine.py` |
 | **Method** | `WorkflowEngine.run_oneshot()` |
 | **SDK gap** | `workflow.run(message=...)` passes the message to `_workflow_entry` (a `JoinExecutor`), which sends `ActionComplete()` downstream — **discarding the user input**. The first real agent never sees it. |
 | **Root cause** | The .NET SDK has `InProcessExecution.StreamAsync(workflow, input, checkpointManager)` which seeds `System.LastMessage.Text` and `Workflow.Inputs` before executors run. The Python SDK has no equivalent class. |

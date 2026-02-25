@@ -1,7 +1,7 @@
 # Copilot Console - One-click installer for Windows
 # Usage: irm https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1 | iex
 
-$WHL_URL = "https://github.com/sanchar10/copilot-agent-console/releases/download/v0.4.0/copilot_agent_console-0.4.0-py3-none-any.whl"
+$WHL_URL = "https://github.com/sanchar10/copilot-agent-console/releases/download/v0.4.0/copilot_console-0.4.0-py3-none-any.whl"
 
 Write-Host ""
 Write-Host "  Copilot Console Installer" -ForegroundColor Cyan
@@ -138,11 +138,11 @@ if (-not $installed) {
 # Inject Agent Framework into pipx venv (pipx uses isolated environments)
 if ($usedPipx -and $afInstalled) {
     Write-Host "  Injecting Agent Framework into pipx environment..." -ForegroundColor DarkGray
-    pipx inject copilot-agent-console agent-framework --pip-args="--pre" 2>&1 | Out-Null
+    pipx inject copilot-console agent-framework --pip-args="--pre" 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  [OK] Agent Framework injected into pipx venv" -ForegroundColor Green
     } else {
-        Write-Host "  [WARN] pipx inject failed. Run manually: pipx inject copilot-agent-console agent-framework --pip-args='--pre'" -ForegroundColor Yellow
+        Write-Host "  [WARN] pipx inject failed. Run manually: pipx inject copilot-console agent-framework --pip-args='--pre'" -ForegroundColor Yellow
     }
 }
 

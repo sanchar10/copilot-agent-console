@@ -31,7 +31,7 @@ Transform the Copilot Console from a **chat interface** into a **personal AI ope
 
 ### Agent
 A reusable capability definition — system prompt, model, tools, MCP servers, output settings, runtime settings.
-Stored as JSON in `~/.copilot-agent-console/agents/`. Agents are pure templates, NOT tied to a folder or schedule.
+Stored as JSON in `~/.copilot-console/agents/`. Agents are pure templates, NOT tied to a folder or schedule.
 
 ### Task
 A single execution of an agent with specific input.
@@ -96,7 +96,7 @@ Schedules are NOT part of the agent definition.
 ### Layer 1: Agent Definition Store
 
 ```
-~/.copilot-agent-console/agents/
+~/.copilot-console/agents/
 ├── news-monitor.json
 ├── email-digest.json
 ├── repo-guardian.json
@@ -230,7 +230,7 @@ class NotificationService:
 ### Layer 5: Storage
 
 ```
-~/.copilot-agent-console/
+~/.copilot-console/
 ├── agents/                    # Agent definitions (JSON)
 │   ├── news-monitor.json
 │   └── repo-guardian.json
@@ -452,7 +452,7 @@ Click "View" on a task → see full output, logs, duration.
 - Agent CRUD API (backend routes)
 - Agent Library UI (grid view)
 - Agent Editor UI (form-based)
-- Storage in `~/.copilot-agent-console/agents/`
+- Storage in `~/.copilot-console/agents/`
 
 **No execution yet — just defining agents.**
 
@@ -634,7 +634,7 @@ This matches the SDK's `CustomAgentConfig` which accepts `name`, `display_name`,
 Scheduled agents should auto-approve tool calls (no human to confirm). The SDK supports a `on_permission_request` handler — return auto-approve for scheduled tasks.
 
 ### 9. Concurrency ✅ DECIDED
-**System-level setting** (in `~/.copilot-agent-console/settings.json`):
+**System-level setting** (in `~/.copilot-console/settings.json`):
 ```json
 {
   "max_concurrent_tasks": 3
@@ -686,7 +686,7 @@ MCP servers come from **two pools**, both using the same JSON format (`{"mcpServ
 | Pool | Config file | Visible to CLI? | Source label |
 |---|---|---|---|
 | **Global** | `~/.copilot/mcp-config.json` | ✅ Yes | `"global"` |
-| **Agent Only** | `~/.copilot-agent-console/mcp-config.json` | ❌ No | `"agent-only"` |
+| **Agent Only** | `~/.copilot-console/mcp-config.json` | ❌ No | `"agent-only"` |
 | **Plugin** | `~/.copilot/installed-plugins/.../mcp.json` | ✅ Yes | Plugin name |
 
 **Why two pools?**

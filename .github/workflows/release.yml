@@ -50,7 +50,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.TAG }}
-          name: Copilot Agent Console ${{ steps.version.outputs.TAG }}
+          name: Copilot Console ${{ steps.version.outputs.TAG }}
           body: |
             ## Installation
 
@@ -58,10 +58,10 @@ jobs:
             # Recommended (using pipx)
             pip install pipx
             pipx ensurepath
-            pipx install https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.TAG }}/copilot_agent_console-${{ steps.version.outputs.VERSION_NUMBER }}-py3-none-any.whl
+            pipx install https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.TAG }}/copilot_console-${{ steps.version.outputs.VERSION_NUMBER }}-py3-none-any.whl
 
             # Alternative (using pip)
-            pip install https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.TAG }}/copilot_agent_console-${{ steps.version.outputs.VERSION_NUMBER }}-py3-none-any.whl
+            pip install https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.TAG }}/copilot_console-${{ steps.version.outputs.VERSION_NUMBER }}-py3-none-any.whl
             ```
 
             See [README](https://github.com/${{ github.repository }}#readme) for full setup instructions.

@@ -2,13 +2,13 @@
 
 ### `copilot-console` command not found
 - If installed with `pipx`: Run `pipx ensurepath` and **restart the terminal**
-- If installed with `pip`: Try `python -m copilot_agent_console.cli`
+- If installed with `pip`: Try `python -m copilot_console.cli`
 - Verify Python's Scripts directory is in PATH: `$env:PATH -split ';' | Select-String Python`
 
 ### "github-copilot-sdk not found"
 The SDK should be installed automatically as a dependency. If it's missing:
 ```powershell
-pipx inject copilot-agent-console github-copilot-sdk
+pipx inject copilot-console github-copilot-sdk
 ```
 
 ### Agent not responding to messages
@@ -39,5 +39,5 @@ Copilot Console uses the [GitHub Copilot Python SDK](https://github.com/github/c
 
 If you encounter version-related errors, reinstall Copilot Console to get compatible versions:
 ```powershell
-pipx install --force https://github.com/sanchar10/copilot-agent-console/releases/download/v0.4.0/copilot_agent_console-0.4.0-py3-none-any.whl
+pipx install --force https://github.com/sanchar10/copilot-agent-console/releases/download/v0.4.0/copilot_console-0.4.0-py3-none-any.whl
 ```

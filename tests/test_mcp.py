@@ -39,7 +39,7 @@ class TestMCPServerLoading:
 
     def test_agent_only_servers_loaded(self, client, tmp_path):
         """Agent-only servers from ~/.copilot-console/mcp-config.json are returned."""
-        agent_home = tmp_path / "agent-console-home"
+        agent_home = tmp_path / "copilot-console-home"
         _write_mcp_config(agent_home / "mcp-config.json", {
             "custom-db": {
                 "command": "python",
@@ -58,7 +58,7 @@ class TestMCPServerLoading:
     def test_both_global_and_agent_only_merged(self, client, tmp_path):
         """Both global and agent-only servers appear in the combined list."""
         user_home = tmp_path / "user-home"
-        agent_home = tmp_path / "agent-console-home"
+        agent_home = tmp_path / "copilot-console-home"
         _write_mcp_config(user_home / ".copilot" / "mcp-config.json", {
             "global-server": {"command": "echo", "args": ["global"], "tools": ["*"]},
         })
@@ -74,7 +74,7 @@ class TestMCPServerLoading:
 
     def test_remote_http_server(self, client, tmp_path):
         """Remote HTTP MCP servers are parsed correctly."""
-        agent_home = tmp_path / "agent-console-home"
+        agent_home = tmp_path / "copilot-console-home"
         _write_mcp_config(agent_home / "mcp-config.json", {
             "remote-api": {
                 "type": "http",
@@ -95,7 +95,7 @@ class TestMCPServerLoading:
 
     def test_remote_sse_server(self, client, tmp_path):
         """Remote SSE MCP servers are parsed correctly."""
-        agent_home = tmp_path / "agent-console-home"
+        agent_home = tmp_path / "copilot-console-home"
         _write_mcp_config(agent_home / "mcp-config.json", {
             "sse-server": {
                 "type": "sse",
@@ -145,7 +145,7 @@ class TestMCPServerForSDK:
         """get_servers_for_sdk returns correct format for remote servers."""
         from copilot_console.app.services.mcp_service import mcp_service
 
-        agent_home = tmp_path / "agent-console-home"
+        agent_home = tmp_path / "copilot-console-home"
         _write_mcp_config(agent_home / "mcp-config.json", {
             "remote-srv": {
                 "type": "http",

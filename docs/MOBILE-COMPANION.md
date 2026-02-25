@@ -84,7 +84,7 @@ Skips the Microsoft login — anyone with the tunnel URL can reach the server. T
 
 ### Token Management
 
-- **Token generation**: A cryptographically random token is auto-generated on first use and stored in `~/.copilot-agent-console/settings.json`
+- **Token generation**: A cryptographically random token is auto-generated on first use and stored in `~/.copilot-console/settings.json`
 - **Regeneration**: Click "Regenerate" in Settings to invalidate the current token. All connected phones lose access until they scan the new QR code.
 - **REST calls**: Token sent in `Authorization: Bearer <token>` header
 - **SSE streams**: Token sent as `?token=<token>` query parameter (EventSource API limitation)

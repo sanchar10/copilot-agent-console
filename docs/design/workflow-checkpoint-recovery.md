@@ -15,7 +15,7 @@ vulnerable. AF provides checkpoint storage but no auto-recovery — that's on us
 ```python
 from agent_framework import FileCheckpointStorage
 
-storage = FileCheckpointStorage("~/.copilot-agent-console/workflow-checkpoints")
+storage = FileCheckpointStorage("~/.copilot-console/workflow-checkpoints")
 
 # Normal run — checkpoints saved automatically after each step
 async for event in workflow.run(message="start", checkpoint_storage=storage, stream=True):
@@ -40,7 +40,7 @@ storage.list_checkpoint_ids(workflow_name="my-workflow")
 ### 1. Enable Checkpoint Storage (Quick Win)
 
 - Pass `FileCheckpointStorage` to `run_oneshot()` and `run_as_agent()` by default
-- Storage path: `~/.copilot-agent-console/workflow-checkpoints/{run_id}/`
+- Storage path: `~/.copilot-console/workflow-checkpoints/{run_id}/`
 - Store `checkpoint_id` in `WorkflowRun` model for resume reference
 
 ### 2. Manual Resume (UI)

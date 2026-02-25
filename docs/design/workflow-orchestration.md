@@ -17,7 +17,7 @@ Users need to compose multi-step, multi-agent workflows where agents, tools, MCP
 - **Group Chat and Magentic are orchestration patterns** (how agents collaborate over multiple turns), not graph primitives. Deferred to v2 as composite nodes or workflow templates.
 - **Data model is extensible** — new node types can be added later without schema changes
 - **Visual editor**: YAML editor + Mermaid visualization + Chat (all AF-native). React Flow deferred to v2.
-- **Storage**: YAML files (AF declarative format) + metadata JSON in `~/.copilot-agent-console/workflows/`
+- **Storage**: YAML files (AF declarative format) + metadata JSON in `~/.copilot-console/workflows/`
 - **Execution**: Each agent node gets its own independent Copilot session (no tool cascade)
 
 ## Implementation Principles (Phase 1)
@@ -58,7 +58,7 @@ Users need to compose multi-step, multi-agent workflows where agents, tools, MCP
 - **Also used for LLM-based routing**: an agent with a classifier prompt + structured output → downstream Switch-Case edges route based on agent's decision
 
 #### 2. Tool Node → AF Function Executor
-- Wraps a custom tool from our Tool Builder (`~/.copilot-agent-console/tools/`)
+- Wraps a custom tool from our Tool Builder (`~/.copilot-console/tools/`)
 - Deterministic Python function execution
 - Config: tool_id, parameters (static or mapped from input)
 - Input: parameters from previous node
@@ -156,7 +156,7 @@ WorkflowRun:
 ### Storage Layout
 
 ```
-~/.copilot-agent-console/
+~/.copilot-console/
 ├── workflows/
 │   ├── {workflow-id}.yaml        # AF declarative YAML (the workflow definition)
 │   ├── {workflow-id}.meta.json   # Metadata (name, description, id, timestamps)
@@ -253,7 +253,7 @@ GET    /api/workflow-runs/{run_id}/stream — SSE stream for run events (reconne
 ```
 
 Workflow runs use our own WorkflowRun model (not TaskRun) in Phase 1:
-- Stored in `~/.copilot-agent-console/workflow-runs/{date}/{run-id}.json`
+- Stored in `~/.copilot-console/workflow-runs/{date}/{run-id}.json`
 - Accessed from Workflow Editor's run history panel
 - TaskRun integration (shared Task Board) is a later phase
 

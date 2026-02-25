@@ -53,10 +53,10 @@ Example automations:
 ![Automation Runs](docs/screenshots/automation-runs.jpg)
 
 ### 🔌 MCP Server Management
-MCP servers can be defined globally (shared with CLI via `~/.copilot/mcp-config.json`) or app-only (`~/.copilot-agent-console/mcp-config.json`). Individual servers and tools can be toggled on/off at both agent and session level — keeping context focused and avoiding bloat.
+MCP servers can be defined globally (shared with CLI via `~/.copilot/mcp-config.json`) or app-only (`~/.copilot-console/mcp-config.json`). Individual servers and tools can be toggled on/off at both agent and session level — keeping context focused and avoiding bloat.
 
 ### 🔧 Custom Tools
-Python tools dropped into `~/.copilot-agent-console/tools/` become available to all agents. Each tool is defined with a `TOOL_SPECS` list containing name, description, JSON schema, and handler function. Tools auto-reload when files change — no restart needed. The built-in **Tool Builder** agent can generate custom tools from a natural language description — just describe what the tool should do.
+Python tools dropped into `~/.copilot-console/tools/` become available to all agents. Each tool is defined with a `TOOL_SPECS` list containing name, description, JSON schema, and handler function. Tools auto-reload when files change — no restart needed. The built-in **Tool Builder** agent can generate custom tools from a natural language description — just describe what the tool should do.
 
 
 ### 🔀 Workflows
@@ -105,7 +105,7 @@ copilot-console
 3. **Create an agent** — Go to **Agents** in the sidebar, click **+ New Agent**, configure a name, system prompt, and model.
 4. **Run a workflow** — Go to **Workflows**, open **Emoji Poem** or **Codebase Health Check**, click **▶ Run**, enter a topic, and watch the agents chain.
 5. **Schedule an automation** — On an agent card, click **Automations**, then **+ New Automation** to set a cron schedule.
-6. **Add custom tools** — Use the built-in **Tool Builder** agent to create tools via chat, or manually drop a `.py` file into `~/.copilot-agent-console/tools/` (see [Custom Tools](docs/CUSTOM-TOOLS.md)).
+6. **Add custom tools** — Use the built-in **Tool Builder** agent to create tools via chat, or manually drop a `.py` file into `~/.copilot-console/tools/` (see [Custom Tools](docs/CUSTOM-TOOLS.md)).
 
 ---
 
@@ -149,10 +149,10 @@ copilot-console --expose --allow-anonymous
 
 ## Configuration
 
-All data is stored in `C:\Users\<username>\.copilot-agent-console\`:
+All data is stored in `C:\Users\<username>\.copilot-console\`:
 
 ```
-.copilot-agent-console\
+.copilot-console\
 ├── settings.json        # Default model, working directory
 ├── sessions\            # Chat session history
 ├── agents\              # Agent library definitions
@@ -173,7 +173,7 @@ Custom tools can be created using the built-in **Tool Builder** agent or written
 
 - [Manual Installation](docs/INSTALL.md) — Step-by-step setup, updating, and uninstalling
 - [Packaged Samples](docs/SAMPLES.md) — Pre-built agents, workflows, and automations to try
-- [Workflows](src/copilot_agent_console/seed/agent-console/docs/features/workflows.md) — Multi-agent pipelines with YAML
+- [Workflows](src/copilot_console/seed/copilot-console/docs/features/workflows.md) — Multi-agent pipelines with YAML
 - [Custom Tools](docs/CUSTOM-TOOLS.md) — Creating tools with Tool Builder or manually
 - [Agent Teams](docs/AGENT-TEAMS.md) — Composing agents with sub-agents
 - [Mobile Companion](docs/MOBILE-COMPANION.md) — Phone access via secure tunnel

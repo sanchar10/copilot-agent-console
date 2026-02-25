@@ -53,7 +53,7 @@ Sub-agents inherit the model of the parent session. There is no way to specify a
 
 ## Custom Tools Cannot Have Top-Level Imports
 
-Custom tools (Python files in `~/.copilot-agent-console/tools/`) run in a sandboxed environment. Top-level imports of third-party packages are not supported — use inline imports within the function body instead.
+Custom tools (Python files in `~/.copilot-console/tools/`) run in a sandboxed environment. Top-level imports of third-party packages are not supported — use inline imports within the function body instead.
 
 ## Model & System Prompt Cannot Be Changed After Session Creation
 

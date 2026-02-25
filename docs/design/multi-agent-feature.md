@@ -46,7 +46,7 @@ Passed to `create_session` and `resume_session` as `session_opts["custom_agents"
 
 **Acceptance Criteria:**
 - [ ] Agent Editor shows a "Sub-Agents" selector (same UX pattern as MCP and Tools selectors)
-- [ ] Selector lists eligible agents from `~/.copilot-agent-console/agents/`
+- [ ] Selector lists eligible agents from `~/.copilot-console/agents/`
 - [ ] User can select/deselect individual agents
 - [ ] Selected sub-agents are saved to the agent's JSON config as `sub_agents: ["agent-id-1", "agent-id-2"]`
 
@@ -144,7 +144,7 @@ Add `sub_agents` field to the agent config:
 }
 ```
 
-`sub_agents` is a list of agent IDs (referencing other agents in `~/.copilot-agent-console/agents/`).
+`sub_agents` is a list of agent IDs (referencing other agents in `~/.copilot-console/agents/`).
 
 ### Field Mapping: App Agent → SDK CustomAgentConfig
 

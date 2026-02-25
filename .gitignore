@@ -36,7 +36,7 @@ pnpm-debug.log*
 
 # Build outputs
 frontend/dist/
-src/copilot_agent_console/static/
+src/copilot_console/static/
 *.local
 
 # IDE

@@ -31,7 +31,7 @@ def pytest_collection_modifyitems(items):
 @pytest.fixture
 def client(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     # Keep tests hermetic: avoid writing to the real user home.
-    agent_home = tmp_path / "agent-console-home"
+    agent_home = tmp_path / "copilot-console-home"
     user_home = tmp_path / "user-home"
     agent_home.mkdir(parents=True, exist_ok=True)
     user_home.mkdir(parents=True, exist_ok=True)

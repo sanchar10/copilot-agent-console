@@ -61,7 +61,7 @@ Copilot Console ships with pre-built agents, workflows, automations, and tools t
 
 ### 4. 🔧 Tool Builder (Agent)
 
-**What:** Describe a custom tool in plain English — the agent generates a working Python tool file, drops it into `~/.copilot-agent-console/tools/`, and it's immediately available to all agents.
+**What:** Describe a custom tool in plain English — the agent generates a working Python tool file, drops it into `~/.copilot-console/tools/`, and it's immediately available to all agents.
 
 **Try it:**
 1. Go to **Agents** → **Tool Builder** → **New Session**

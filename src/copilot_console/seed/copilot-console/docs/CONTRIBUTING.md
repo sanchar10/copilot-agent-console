@@ -35,7 +35,7 @@ npm run build
 pip install build
 python -m build --wheel
 
-# Output: dist\copilot_agent_console-0.4.0-py3-none-any.whl
+# Output: dist\copilot_console-0.4.0-py3-none-any.whl
 ```
 
 ## Running Tests

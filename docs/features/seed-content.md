@@ -7,20 +7,20 @@ Seed content is a set of bundled defaults that ship with Copilot Console. On ins
 
 | Content | Seed source | Destination |
 |---|---|---|
-| Agents | `seed/agent-console/agents/` | `~/.copilot-agent-console/agents/` |
-| Custom tools | `seed/agent-console/tools/` | `~/.copilot-agent-console/tools/` |
-| MCP config | `seed/agent-console/mcp-config.json.template` | `~/.copilot-agent-console/mcp-config.json` |
-| Local MCP servers | `seed/agent-console/local-mcp-servers/` | `~/.copilot-agent-console/local-mcp-servers/` |
-| Documentation | `seed/agent-console/docs/` | `~/.copilot-agent-console/docs/` |
+| Agents | `seed/copilot-console/agents/` | `~/.copilot-console/agents/` |
+| Custom tools | `seed/copilot-console/tools/` | `~/.copilot-console/tools/` |
+| MCP config | `seed/copilot-console/mcp-config.json.template` | `~/.copilot-console/mcp-config.json` |
+| Local MCP servers | `seed/copilot-console/local-mcp-servers/` | `~/.copilot-console/local-mcp-servers/` |
+| Documentation | `seed/copilot-console/docs/` | `~/.copilot-console/docs/` |
 | Copilot skills | `seed/copilot/skills/` | `~/.copilot/skills/` |
 
 ## Directory Layout
 
-Bundled seed content lives in `src/copilot_agent_console/seed/` and mirrors two destination roots:
+Bundled seed content lives in `src/copilot_console/seed/` and mirrors two destination roots:
 
 ```
-src/copilot_agent_console/seed/
-├── agent-console/           → ~/.copilot-agent-console/
+src/copilot_console/seed/
+├── copilot-console/           → ~/.copilot-console/
 │   ├── agents/              # Starter agent definitions
 │   ├── docs/                # App documentation (read by Console Guide agent)
 │   ├── local-mcp-servers/   # Bundled MCP server scripts
@@ -33,7 +33,7 @@ src/copilot_agent_console/seed/
 
 ## When Seeding Runs
 
-Seeding runs **once per app version** — on initial install and on each update. The app stores the last seeded version in a metadata file (`~/.copilot-agent-console/metadata.json` → `seed_version` key). If the current app version matches the stored version, seeding is skipped.
+Seeding runs **once per app version** — on initial install and on each update. The app stores the last seeded version in a metadata file (`~/.copilot-console/metadata.json` → `seed_version` key). If the current app version matches the stored version, seeding is skipped.
 
 Seeding can also be forced programmatically via `seed_bundled_content(force=True)`.
 
@@ -41,7 +41,7 @@ Seeding can also be forced programmatically via `seed_bundled_content(force=True
 
 The two destination roots use different sync strategies:
 
-### `agent-console/` items → copy-if-missing
+### `copilot-console/` items → copy-if-missing
 Files are copied **only if they don't already exist** at the destination. This preserves any edits the user has made to agents, tools, or config. If a user deletes a seed file, it will be restored on the next version update.
 
 ### `copilot/` items → copy-or-update
@@ -53,7 +53,7 @@ Files with a `.template` extension receive variable expansion before being writt
 
 | Variable | Value | Example |
 |---|---|---|
-| `{{APP_HOME}}` | Path to `~/.copilot-agent-console/` | `C:/Users/me/.copilot-agent-console` |
+| `{{APP_HOME}}` | Path to `~/.copilot-console/` | `C:/Users/me/.copilot-console` |
 
 **Example:** `mcp-config.json.template` containing `{{APP_HOME}}/local-mcp-servers/weather_server.py` is written as `mcp-config.json` with the expanded path.
 
@@ -70,20 +70,20 @@ The seed `mcp-config.json.template` receives special handling: instead of overwr
 ## How to Add New Seed Content
 
 ### Adding a seed agent
-1. Create a JSON file in `src/copilot_agent_console/seed/agent-console/agents/`
+1. Create a JSON file in `src/copilot_console/seed/copilot-console/agents/`
 2. Follow the agent schema used by existing agents (id, name, icon, description, model, system_message, tools, mcp_servers)
 3. If the agent references app paths, use `.json.template` extension and `{{APP_HOME}}` variable
-4. The agent will be copied to `~/.copilot-agent-console/agents/` on next install/update (copy-if-missing)
+4. The agent will be copied to `~/.copilot-console/agents/` on next install/update (copy-if-missing)
 
 ### Adding a seed tool
-1. Create a `.py` file in `src/copilot_agent_console/seed/agent-console/tools/`
+1. Create a `.py` file in `src/copilot_console/seed/copilot-console/tools/`
 2. Export a `TOOL_SPECS` list (see [Custom Tools](../CUSTOM-TOOLS.md))
 
 ### Adding an MCP server
-1. Add the server entry to `src/copilot_agent_console/seed/agent-console/mcp-config.json.template`
+1. Add the server entry to `src/copilot_console/seed/copilot-console/mcp-config.json.template`
 2. If the server is a local script, place it in `local-mcp-servers/` and reference it with `{{APP_HOME}}`
 3. New servers are merged in without affecting existing user config
 
 ### Adding documentation
-1. Place markdown files in `src/copilot_agent_console/seed/agent-console/docs/`
-2. These are copied to `~/.copilot-agent-console/docs/` and can be read by agents like Console Guide
+1. Place markdown files in `src/copilot_console/seed/copilot-console/docs/`
+2. These are copied to `~/.copilot-console/docs/` and can be read by agents like Console Guide

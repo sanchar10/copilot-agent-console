@@ -1,5 +1,5 @@
 /**
- * Syncs docs/ → src/copilot_agent_console/seed/agent-console/docs/
+ * Syncs docs/ → src/copilot_console/seed/copilot-console/docs/
  * Run automatically as part of the build pipeline.
  * Only copies .md files (not images/screenshots).
  */
@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC = path.join(__dirname, '..', 'docs');
-const DEST = path.join(__dirname, '..', 'src', 'copilot_agent_console', 'seed', 'agent-console', 'docs');
+const DEST = path.join(__dirname, '..', 'src', 'copilot_console', 'seed', 'copilot-console', 'docs');
 
 function syncDir(src, dest, relPath = '') {
   let count = 0;
@@ -56,7 +56,7 @@ const count = syncDir(SRC, DEST);
 const rootReadme = path.join(__dirname, '..', 'README.md');
 if (fs.existsSync(rootReadme)) {
   fs.copyFileSync(rootReadme, path.join(DEST, 'README.md'));
-  console.log(`  Synced ${count + 1} doc files → seed/agent-console/docs/ (including README.md)`);
+  console.log(`  Synced ${count + 1} doc files → seed/copilot-console/docs/ (including README.md)`);
 } else {
-  console.log(`  Synced ${count} doc files → seed/agent-console/docs/`);
+  console.log(`  Synced ${count} doc files → seed/copilot-console/docs/`);
 }

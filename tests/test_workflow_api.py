@@ -38,7 +38,7 @@ trigger:
 @pytest.fixture
 def wf_client(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     """Test client with localhost base_url so auth middleware allows requests."""
-    agent_home = tmp_path / "agent-console-home"
+    agent_home = tmp_path / "copilot-console-home"
     user_home = tmp_path / "user-home"
     agent_home.mkdir(parents=True, exist_ok=True)
     user_home.mkdir(parents=True, exist_ok=True)
