@@ -6,9 +6,9 @@ __pycache__/
 TODO.md
 *.png
 test_sdk.py
-test_api.py
-auth.py
-Tasks-do-not-push.txt
+/test_api.py
+/auth.py
+/Tasks-do-not-push.txt
 .Python
 build/
 develop-eggs/
