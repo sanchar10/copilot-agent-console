@@ -190,10 +190,7 @@ if ($setupMobile -eq 'y' -or $setupMobile -eq 'Y') {
         Write-Host "  Installing devtunnel..." -ForegroundColor Yellow
         $winget = Get-Command winget -ErrorAction SilentlyContinue
         if ($winget) {
-            winget install Microsoft.devtunnel --accept-source-agreements --accept-package-agreements 2>&1 | ForEach-Object {
-                $line = $_.ToString().Trim()
-                if ($line -ne '') { Write-Host "  $line" -ForegroundColor DarkGray }
-            }
+            winget install Microsoft.devtunnel --accept-source-agreements --accept-package-agreements --disable-interactivity 2>&1 | Out-Null
             # Refresh PATH for current session
             $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
             $devtunnel = Get-Command devtunnel -ErrorAction SilentlyContinue
