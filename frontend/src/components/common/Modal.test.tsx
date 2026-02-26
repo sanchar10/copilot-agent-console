@@ -37,7 +37,7 @@ describe('Modal', () => {
 
   it('calls onClose when clicking the backdrop', () => {
     const onClose = vi.fn();
-    const { container } = render(
+    render(
       <Modal isOpen={true} onClose={onClose} title="Backdrop Test">
         <p>content</p>
       </Modal>,

@@ -33,7 +33,7 @@ interface WorkflowEditorProps {
 }
 
 export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
-  const { openTab, closeTab, replaceTab } = useTabStore();
+  const { openTab, replaceTab } = useTabStore();
   const { fetchWorkflows } = useWorkflowStore();
 
   const [workflow, setWorkflow] = useState<WorkflowDetail | null>(null);
@@ -123,7 +123,7 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
           yaml_content: yamlContent,
         });
         // Pre-populate local state so useEffect doesn't re-fetch
-        setWorkflow(created);
+        setWorkflow(created as unknown as WorkflowDetail);
         setName(created.name);
         setDescription(created.description);
         setDirty(false);
