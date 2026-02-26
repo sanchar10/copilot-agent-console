@@ -69,7 +69,7 @@ Ships with sample workflows including **Codebase Health Check** (scanner → ana
 ### 📱 Mobile Companion
 Access Copilot Console from your phone — a purpose-built mobile UI served through a secure devtunnel. Monitor active agents, check unread messages with blue dot indicators, and reply to agents on the go. Install as a PWA home screen app for a native-like experience with push notifications when agents complete.
 
-<img src="docs/screenshots/mobile.jpeg" alt="Mobile Companion" height="300">
+<img src="docs/screenshots/mobile.jpeg" alt="Mobile Companion" height="350">
 
 **Highlights:**
 - **Pull-to-refresh** session list — no background polling
