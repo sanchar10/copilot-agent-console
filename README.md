@@ -1,6 +1,6 @@
 # Copilot Console
 
-A locally running visual control center for interfacing, managing and automating GitHub Copilot agents through a rich web interface.
+Orchestrate local multi-agent sessions, workflows and automation from a unified control center with live activity.
 
 ![Copilot Console](https://img.shields.io/badge/Copilot-Console-blue?style=flat-square)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows)
