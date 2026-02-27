@@ -35,7 +35,7 @@ copilot-console --port 9000
 
 ## SDK / CLI Version Compatibility
 
-Copilot Console uses the [GitHub Copilot Python SDK](https://github.com/github/copilot-sdk) (>=0.1.25) which bundles its own Copilot binary. The Copilot CLI installed via npm is only needed for initial authentication (`copilot login`) — the SDK handles all runtime communication independently.
+Copilot Console uses the [GitHub Copilot Python SDK](https://github.com/github/copilot-sdk) (>=0.1.28) which bundles its own Copilot binary. The Copilot CLI installed via npm is only needed for initial authentication (`copilot login`) — the SDK handles all runtime communication independently.
 
 If you encounter version-related errors, reinstall Copilot Console to get compatible versions:
 ```powershell

@@ -61,7 +61,7 @@ export function SubAgentSelector({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={`
-          flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md
+          flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md h-[30px]
           transition-colors duration-150
           ${disabled
             ? 'bg-gray-100/80 dark:bg-gray-800/80 text-gray-400 border border-gray-200/60 dark:border-gray-700/60 cursor-not-allowed'

@@ -29,6 +29,14 @@ from typing import AsyncGenerator, TYPE_CHECKING
 from copilot import CopilotClient
 from copilot.types import Tool
 
+# SDK >=0.1.28 requires on_permission_request for create/resume session.
+# Import approve_all if available, otherwise provide a fallback for older SDKs.
+try:
+    from copilot.types import PermissionHandler
+    approve_all_permissions = PermissionHandler.approve_all
+except (ImportError, AttributeError):
+    approve_all_permissions = None
+
 from copilot_console.app.config import DEFAULT_MODELS
 from copilot_console.app.services.logging_service import get_logger
 
@@ -153,6 +161,9 @@ class SessionClient:
             "streaming": True,
         }
         
+        if approve_all_permissions:
+            session_opts["on_permission_request"] = approve_all_permissions
+        
         if mcp_servers:
             session_opts["mcp_servers"] = mcp_servers
         
@@ -182,6 +193,8 @@ class SessionClient:
         
         try:
             resume_opts: dict = {"streaming": True}
+            if approve_all_permissions:
+                resume_opts["on_permission_request"] = approve_all_permissions
             if mcp_servers:
                 resume_opts["mcp_servers"] = mcp_servers
             if tools:
@@ -379,7 +392,10 @@ class CopilotService:
 
         # Resume temporarily with main client, get messages, destroy
         try:
-            session = await self._main_client.resume_session(session_id, {"streaming": False})
+            resume_config: dict = {"streaming": False}
+            if approve_all_permissions:
+                resume_config["on_permission_request"] = approve_all_permissions
+            session = await self._main_client.resume_session(session_id, resume_config)
             messages = await session.get_messages()
             await session.destroy()
             logger.info(f"Fetched {len(messages)} messages from session {session_id} (temporary resume)")
@@ -443,7 +459,10 @@ class CopilotService:
             
             try:
                 # Resume the session just to destroy it
-                session = await self._main_client.resume_session(session_id, {"streaming": False})
+                destroy_config: dict = {"streaming": False}
+                if approve_all_permissions:
+                    destroy_config["on_permission_request"] = approve_all_permissions
+                session = await self._main_client.resume_session(session_id, destroy_config)
                 await session.destroy()
                 logger.info(f"[{session_id}] Session destroyed via main client")
             except Exception as e:

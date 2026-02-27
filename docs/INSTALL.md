@@ -7,7 +7,7 @@ Before installing Copilot Console, ensure the following are available. All comma
 | Requirement | Version | How to check |
 |---|---|---|
 | **Windows** | 10 or 11 | — |
-| **Python** | 3.10 or higher | `python --version` |
+| **Python** | 3.11 or higher | `python --version` |
 | **Node.js** | 18 or higher | `node --version` |
 | **GitHub Copilot CLI** | 0.0.410+ | `copilot --version` |
 | **GitHub Copilot subscription** | Active | [github.com/settings/copilot](https://github.com/settings/copilot) |
@@ -19,7 +19,7 @@ Download from [python.org](https://www.python.org/downloads/). During installati
 
 Verify:
 ```powershell
-python --version    # Should show 3.10+
+python --version    # Should show 3.11+
 pip --version       # Should work
 ```
 

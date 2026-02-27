@@ -22,15 +22,22 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 from agent_framework import (
+    FunctionTool,
     Message,
     Workflow,
     WorkflowEvent,
     WorkflowRunResult,
     WorkflowViz,
 )
-from agent_framework._tools import FunctionTool
 from agent_framework_declarative import WorkflowFactory
 from agent_framework_github_copilot import GitHubCopilotAgent
+
+# SDK >=0.1.28 requires on_permission_request for create/resume session.
+try:
+    from copilot.types import PermissionHandler
+    approve_all_permissions = PermissionHandler.approve_all
+except (ImportError, AttributeError):
+    approve_all_permissions = None
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +108,7 @@ class WorkflowCopilotAgent(GitHubCopilotAgent):
         if self._tools:
             config["tools"] = self._prepare_tools(self._tools)
 
-        permission_handler = opts.get("on_permission_request") or self._permission_handler
+        permission_handler = opts.get("on_permission_request") or self._permission_handler or approve_all_permissions
         if permission_handler:
             config["on_permission_request"] = permission_handler
 
@@ -134,6 +141,8 @@ class WorkflowCopilotAgent(GitHubCopilotAgent):
 
         if self._permission_handler:
             config["on_permission_request"] = self._permission_handler
+        elif approve_all_permissions:
+            config["on_permission_request"] = approve_all_permissions
 
         if self._mcp_servers:
             config["mcp_servers"] = self._mcp_servers

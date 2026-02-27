@@ -4,48 +4,86 @@ For contributors who want to modify the code.
 
 ## Prerequisites
 
-- Python 3.10+
-- Node.js 18+
-- GitHub Copilot CLI 0.0.410+ (see [Manual Installation](INSTALL.md))
+| Requirement | Version | How to check |
+|---|---|---|
+| **Python** | 3.11 – 3.13 | `python --version` |
+| **Node.js** | 18+ | `node --version` |
+| **GitHub Copilot CLI** | 0.0.410+ | `copilot --version` |
+
+> **Note:** Python 3.14 is not yet fully supported due to pre-release dependency resolution issues. Use 3.11–3.13.
 
 ## Setup
+
+### Option A: Using uv (Recommended)
+
+[uv](https://docs.astral.sh/uv/) is a fast Python package manager that handles venvs automatically.
 
 ```powershell
 # Clone the repo
 git clone https://github.com/sanchar10/copilot-agent-console.git
 cd copilot-agent-console
 
-# Install all dependencies (frontend + backend)
-npm run setup
+# Install Python dependencies (creates .venv automatically, handles pre-release)
+uv sync --prerelease=allow
 
-# Start in development mode (hot reload for both frontend and backend)
+# Install frontend dependencies
+npm install --prefix frontend
+
+# Start in development mode
+uv run npm run dev
+```
+
+> Don't have uv? Install it: `irm https://astral.sh/uv/install.ps1 | iex` (Windows) or `curl -LsSf https://astral.sh/uv/install.sh | sh` (macOS/Linux)
+
+### Option B: Using pip + venv
+
+```powershell
+# Clone the repo
+git clone https://github.com/sanchar10/copilot-agent-console.git
+cd copilot-agent-console
+
+# Create and activate a virtual environment
+python -m venv .venv
+.venv\Scripts\Activate.ps1          # PowerShell
+# .venv\Scripts\activate.bat        # Command Prompt
+
+# Install Python dependencies (agent-framework is pre-release, needs --pre)
+pip install -e ".[dev]" --pre
+
+# Install frontend dependencies
+npm install --prefix frontend
+
+# Start in development mode
 npm run dev
 ```
 
 - Frontend: http://localhost:5173 (Vite dev server with HMR)
 - Backend: http://localhost:8765 (FastAPI with auto-reload)
 
+> **Why a virtual environment?** The `agent-framework` package is pre-release. Without a venv, it installs into your global Python and can conflict with other projects.
+
+## Running Tests
+
+```powershell
+# Backend tests
+uv run pytest tests/ --ignore=tests/e2e -q      # uv
+python -m pytest tests/ --ignore=tests/e2e -q    # pip (venv activated)
+
+# Frontend tests
+npm test --prefix frontend
+```
+
 ## Building the Package
 
 ```powershell
 # Build frontend
-npm run build
+npm run build --prefix frontend
 
 # Build Python wheel
 pip install build
 python -m build --wheel
 
 # Output: dist\copilot_console-0.4.0-py3-none-any.whl
-```
-
-## Running Tests
-
-```powershell
-# Backend tests
-python -m pytest
-
-# Frontend tests
-npm test --prefix frontend
 ```
 
 ## Mobile Companion (Dev Mode)
@@ -62,7 +100,34 @@ npm run dev -- --expose --allow-anonymous
 
 This starts the backend, frontend, and devtunnel automatically. Open Settings in the desktop UI to see the QR code, then scan it from your phone.
 
-> **Note:** `npm run dev` sets `PYTHONPATH=src/` automatically, so no `pip install -e .` is needed. Third-party dependencies (fastapi, uvicorn, etc.) are auto-installed on first run if missing.
+## Troubleshooting
+
+### `agent_framework` import errors (e.g., `FunctionTool`, `AIFunction`)
+
+The `agent-framework` package is pre-release. Make sure you installed with pre-release support:
+
+```powershell
+uv sync --prerelease=allow           # uv
+pip install -e ".[dev]" --pre        # pip
+```
+
+If you see `ModuleNotFoundError: No module named 'agent_framework'`, your venv may not be activated (pip) or you may need to prefix with `uv run` (uv).
+
+### `pip install -e .` hangs or fails on Python 3.14
+
+Use Python 3.11–3.13 instead. Python 3.14 has known issues with pre-release dependency resolution.
+
+### Tests fail with `ModuleNotFoundError`
+
+Make sure your venv is activated and you ran `pip install -e ".[dev]" --pre`.
+
+### Frontend build errors
+
+```powershell
+cd frontend
+npx tsc --noEmit    # Check for TypeScript errors
+npm run build       # Full build
+```
 
 ## Architecture
 
