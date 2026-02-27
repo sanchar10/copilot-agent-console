@@ -1,6 +1,6 @@
 # Copilot Console
 
-A locally running visual control center for interfacing, managing and automating GitHub Copilot agents through a rich web interface.
+Orchestrate local multi-agent sessions, workflows and automation from a unified control center with live activity.
 
 ![Copilot Console](https://img.shields.io/badge/Copilot-Console-blue?style=flat-square)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows)
@@ -69,7 +69,7 @@ Ships with sample workflows including **Codebase Health Check** (scanner → ana
 ### 📱 Mobile Companion
 Access Copilot Console from your phone — a purpose-built mobile UI served through a secure devtunnel. Monitor active agents, check unread messages with blue dot indicators, and reply to agents on the go. Install as a PWA home screen app for a native-like experience with push notifications when agents complete.
 
-<img src="docs/screenshots/mobile.jpeg" alt="Mobile Companion" height="300">
+<img src="docs/screenshots/mobile.jpeg" alt="Mobile Companion" height="350">
 
 **Highlights:**
 - **Pull-to-refresh** session list — no background polling
@@ -103,9 +103,10 @@ copilot-console
 1. **Start a session** — Click `+` in the sidebar to create a new conversation.
 2. **Chat** — Type a message and hit Enter. Responses stream in real-time.
 3. **Create an agent** — Go to **Agents** in the sidebar, click **+ New Agent**, configure a name, system prompt, and model.
-4. **Run a workflow** — Go to **Workflows**, open **Emoji Poem** or **Codebase Health Check**, click **▶ Run**, enter a topic, and watch the agents chain.
-5. **Schedule an automation** — On an agent card, click **Automations**, then **+ New Automation** to set a cron schedule.
-6. **Add custom tools** — Use the built-in **Tool Builder** agent to create tools via chat, or manually drop a `.py` file into `~/.copilot-console/tools/` (see [Custom Tools](docs/CUSTOM-TOOLS.md)).
+4. **Build a micro-app** — Go to **Agents** → **Dev Lead** → **New Session**, pick a starter prompt (Task Tracker, Expense Tracker, or Daily Journal), and watch a 6-agent team design, build, test, and document a full-stack app.
+5. **Run a workflow** — Go to **Workflows**, open **Emoji Poem** or **Codebase Health Check**, click **▶ Run**, enter a topic, and watch the agents chain.
+6. **Schedule an automation** — On an agent card, click **Automations**, then **+ New Automation** to set a cron schedule.
+7. **Add custom tools** — Use the built-in **Tool Builder** agent to create tools via chat, or manually drop a `.py` file into `~/.copilot-console/tools/` (see [Custom Tools](docs/CUSTOM-TOOLS.md)).
 
 ---
 

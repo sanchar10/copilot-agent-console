@@ -201,8 +201,10 @@ def setup_logging(level: int = logging.INFO) -> None:
     # Remove existing handlers to avoid duplicates
     root_logger.handlers.clear()
     
-    # Console handler (like before)
-    console_handler = logging.StreamHandler(sys.stdout)
+    # Console handler — force UTF-8 to avoid cp1252 errors on Windows
+    # when agent responses contain Unicode characters (arrows, emoji, etc.)
+    utf8_stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', errors='replace', closefd=False)
+    console_handler = logging.StreamHandler(utf8_stdout)
     console_handler.setLevel(level)
     console_handler.setFormatter(
         logging.Formatter("%(levelname)-7s | %(name)s - %(message)s")

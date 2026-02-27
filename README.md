@@ -103,9 +103,10 @@ copilot-console
 1. **Start a session** — Click `+` in the sidebar to create a new conversation.
 2. **Chat** — Type a message and hit Enter. Responses stream in real-time.
 3. **Create an agent** — Go to **Agents** in the sidebar, click **+ New Agent**, configure a name, system prompt, and model.
-4. **Run a workflow** — Go to **Workflows**, open **Emoji Poem** or **Codebase Health Check**, click **▶ Run**, enter a topic, and watch the agents chain.
-5. **Schedule an automation** — On an agent card, click **Automations**, then **+ New Automation** to set a cron schedule.
-6. **Add custom tools** — Use the built-in **Tool Builder** agent to create tools via chat, or manually drop a `.py` file into `~/.copilot-console/tools/` (see [Custom Tools](docs/CUSTOM-TOOLS.md)).
+4. **Build a micro-app** — Go to **Agents** → **Dev Lead** → **New Session**, pick a starter prompt (Task Tracker, Expense Tracker, or Daily Journal), and watch a 6-agent team design, build, test, and document a full-stack app.
+5. **Run a workflow** — Go to **Workflows**, open **Emoji Poem** or **Codebase Health Check**, click **▶ Run**, enter a topic, and watch the agents chain.
+6. **Schedule an automation** — On an agent card, click **Automations**, then **+ New Automation** to set a cron schedule.
+7. **Add custom tools** — Use the built-in **Tool Builder** agent to create tools via chat, or manually drop a `.py` file into `~/.copilot-console/tools/` (see [Custom Tools](docs/CUSTOM-TOOLS.md)).
 
 ---
 

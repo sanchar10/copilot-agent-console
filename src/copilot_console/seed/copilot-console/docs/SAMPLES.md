@@ -59,7 +59,26 @@ Copilot Console ships with pre-built agents, workflows, automations, and tools t
 
 ---
 
-### 4. 🔧 Tool Builder (Agent)
+### 4. 👨‍💼 Build a Micro-App (Agent Team)
+
+**What:** The **Dev Lead** agent coordinates a team of 5 specialist sub-agents (architect, backend-dev, frontend-dev, qa-engineer, doc-writer) to design, build, test, and document a full-stack web app from a single prompt.
+
+**Try it:**
+1. Go to **Agents** → **Dev Lead** → **New Session**
+2. Pick a starter prompt or describe your app: *"Build a task tracker where I can add tasks with priority, mark them done, and filter by status"*
+3. Watch the team work — the Dev Lead delegates to each specialist in order:
+   - **Architect** creates the technical design
+   - **Backend Dev** implements the Python/Flask API
+   - **Frontend Dev** builds the HTML/CSS/JS UI
+   - **QA Engineer** reviews and tests everything
+   - **Doc Writer** creates the README
+4. At the end you get a working app with instructions to run it
+
+**Starter prompts:** 📋 Task Tracker · 💰 Expense Tracker · 📓 Daily Journal
+
+---
+
+### 5. 🔧 Tool Builder (Agent)
 
 **What:** Describe a custom tool in plain English — the agent generates a working Python tool file, drops it into `~/.copilot-console/tools/`, and it's immediately available to all agents.
 
@@ -76,6 +95,12 @@ Copilot Console ships with pre-built agents, workflows, automations, and tools t
 
 | Icon | Name | Purpose |
 |------|------|---------|
+| 👨‍💼 | Dev Lead | Orchestrates a 6-agent team to build full-stack apps from requirements |
+| 🏗️ | Architect | Creates technical designs from requirements (Dev Lead sub-agent) |
+| ⚙️ | Backend Dev | Implements Python Flask backend code (Dev Lead sub-agent) |
+| 🎨 | Frontend Dev | Implements HTML/CSS/JS frontend (Dev Lead sub-agent) |
+| 🧪 | QA Engineer | Reviews code and tests applications (Dev Lead sub-agent) |
+| 📝 | Doc Writer | Creates README and documentation (Dev Lead sub-agent) |
 | 📰 | Morning Tech Brief | Web search for latest tech news, HTML report |
 | 🔍 | Codebase Scanner | Read-only directory analysis (files, TODOs, tests) |
 | 📊 | Health Analyst | Scores codebase health from scan data |

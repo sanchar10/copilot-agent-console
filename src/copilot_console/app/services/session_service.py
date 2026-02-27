@@ -211,7 +211,7 @@ class SessionService:
                         try:
                             session_file = storage_service._session_file(session_id)
                             session_file.write_text(
-                                json.dumps(stored_meta, indent=2, default=str)
+                                json.dumps(stored_meta, indent=2, default=str), encoding="utf-8"
                             )
                         except Exception:
                             pass  # Non-critical, name will be re-fetched next time

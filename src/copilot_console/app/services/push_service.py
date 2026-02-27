@@ -32,7 +32,7 @@ def get_or_create_vapid_keys() -> dict[str, str]:
         # Ensure PEM file exists on disk (for pywebpush)
         if not VAPID_PEM_FILE.exists():
             APP_HOME.mkdir(parents=True, exist_ok=True)
-            VAPID_PEM_FILE.write_text(settings["vapid_private_key"])
+            VAPID_PEM_FILE.write_text(settings["vapid_private_key"], encoding="utf-8")
         return {
             "vapid_public_key": settings["vapid_public_key"],
             "vapid_private_key": settings["vapid_private_key"],
@@ -63,7 +63,7 @@ def get_or_create_vapid_keys() -> dict[str, str]:
     
     # Also save PEM to file for pywebpush (it prefers file paths)
     APP_HOME.mkdir(parents=True, exist_ok=True)
-    VAPID_PEM_FILE.write_text(private_pem)
+    VAPID_PEM_FILE.write_text(private_pem, encoding="utf-8")
     
     logger.info("Generated new VAPID keys for push notifications")
     return {

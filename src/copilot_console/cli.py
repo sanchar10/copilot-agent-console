@@ -32,7 +32,7 @@ def initialize_app_directory():
         settings_file.write_text(json.dumps({
             "default_model": "gpt-4o",
             "default_cwd": str(Path.home()),
-        }, indent=2))
+        }, indent=2), encoding="utf-8")
         print(f"✓ Created settings at {settings_file}")
     
     # Seed bundled content (agents, skills, tools, MCP servers) on install/update
@@ -50,6 +50,14 @@ def open_browser_delayed(url: str, delay: float = 1.5):
 
 def main():
     """Main entry point for Copilot Console."""
+    # Force UTF-8 stdout/stderr on Windows to handle emoji and Unicode in print()
+    if sys.platform == "win32" and hasattr(sys.stdout, "fileno"):
+        try:
+            sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', errors='replace', closefd=False)
+            sys.stderr = open(sys.stderr.fileno(), mode='w', encoding='utf-8', errors='replace', closefd=False)
+        except (OSError, ValueError):
+            pass
+
     parser = argparse.ArgumentParser(
         prog="copilot-console",
         description="Copilot Console - A feature-rich console for GitHub Copilot agents",
