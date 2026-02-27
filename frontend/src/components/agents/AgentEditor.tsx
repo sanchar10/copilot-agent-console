@@ -73,7 +73,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
       setName(existingAgent.name);
       setDescription(existingAgent.description);
       setIcon(existingAgent.icon);
-      setModel(existingAgent.model);
+      setModel(existingAgent.model || defaultModel);
       setSystemMessage(existingAgent.system_message?.content ? existingAgent.system_message : null);
       // Load tools from structured fields
       setSelectedTools(existingAgent.tools.custom || []);

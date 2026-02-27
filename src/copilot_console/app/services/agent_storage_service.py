@@ -47,6 +47,12 @@ class AgentStorageService:
             json.dumps(data, indent=2, default=str), encoding="utf-8"
         )
 
+    def _ensure_id(self, data: dict, agent_file: Path) -> dict:
+        """Ensure agent data has an 'id' field, deriving from filename if missing."""
+        if "id" not in data:
+            data["id"] = agent_file.stem
+        return data
+
     def load_agent(self, agent_id: str) -> Agent | None:
         """Load an agent definition by ID."""
         agent_file = self._agent_file(agent_id)
@@ -54,6 +60,7 @@ class AgentStorageService:
             return None
         try:
             data = json.loads(agent_file.read_text(encoding="utf-8"))
+            self._ensure_id(data, agent_file)
             return Agent(**data)
         except (json.JSONDecodeError, IOError, ValueError):
             return None
@@ -65,6 +72,7 @@ class AgentStorageService:
             for agent_file in sorted(AGENTS_DIR.glob("*.json")):
                 try:
                     data = json.loads(agent_file.read_text(encoding="utf-8"))
+                    self._ensure_id(data, agent_file)
                     agents.append(Agent(**data))
                 except (json.JSONDecodeError, IOError, ValueError):
                     pass
