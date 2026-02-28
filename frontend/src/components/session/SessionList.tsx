@@ -8,7 +8,7 @@ interface SessionListProps {
 }
 
 // Estimated height of each session item (adjust if needed)
-const ITEM_HEIGHT = 64;
+const ITEM_HEIGHT = 56;
 
 export function SessionList({ sessions }: SessionListProps) {
   const parentRef = useRef<HTMLDivElement>(null);

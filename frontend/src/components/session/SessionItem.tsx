@@ -231,7 +231,7 @@ export function SessionItem({ session }: SessionItemProps) {
     <>
       <div
         onClick={handleClick}
-        className={`group relative flex items-center gap-3 px-3 py-3 cursor-pointer transition-all rounded-lg ${
+        className={`group relative flex items-center gap-3 px-3 py-2 cursor-pointer transition-all rounded-lg ${
           isActive
             ? 'bg-blue-50 border border-blue-200 shadow-sm dark:bg-blue-900/30 dark:border-blue-700'
             : isOpen
