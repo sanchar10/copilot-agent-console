@@ -79,6 +79,11 @@ if ($needsLogin) {
 # --- Install Copilot Console ---
 Write-Host ""
 Write-Host "  Installing Copilot Console..." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "  ┌─────────────────────────────────────────────────────┐" -ForegroundColor Yellow
+Write-Host "  │  ⏳ This may take 3-5 minutes — please wait...     │" -ForegroundColor Yellow
+Write-Host "  └─────────────────────────────────────────────────────┘" -ForegroundColor Yellow
+Write-Host ""
 
 # Install Agent Framework (pre-release) — required for workflow orchestration
 # Installed separately because AF is pre-release and needs --pre flag.
@@ -101,7 +106,6 @@ $installed = $false
 $usedPipx = $false
 $pipx = Get-Command pipx -ErrorAction SilentlyContinue
 if ($pipx) {
-    Write-Host "  This may take a few minutes — please wait..." -ForegroundColor DarkGray
     pipx install --force $WHL_URL 2>&1 | ForEach-Object {
         $line = $_.ToString().Trim()
         if ($line -ne '' -and $line -notmatch 'symlink|These apps') {
@@ -118,7 +122,6 @@ if ($pipx) {
     Write-Host "  [WARN] pipx not found, using pip instead." -ForegroundColor Yellow
 }
 if (-not $installed) {
-    Write-Host "  This may take a few minutes — please wait..." -ForegroundColor DarkGray
     pip install --user --no-cache-dir --ignore-installed $WHL_URL 2>&1 | ForEach-Object {
         $line = $_.ToString()
         if ($line -match 'Downloading.*copilot.agent.console|Installing collected') {

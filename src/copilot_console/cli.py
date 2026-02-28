@@ -29,8 +29,9 @@ def initialize_app_directory():
     # Create default settings if not exists
     settings_file = app_home / "settings.json"
     if not settings_file.exists():
+        from copilot_console.app.config import DEFAULT_MODEL
         settings_file.write_text(json.dumps({
-            "default_model": "gpt-4o",
+            "default_model": DEFAULT_MODEL,
             "default_cwd": str(Path.home()),
         }, indent=2), encoding="utf-8")
         print(f"✓ Created settings at {settings_file}")
