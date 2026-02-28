@@ -29,12 +29,6 @@ def test_sidebar_has_settings_button(page: Page):
     expect(settings_btn).to_be_visible()
 
 
-def test_sidebar_has_ralph_monitor(page: Page):
-    """Sidebar has Ralph Monitor button."""
-    sidebar = page.locator("aside")
-    ralph_btn = sidebar.get_by_text("Ralph Monitor")
-    expect(ralph_btn).to_be_visible()
-
 
 def test_sidebar_has_active_agents(page: Page):
     """Sidebar has Active Agents button."""

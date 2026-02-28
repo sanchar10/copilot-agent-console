@@ -270,21 +270,6 @@ class TestLogsRouter:
         assert data["session_id"] == "some-session-id"
         assert data["count"] == 1
 
-    def test_ralph_logs(self, client, monkeypatch):
-        import copilot_console.app.routers.logs as logs_router
-
-        monkeypatch.setattr(
-            logs_router, "read_ralph_logs",
-            lambda run_id, tail=None: ["ralph log 1"],
-        )
-
-        resp = client.get("/api/logs/ralph/run-123")
-        assert resp.status_code == 200
-        data = resp.json()
-        assert data["run_id"] == "run-123"
-        assert data["count"] == 1
-
-
 # ── mcp router ───────────────────────────────────────────────────────────
 
 class TestMCPRouter:

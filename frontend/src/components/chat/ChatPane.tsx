@@ -8,7 +8,6 @@ import { StreamingMessage } from './StreamingMessage';
 import { InputBox, clearReadySession } from './InputBox';
 import { TabBar } from './TabBar';
 import { Header } from '../layout/Header';
-import { RalphMonitor } from '../ralph/RalphMonitor';
 import { AgentLibrary } from '../agents/AgentLibrary';
 import { AgentEditor } from '../agents/AgentEditor';
 import { AutomationManager } from '../automations/AutomationManager';
@@ -469,7 +468,6 @@ export function ChatPane() {
           <InputBox promptToSend={newSessionPromptToSend} onPromptSent={() => setNewSessionPromptToSend(null)} />
         </div>
       )}
-      {!showNewSession && activeTab?.type === 'ralph-monitor' && <RalphMonitor />}
       {!showNewSession && activeTab?.type === 'agent-library' && <AgentLibrary />}
       {!showNewSession && activeTab?.type === 'agent-detail' && activeTab.agentId && (
         <AgentEditor agentId={activeTab.agentId} />

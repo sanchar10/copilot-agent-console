@@ -22,12 +22,6 @@ vi.mock('../../stores/uiStore', () => ({
   }),
 }));
 
-vi.mock('../../stores/ralphStore', () => ({
-  useRalphStore: () => ({
-    runs: [],
-    refreshRuns: vi.fn(),
-  }),
-}));
 
 vi.mock('../../stores/tabStore', () => ({
   useTabStore: () => ({
@@ -36,7 +30,6 @@ vi.mock('../../stores/tabStore', () => ({
   }),
   tabId: {
     session: (id: string) => `session:${id}`,
-    ralphMonitor: () => 'ralph-monitor',
     agentLibrary: () => 'agent-library',
     workflowLibrary: () => 'workflow-library',
     automationManager: () => 'automation-manager',
@@ -89,11 +82,6 @@ vi.mock('../../api/activeAgents', () => ({
   getActiveAgents: vi.fn().mockResolvedValue({ count: 0 }),
 }));
 
-vi.mock('../../hooks/useFeatureFlags', () => ({
-  useFeatureFlags: () => ({
-    hasFlag: () => false,
-  }),
-}));
 
 // Mock SessionList to keep Sidebar test isolated
 vi.mock('../session/SessionList', () => ({

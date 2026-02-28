@@ -25,10 +25,6 @@ describe('tabStore', () => {
       expect(tabId.session('abc')).toBe('session:abc');
     });
 
-    it('builds ralph-monitor tab id', () => {
-      expect(tabId.ralphMonitor()).toBe('ralph-monitor');
-    });
-
     it('builds file tab id', () => {
       expect(tabId.file('/foo/bar.ts')).toBe('file:/foo/bar.ts');
     });
@@ -60,7 +56,6 @@ describe('tabStore', () => {
     });
 
     it('returns null for non-session tab id', () => {
-      expect(sessionIdFromTabId('ralph-monitor')).toBeNull();
       expect(sessionIdFromTabId('file:/foo.ts')).toBeNull();
     });
   });

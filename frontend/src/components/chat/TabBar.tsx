@@ -2,7 +2,6 @@ import { useSessionStore } from '../../stores/sessionStore';
 import { useChatStore } from '../../stores/chatStore';
 import { useViewedStore } from '../../stores/viewedStore';
 import { useTabStore } from '../../stores/tabStore';
-import { useRalphStore } from '../../stores/ralphStore';
 import { getSession, disconnectSession } from '../../api/sessions';
 
 export function TabBar() {
@@ -10,7 +9,6 @@ export function TabBar() {
   const { messagesPerSession, setMessages, clearSessionMessages } = useChatStore();
   const { markViewed } = useViewedStore();
   const { tabs, activeTabId, switchTab, closeTab } = useTabStore();
-  const { refreshRuns } = useRalphStore();
 
   const handleTabClick = async (tab: { id: string; type: string; sessionId?: string }) => {
     if (tab.id === activeTabId) return;
@@ -30,10 +28,6 @@ export function TabBar() {
         }
       }
       markViewed(tab.sessionId);
-    }
-
-    if (tab.type === 'ralph-monitor') {
-      refreshRuns();
     }
 
     switchTab(tab.id);

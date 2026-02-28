@@ -1,14 +1,14 @@
 /**
  * Generic tab management store.
- * Supports multiple tab types: chat sessions, ralph monitor, file viewer, etc.
+ * Supports multiple tab types: chat sessions, file viewer, etc.
  */
 
 import { create } from 'zustand';
 
-export type TabType = 'session' | 'ralph-monitor' | 'file' | 'agent-library' | 'agent-detail' | 'automation-manager' | 'task-board' | 'task-run-detail' | 'workflow-library' | 'workflow-editor' | 'workflow-run';
+export type TabType = 'session' | 'file' | 'agent-library' | 'agent-detail' | 'automation-manager' | 'task-board' | 'task-run-detail' | 'workflow-library' | 'workflow-editor' | 'workflow-run';
 
 export interface Tab {
-  id: string;           // "session:<uuid>", "ralph-monitor", "file:<path>", "agent-library", "agent:<id>", "automation-manager", "task-board", "task-run:<id>", "workflow-library", "workflow:<id>", "workflow-run:<id>"
+  id: string;           // "session:<uuid>", "file:<path>", "agent-library", "agent:<id>", "automation-manager", "task-board", "task-run:<id>", "workflow-library", "workflow:<id>", "workflow-run:<id>"
   type: TabType;
   label: string;
   sessionId?: string;   // for type='session'
@@ -40,7 +40,6 @@ interface TabState {
 // Helper to build tab IDs
 export const tabId = {
   session: (sessionId: string) => `session:${sessionId}`,
-  ralphMonitor: () => 'ralph-monitor',
   file: (filePath: string) => `file:${filePath}`,
   agentLibrary: () => 'agent-library',
   agentDetail: (agentId: string) => `agent:${agentId}`,

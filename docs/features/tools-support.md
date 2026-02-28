@@ -1,7 +1,7 @@
 # Feature: Tools Support
 
 ## Summary
-Local tools system for chat sessions and Ralph AI Runner. Tools are defined as Python files in `~/.copilot-web/tools/` folder, each file can define one or more tools using OpenAI-style metadata. The app scans this folder, loads tool definitions, and makes them available for selection in chat sessions.
+Local tools system for chat sessions. Tools are defined as Python files in `~/.copilot-web/tools/` folder, each file can define one or more tools using OpenAI-style metadata. The app scans this folder, loads tool definitions, and makes them available for selection in chat sessions.
 
 ## Tool Definition Format
 
@@ -114,7 +114,3 @@ TOOL_SPECS = [
 - [ ] Tools dropdown disabled after session starts (selection locked)
 - [ ] Badge shows count of selected tools
 
-### Ralph Integration
-- [ ] Ralph sub-agents can use selected tools
-- [ ] Tool selection can be specified in execution plan
-- [ ] Default: inherit tools from prep session or use all available

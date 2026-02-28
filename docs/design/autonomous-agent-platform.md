@@ -256,7 +256,7 @@ class NotificationService:
 Add to the existing tab system:
 
 ```typescript
-type TabType = 'session' | 'ralph-monitor' | 'file' | 'agent-library' | 'task-board' | 'agent-detail';
+type TabType = 'session' | 'file' | 'agent-library' | 'task-board' | 'agent-detail';
 ```
 
 ### Screen 1: Agent Library (New sidebar section + tab)
@@ -667,9 +667,6 @@ The chat sidebar should only show sessions the user directly interacts with. Oth
 | Regular chat | `null` | ✅ | Sidebar |
 | Manual agent "Run Now" | `"manual"` | ✅ | Sidebar |
 | Scheduled agent run | `"automation"` | ❌ | Task Board |
-| Ralph loop job | `"ralph"` | ❌ | Ralph Monitor |
-
-**Implementation:** Currently Ralph sessions appear in the sidebar (they create SDK sessions that show up in the session list). When we later add `trigger: "ralph"` tagging to ralph-created sessions, they'll be automatically filtered out by the same filter logic — accessed only from Ralph Monitor instead.
 
 **Future-proof filter logic:**
 ```typescript
@@ -710,12 +707,11 @@ MCP servers come from **two pools**, both using the same JSON format (`{"mcpServ
 
 ### Current Architecture (5 types, conditionals)
 ```typescript
-type TabType = 'session' | 'ralph-monitor' | 'file' | 'agent-library' | 'task-board' | 'agent-detail';
+type TabType = 'session' | 'file' | 'agent-library' | 'task-board' | 'agent-detail';
 ```
 
 Currently uses conditional rendering in `ChatPane`:
 ```typescript
-{activeTab?.type === 'ralph-monitor' && <RalphMonitor />}
 {activeTab?.type === 'agent-library' && <AgentLibrary />}
 {activeTab?.type === 'agent-detail' && <AgentDetail agentId={activeTab.agentId} />}
 {activeTab?.type === 'task-board' && <TaskBoard />}
@@ -759,12 +755,6 @@ const tabRegistry: Record<TabType, TabRegistration> = {
     onActivate: (tab) => loadCachedMessages(tab.sessionId),
     onClose: async (tab) => { disconnectSession(tab.sessionId); return true; },
     getProps: (tab) => ({ sessionId: tab.sessionId }),
-  },
-  'ralph-monitor': {
-    component: RalphMonitor,
-    icon: '🔄',
-    singleton: true,
-    onActivate: () => refreshRuns(),
   },
   'agent-library': {
     component: AgentLibrary,

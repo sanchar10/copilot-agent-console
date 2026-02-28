@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSessionStore } from '../../stores/sessionStore';
 import { useUIStore } from '../../stores/uiStore';
-import { useRalphStore } from '../../stores/ralphStore';
 import { useTabStore, tabId } from '../../stores/tabStore';
 import { useAgentMonitorStore } from '../../stores/agentMonitorStore';
 import { useAgentStore } from '../../stores/agentStore';
@@ -13,23 +12,16 @@ import { getSettings } from '../../api/settings';
 import { getActiveAgents } from '../../api/activeAgents';
 import { SessionList } from '../session/SessionList';
 import { Button } from '../common/Button';
-import { useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 export function Sidebar() {
   const { sessions, setSessions, startNewSession, setLoading, setError } = useSessionStore();
   const { setAvailableModels, setDefaultModel, setDefaultCwd, openSettingsModal, defaultModel, defaultCwd } = useUIStore();
-  const { runs, refreshRuns } = useRalphStore();
   const { activeTabId, openTab } = useTabStore();
   const { setOpen: setAgentMonitorOpen, activeCount, setActiveCount } = useAgentMonitorStore();
   const { agents, fetchAgents } = useAgentStore();
   const { workflows, fetchWorkflows } = useWorkflowStore();
   const { automations, fetchAutomations } = useAutomationStore();
-  const { hasFlag } = useFeatureFlags();
-  const showRalph = hasFlag('ralph');
   const [sessionSearch, setSessionSearch] = useState('');
-
-  // Count active Ralph runs
-  const activeRunCount = runs.filter(r => ['pending', 'running', 'paused'].includes(r.status)).length;
 
   // Poll for active agents count every 5 seconds
   useEffect(() => {
@@ -119,35 +111,6 @@ export function Sidebar() {
           </svg>
           New Session
         </Button>
-
-        {/* Ralph Monitor Button - only visible with ?features=ralph */}
-        {showRalph && (() => {
-          const ralphTabId = tabId.ralphMonitor();
-          const isRalphActive = activeTabId === ralphTabId;
-          return (
-          <button
-            onClick={() => {
-              refreshRuns();
-              openTab({ id: ralphTabId, type: 'ralph-monitor', label: 'Ralph Monitor' });
-            }}
-            className={`w-full mt-2 flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm ${
-              isRalphActive
-                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' 
-                : 'bg-gray-50 dark:bg-[#2a2a3c] hover:bg-gray-100 dark:hover:bg-[#32324a] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-[#3a3a4e]'
-            }`}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-            Ralph Monitor
-            {activeRunCount > 0 && (
-              <span className="bg-emerald-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                {activeRunCount}
-              </span>
-            )}
-          </button>
-          );
-        })()}
 
         {/* Agent Monitor Button */}
         <button

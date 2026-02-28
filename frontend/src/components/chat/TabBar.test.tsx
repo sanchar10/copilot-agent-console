@@ -37,11 +37,6 @@ vi.mock('../../stores/viewedStore', () => ({
   }),
 }));
 
-vi.mock('../../stores/ralphStore', () => ({
-  useRalphStore: () => ({
-    refreshRuns: vi.fn(),
-  }),
-}));
 
 vi.mock('../../api/sessions', () => ({
   getSession: vi.fn(),
