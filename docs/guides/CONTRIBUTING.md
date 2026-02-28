@@ -75,6 +75,26 @@ npm test --prefix frontend
 
 ## Building the Package
 
+### CI Release (GitHub Actions)
+
+This repo’s wheel is built by GitHub Actions, not manually on developer machines.
+
+- Workflow: `.github/workflows/release.yml`
+- Trigger: push a git tag matching `v*` (for example `v0.4.0`)
+- Steps (high level): `npm run build --prefix frontend` → `python -m build --wheel` → create a GitHub Release and attach `dist/*.whl`
+- No “build token” is committed/pushed — the workflow uses GitHub Actions’ built-in `GITHUB_TOKEN`.
+
+#### Rebuild the same version (retag)
+
+If you need to regenerate the wheel for the *same* version (without bumping version numbers), force-move the tag to the desired commit and force-push it:
+
+```powershell
+git tag -f v0.4.0 <commit_sha>
+git push -f origin v0.4.0
+```
+
+### Local build (optional)
+
 ```powershell
 # Build frontend
 npm run build --prefix frontend
