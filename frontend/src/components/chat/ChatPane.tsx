@@ -210,6 +210,7 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
       <Header
         sessionName={session?.session_name}
         model={session?.model}
+        reasoningEffort={session?.reasoning_effort}
         cwd={session?.cwd}
         isNewSession={false}
         availableModels={availableModels}
@@ -268,9 +269,9 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
             ) : (
               <>
                 {messages.map((message) => (
-                  <MessageBubble key={message.id} message={message} />
+                  <MessageBubble key={message.id} message={message} cwd={session?.cwd} />
                 ))}
-                {isStreaming && <StreamingMessage content={streamingContent} steps={streamingSteps} />}
+                {isStreaming && <StreamingMessage content={streamingContent} steps={streamingSteps} cwd={session?.cwd} />}
               </>
             )}
             <div ref={messagesEndRef} />
@@ -307,8 +308,12 @@ export function ChatPane() {
     updateNewSessionSettings({ name });
   }, [updateNewSessionSettings]);
 
-  const handleNewSessionModelChange = useCallback((model: string) => {
-    updateNewSessionSettings({ model });
+  const handleNewSessionModelChange = useCallback((model: string, reasoningEffort?: string | null) => {
+    updateNewSessionSettings({ model, reasoningEffort: reasoningEffort ?? null });
+  }, [updateNewSessionSettings]);
+
+  const handleNewSessionReasoningEffortChange = useCallback((reasoningEffort: string | null) => {
+    updateNewSessionSettings({ reasoningEffort });
   }, [updateNewSessionSettings]);
 
   const handleNewSessionCwdChange = useCallback((cwd: string) => {
@@ -413,6 +418,7 @@ export function ChatPane() {
           <Header
             sessionName={newSessionSettings.name}
             model={newSessionSettings.model}
+            reasoningEffort={newSessionSettings.reasoningEffort}
             cwd={newSessionSettings.cwd}
             isNewSession={true}
             availableModels={availableModels}
@@ -426,6 +432,7 @@ export function ChatPane() {
             onRelatedSessionClick={handleNewSessionRelatedClick}
             onNameChange={handleNewSessionNameChange}
             onModelChange={handleNewSessionModelChange}
+            onReasoningEffortChange={handleNewSessionReasoningEffortChange}
             onCwdChange={handleNewSessionCwdChange}
             onMcpSelectionsChange={handleNewSessionMcpChange}
             onToolSelectionsChange={handleNewSessionToolsChange}

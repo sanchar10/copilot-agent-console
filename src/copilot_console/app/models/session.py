@@ -12,6 +12,7 @@ class SessionBase(BaseModel):
 
     session_name: str = Field(default="New Session")
     model: str
+    reasoning_effort: str | None = Field(default=None, description="Reasoning effort level (low/medium/high/xhigh) for models that support it")
     cwd: str | None = Field(default=None, description="Working directory for this session")
     mcp_servers: list[str] = Field(
         default_factory=list,
@@ -43,6 +44,7 @@ class SessionCreate(BaseModel):
     """Request to create a new session."""
 
     model: str
+    reasoning_effort: str | None = None
     name: str | None = None
     cwd: str | None = None
     mcp_servers: list[str] | None = None

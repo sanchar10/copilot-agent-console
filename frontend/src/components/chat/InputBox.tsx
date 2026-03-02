@@ -231,6 +231,7 @@ export function InputBox({ sessionId, promptToSend, onPromptSent }: InputBoxProp
         
         const session = await createSession({ 
           model: sessionModel,
+          reasoning_effort: newSessionSettings?.reasoningEffort,
           name: sessionName,
           cwd: sessionCwd,
           mcp_servers: sessionMcpServers,

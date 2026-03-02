@@ -1,13 +1,14 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { ChatStep } from '../../types/message';
 import type { Components } from 'react-markdown';
-import { processFileLinks, isFilePath, handleFilePathClick } from '../../utils/processFileLinks';
+import { processFileLinks, isFilePath, resolveFileHref, handleFilePathClick } from '../../utils/processFileLinks';
 
 interface StreamingMessageProps {
   content: string;
   steps?: ChatStep[];
+  cwd?: string | null;
 }
 
 // --- Segment splitting: extract code fences before ReactMarkdown sees them ---
@@ -83,7 +84,8 @@ function splitSegments(content: string): Segment[] {
 
 // --- Markdown components for text segments only (no code blocks) ---
 
-const streamingMarkdownComponents: Components = {
+function createStreamingMarkdownComponents(cwd?: string | null): Components {
+  return {
   pre({ children }) {
     return <>{children}</>;
   },
@@ -133,8 +135,21 @@ const streamingMarkdownComponents: Components = {
     );
   },
   a({ href, children }) {
+    const resolvedPath = resolveFileHref(href, cwd);
+    if (resolvedPath) {
+      return (
+        <span
+          data-filepath={resolvedPath}
+          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline cursor-pointer"
+          title={`Click to open: ${resolvedPath}`}
+        >
+          📄 {children}
+        </span>
+      );
+    }
+    const safeHref = href && /^www\./i.test(href) ? `https://${href}` : href;
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
         {children}
       </a>
     );
@@ -167,7 +182,8 @@ const streamingMarkdownComponents: Components = {
   hr() {
     return <hr className="my-4 border-gray-300 dark:border-gray-600" />;
   },
-};
+  };
+}
 
 // --- Code segment renderer (stable <pre> — no heavy components) ---
 
@@ -188,8 +204,9 @@ function StreamingCodeBlock({ segment }: { segment: CodeSegment }) {
 
 // --- Main component ---
 
-export function StreamingMessage({ content, steps }: StreamingMessageProps) {
+export function StreamingMessage({ content, steps, cwd }: StreamingMessageProps) {
   const stepsRef = useRef<HTMLDivElement>(null);
+  const mdComponents = useMemo(() => createStreamingMarkdownComponents(cwd), [cwd]);
 
   useEffect(() => {
     if (stepsRef.current) {
@@ -236,7 +253,7 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
           <div className="prose prose-sm max-w-none prose-gray dark:prose-invert">
             {segments.map((seg, i) =>
               seg.type === 'text' ? (
-                <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={streamingMarkdownComponents}>
+                <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={mdComponents}>
                   {seg.content}
                 </ReactMarkdown>
               ) : (

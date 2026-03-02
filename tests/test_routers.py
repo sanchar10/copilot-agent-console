@@ -219,12 +219,175 @@ class TestSessionsRouter:
         )
         assert resp.status_code == 404
 
+    def test_create_session_without_mcp_or_tools_defaults_to_empty(self, client):
+        """When mcp_servers/tools are omitted, session starts with none selected."""
+        resp = client.post("/api/sessions", json={"model": "gpt-4.1"})
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["mcp_servers"] == []
+        assert data["tools"]["custom"] == []
+        assert data["tools"]["builtin"] == []
+
+    def test_create_session_with_explicit_mcp_and_tools(self, client):
+        """When mcp_servers/tools are provided, they are used as-is."""
+        resp = client.post("/api/sessions", json={
+            "model": "gpt-4.1",
+            "mcp_servers": ["server-a"],
+            "tools": {"custom": ["tool-a"], "builtin": []},
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["mcp_servers"] == ["server-a"]
+        assert data["tools"]["custom"] == ["tool-a"]
+
     def test_active_agents(self, client):
         resp = client.get("/api/sessions/active-agents")
         assert resp.status_code == 200
         data = resp.json()
         assert data["count"] == 0
         assert data["sessions"] == []
+
+
+# ── CLI session adoption ─────────────────────────────────────────────────
+
+class TestCLISessionAdoption:
+    """Verify that CLI sessions are adopted with none selected for MCP/tools."""
+
+    def test_adopt_cli_session_has_empty_mcp_and_tools(self, client, monkeypatch):
+        """When a CLI session is clicked, adoption should have no MCP servers or tools selected."""
+        import copilot_console.app.services.copilot_service as cs_mod
+
+        # Fake SDK session (simulates a CLI-created session with context)
+        fake_context = type('FakeContext', (), {
+            'cwd': 'C:\\Users\\testuser\\projects\\myapp',
+        })()
+        fake_sdk_session = type('FakeSession', (), {
+            'sessionId': 'cli-session-123',
+            'session_id': 'cli-session-123',
+            'startTime': '2026-01-01T00:00:00Z',
+            'modifiedTime': '2026-01-01T01:00:00Z',
+            'summary': 'CLI test session',
+            'context': fake_context,
+        })()
+
+        async def _fake_list():
+            return [fake_sdk_session]
+
+        async def _fake_messages(session_id):
+            return []
+
+        monkeypatch.setattr(cs_mod.copilot_service, "list_sessions", _fake_list)
+        monkeypatch.setattr(cs_mod.copilot_service, "get_cached_session_metadata", lambda sid: None)
+        monkeypatch.setattr(cs_mod.copilot_service, "get_session_messages", _fake_messages)
+
+        # GET triggers adoption via get_session → get_session_with_messages
+        resp = client.get("/api/sessions/cli-session-123")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["mcp_servers"] == []
+        assert data["tools"]["custom"] == []
+        assert data["tools"]["builtin"] == []
+        assert data["session_name"] == "CLI test session"
+        assert data["cwd"] == "C:\\Users\\testuser\\projects\\myapp"
+
+
+# ── Session optimization ─────────────────────────────────────────────────
+
+class TestSessionOptimization:
+    """Verify optimized session paths: get_session_local, auto-name, enqueue."""
+
+    def test_get_session_local_returns_from_storage(self, client):
+        """get_session_local reads session.json without SDK calls."""
+        from copilot_console.app.services.session_service import session_service
+
+        # Create a session (writes session.json)
+        resp = client.post("/api/sessions", json={"model": "gpt-4.1", "cwd": "/tmp/test"})
+        assert resp.status_code == 200
+        session_id = resp.json()["session_id"]
+
+        # get_session_local should return the session from disk
+        session = session_service.get_session_local(session_id)
+        assert session is not None
+        assert session.session_id == session_id
+        assert session.model == "gpt-4.1"
+        assert session.mcp_servers == []
+        assert session.tools.custom == []
+
+    def test_get_session_local_returns_none_for_unknown(self, client):
+        """get_session_local returns None when session.json doesn't exist."""
+        from copilot_console.app.services.session_service import session_service
+        assert session_service.get_session_local("nonexistent-id") is None
+
+    def test_auto_name_pending_on_create(self, client):
+        """Creating a session without a name adds it to pending auto-name set."""
+        from copilot_console.app.services.session_service import session_service
+
+        resp = client.post("/api/sessions", json={"model": "gpt-4.1"})
+        session_id = resp.json()["session_id"]
+        assert session_service.should_auto_name(session_id) is True
+
+    def test_auto_name_not_pending_when_name_set(self, client):
+        """Creating a session with a user-provided name does NOT pend auto-naming."""
+        from copilot_console.app.services.session_service import session_service
+
+        resp = client.post("/api/sessions", json={"model": "gpt-4.1", "name": "My Session"})
+        session_id = resp.json()["session_id"]
+        assert session_service.should_auto_name(session_id) is False
+
+    def test_consume_auto_name_clears_flag(self, client):
+        """consume_auto_name returns True once then False."""
+        from copilot_console.app.services.session_service import session_service
+
+        resp = client.post("/api/sessions", json={"model": "gpt-4.1"})
+        session_id = resp.json()["session_id"]
+
+        assert session_service.consume_auto_name(session_id) is True
+        assert session_service.consume_auto_name(session_id) is False
+        assert session_service.should_auto_name(session_id) is False
+
+    def test_get_session_uses_cache(self, client, monkeypatch):
+        """get_session with stored meta uses SDK cache, not list_sessions."""
+        import copilot_console.app.services.copilot_service as cs_mod
+
+        # Create a session first
+        resp = client.post("/api/sessions", json={"model": "gpt-4.1"})
+        session_id = resp.json()["session_id"]
+
+        # Put fake metadata in SDK cache
+        fake_sdk = type('FakeSession', (), {
+            'sessionId': session_id,
+            'startTime': '2026-01-01T00:00:00Z',
+            'modifiedTime': '2026-01-02T00:00:00Z',
+        })()
+        cs_mod.copilot_service._sdk_metadata_cache[session_id] = fake_sdk
+
+        # Track if list_sessions is called (it should NOT be)
+        list_called = []
+
+        async def _tracking_list():
+            list_called.append(True)
+            return []
+
+        async def _fake_messages(session_id):
+            return []
+
+        monkeypatch.setattr(cs_mod.copilot_service, "list_sessions", _tracking_list)
+        monkeypatch.setattr(cs_mod.copilot_service, "get_session_messages", _fake_messages)
+
+        # GET /{session_id} calls get_session → should use cache, not list_sessions
+        resp = client.get(f"/api/sessions/{session_id}")
+        assert resp.status_code == 200
+        assert list_called == [], "list_sessions should NOT be called when cache has data"
+
+    def test_enqueue_checks_active_not_get_session(self, client, monkeypatch):
+        """Enqueue endpoint uses is_session_active, not get_session."""
+        import copilot_console.app.services.copilot_service as cs_mod
+
+        # Session doesn't need to exist in storage — just check the 404 path
+        monkeypatch.setattr(cs_mod.copilot_service, "is_session_active", lambda sid: False)
+
+        resp = client.post("/api/sessions/fake-id/enqueue", json={"content": "test"})
+        assert resp.status_code == 404
 
 
 # ── logs router ──────────────────────────────────────────────────────────

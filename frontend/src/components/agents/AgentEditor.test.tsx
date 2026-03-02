@@ -101,8 +101,7 @@ describe('AgentEditor', () => {
 
   it('renders model selector with available models', () => {
     render(<AgentEditor agentId="new" />);
-    const modelSelect = screen.getByDisplayValue('GPT-4');
-    expect(modelSelect).toBeInTheDocument();
+    expect(screen.getByText('GPT-4')).toBeInTheDocument();
   });
 
   it('renders system prompt editor', () => {

@@ -9,6 +9,7 @@ import { useTabStore } from './tabStore';
 interface NewSessionSettings {
   name: string;
   model: string;
+  reasoningEffort: string | null;
   cwd: string;
   mcpServers: string[];
   tools: AgentTools;
@@ -88,6 +89,7 @@ export const useSessionStore = create<SessionState>((set) => ({
       newSessionSettings: {
         name: 'New Session',
         model: defaultModel,
+        reasoningEffort: null,
         cwd: defaultCwd,
         mcpServers: defaultMcpServers,
         tools: defaultTools,

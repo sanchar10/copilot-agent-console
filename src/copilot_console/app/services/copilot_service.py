@@ -20,9 +20,6 @@ Long-running agent support:
 
 import asyncio
 import os
-import shutil
-import subprocess
-import sys
 import time
 from typing import AsyncGenerator, TYPE_CHECKING
 
@@ -44,51 +41,6 @@ if TYPE_CHECKING:
     from copilot_console.app.services.response_buffer import ResponseBuffer
 
 logger = get_logger(__name__)
-
-
-def find_copilot_cli() -> str | None:
-    """Find the copilot CLI executable path."""
-    cli_path = shutil.which("copilot")
-    if cli_path:
-        return cli_path
-    
-    if sys.platform == "win32":
-        npm_paths = [
-            os.path.expandvars(r"%APPDATA%\npm\copilot.cmd"),
-            os.path.expandvars(r"%APPDATA%\npm\copilot"),
-            os.path.expanduser(r"~\AppData\Roaming\npm\copilot.cmd"),
-        ]
-        for path in npm_paths:
-            if os.path.exists(path):
-                return path
-    
-    try:
-        if sys.platform == "win32":
-            result = subprocess.run(
-                ["where.exe", "copilot"],
-                capture_output=True,
-                text=True,
-                shell=True,
-            )
-            if result.returncode == 0:
-                paths = result.stdout.strip().split("\n")
-                for p in paths:
-                    if p.endswith(".cmd"):
-                        return p.strip()
-                if paths:
-                    return paths[0].strip()
-        else:
-            result = subprocess.run(
-                ["which", "copilot"],
-                capture_output=True,
-                text=True,
-            )
-            if result.returncode == 0:
-                return result.stdout.strip()
-    except Exception:
-        pass
-    
-    return None
 
 
 class SessionClient:
@@ -140,7 +92,7 @@ class SessionClient:
         """Update last activity timestamp."""
         self.last_activity = time.time()
     
-    async def create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, custom_agents: list[dict] | None = None) -> object:
+    async def create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, custom_agents: list[dict] | None = None, reasoning_effort: str | None = None) -> object:
         """Create a new SDK session.
         
         Args:
@@ -181,6 +133,9 @@ class SessionClient:
         if custom_agents:
             session_opts["custom_agents"] = custom_agents
         
+        if reasoning_effort:
+            session_opts["reasoning_effort"] = reasoning_effort
+        
         self.session = await self.client.create_session(session_opts)
         self.touch()
         logger.info(f"[{self.session_id}] Created SDK session with model={model}, mcp_servers={len(mcp_servers or {})}, tools={len(tools or [])}, system_message={'yes' if system_message else 'no'}, custom_agents={len(custom_agents or [])}")
@@ -217,7 +172,7 @@ class SessionClient:
             logger.warning(f"[{self.session_id}] Could not resume session: {e}")
             return None
     
-    async def get_or_create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, is_new_session: bool = False, custom_agents: list[dict] | None = None) -> object:
+    async def get_or_create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, is_new_session: bool = False, custom_agents: list[dict] | None = None, reasoning_effort: str | None = None) -> object:
         """Get existing session or create/resume one."""
         if self.session:
             self.touch()
@@ -233,7 +188,7 @@ class SessionClient:
             logger.info(f"[{self.session_id}] New session - skipping resume attempt")
         
         # Create new
-        return await self.create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, custom_agents)
+        return await self.create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, custom_agents, reasoning_effort)
 
 
 class CopilotService:
@@ -250,6 +205,10 @@ class CopilotService:
         
         # Per-session clients with CWD
         self._session_clients: dict[str, SessionClient] = {}
+        
+        # SDK metadata cache: populated by list_sessions(), used by get_session()
+        # to avoid redundant list_sessions() calls on individual session lookups
+        self._sdk_metadata_cache: dict[str, object] = {}
         
         self._lock: asyncio.Lock | None = None  # Created lazily in async context
         self._cleanup_task: asyncio.Task | None = None
@@ -350,26 +309,44 @@ class CopilotService:
         
         try:
             models = await self._main_client.list_models()
-            self._models_cache = models
+            result = []
+            for m in models:
+                entry: dict = {"id": m.id, "name": m.name}
+                if getattr(m, "supported_reasoning_efforts", None):
+                    entry["supported_reasoning_efforts"] = m.supported_reasoning_efforts
+                if getattr(m, "default_reasoning_effort", None):
+                    entry["default_reasoning_effort"] = m.default_reasoning_effort
+                result.append(entry)
+            self._models_cache = result
             self._models_cache_time = now
-            logger.info(f"Listed {len(models)} models from SDK")
-            return models
+            logger.info(f"Listed {len(result)} models from SDK")
+            return result
         except Exception as e:
             logger.warning(f"Failed to list models from SDK: {e}, using defaults")
             return [{"id": m, "name": m} for m in DEFAULT_MODELS]
 
     async def list_sessions(self) -> list[dict]:
-        """List all sessions from the SDK."""
+        """List all sessions from the SDK. Also populates SDK metadata cache."""
         await self._start_main_client()
         assert self._main_client is not None
         
         try:
             sessions = await self._main_client.list_sessions()
             logger.info(f"Listed {len(sessions)} sessions from SDK")
+            # Populate metadata cache
+            self._sdk_metadata_cache = {}
+            for s in sessions:
+                sid = getattr(s, "sessionId", None) or getattr(s, "session_id", None)
+                if sid:
+                    self._sdk_metadata_cache[sid] = s
             return sessions
         except Exception as e:
             logger.error(f"Failed to list sessions: {e}", exc_info=True)
             return []
+
+    def get_cached_session_metadata(self, session_id: str) -> object | None:
+        """Get cached SDK metadata for a session (populated by list_sessions)."""
+        return self._sdk_metadata_cache.get(session_id)
 
     async def get_session_messages(self, session_id: str) -> list:
         """Get messages from a session WITHOUT keeping it active.
@@ -503,6 +480,7 @@ class CopilotService:
         mode: str | None = None,
         attachments: list[dict] | None = None,
         custom_agents: list[dict] | None = None,
+        reasoning_effort: str | None = None,
     ) -> AsyncGenerator[dict, None]:
         """Send a message and stream the response.
 
@@ -512,7 +490,7 @@ class CopilotService:
 
         # Get or create per-session client
         client = await self.get_session_client(session_id, cwd)
-        session = await client.get_or_create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, is_new_session, custom_agents)
+        session = await client.get_or_create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, is_new_session, custom_agents, reasoning_effort)
 
         done = asyncio.Event()
         event_queue: asyncio.Queue[dict | None] = asyncio.Queue()
@@ -773,6 +751,14 @@ class CopilotService:
                     "data": {}
                 })
 
+            elif event_type == "session.title_changed":
+                title = getattr(event.data, "title", None)
+                if title and isinstance(title, str) and title.strip():
+                    event_queue.put_nowait({
+                        "event": "title_changed",
+                        "data": {"title": title.strip()}
+                    })
+
             elif event_type == "session.idle":
                 idle_received = True
                 if compacting:
@@ -825,6 +811,7 @@ class CopilotService:
         mode: str | None = None,
         attachments: list[dict] | None = None,
         custom_agents: list[dict] | None = None,
+        reasoning_effort: str | None = None,
     ) -> None:
         """Send a message in a background task that won't be cancelled.
         
@@ -850,6 +837,7 @@ class CopilotService:
                 mode=mode,
                 attachments=attachments,
                 custom_agents=custom_agents,
+                reasoning_effort=reasoning_effort,
             ):
                 event_type = evt.get("event")
                 
@@ -866,6 +854,10 @@ class CopilotService:
                     buffer.add_notification("pending_messages", evt.get("data") or {})
                 elif event_type == "turn_done":
                     buffer.add_notification("turn_done", evt.get("data") or {})
+                elif event_type == "title_changed":
+                    title = (evt.get("data") or {}).get("title")
+                    if title:
+                        buffer.updated_session_name = title
         except asyncio.CancelledError:
             logger.warning(f"[{session_id}] Background task was cancelled")
             buffer.fail("Task was cancelled")

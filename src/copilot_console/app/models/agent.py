@@ -50,6 +50,7 @@ class AgentBase(BaseModel):
         description="System prompt configuration"
     )
     model: str = Field(default="claude-sonnet-4", description="Model to use")
+    reasoning_effort: str | None = Field(default=None, description="Reasoning effort level (low/medium/high/xhigh) for models that support it")
     tools: AgentTools = Field(
         default_factory=AgentTools,
         description="Tool configuration"
@@ -80,6 +81,7 @@ class AgentUpdate(BaseModel):
     icon: str | None = None
     system_message: SystemMessage | None = None
     model: str | None = None
+    reasoning_effort: str | None = None
     tools: AgentTools | None = None
     mcp_servers: list[str] | None = None
     sub_agents: list[str] | None = None

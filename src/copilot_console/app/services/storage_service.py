@@ -58,6 +58,7 @@ class StorageService:
             "session_id": session.session_id,
             "session_name": session.session_name,
             "model": session.model,
+            "reasoning_effort": session.reasoning_effort,
             "cwd": session.cwd,
             "mcp_servers": session.mcp_servers,
             "tools": session.tools.model_dump() if hasattr(session.tools, 'model_dump') else session.tools,
@@ -78,6 +79,14 @@ class StorageService:
             return None
 
         return json.loads(session_file.read_text(encoding="utf-8"))
+
+    def save_session_raw(self, session_id: str, data: dict) -> None:
+        """Save raw session metadata dict to disk (for direct updates)."""
+        session_dir = self._session_dir(session_id)
+        session_dir.mkdir(parents=True, exist_ok=True)
+        self._session_file(session_id).write_text(
+            json.dumps(data, indent=2, default=str), encoding="utf-8"
+        )
 
     def list_all_sessions(self) -> list[dict]:
         """List all stored session metadata (without timestamps)."""

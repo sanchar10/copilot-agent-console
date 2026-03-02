@@ -106,6 +106,12 @@ def get_default_tools() -> AgentTools:
 class SessionService:
     """Business logic for session management - uses SDK for session lifecycle."""
 
+    def __init__(self) -> None:
+        # Sessions that need auto-naming after first agent response.
+        # Populated by create_session() when name_set=False, consumed by
+        # should_auto_name() after first response, then cleared.
+        self._pending_auto_name: set[str] = set()
+
     async def create_session(self, request: SessionCreate) -> Session:
         """Create a new session.
         
@@ -119,20 +125,15 @@ class SessionService:
         settings = storage_service.get_settings()
         default_cwd = settings.get("default_cwd", str(os.path.expanduser("~")))
         
-        # Get MCP servers - use provided or default to all enabled
-        mcp_servers = request.mcp_servers
-        if mcp_servers is None:
-            mcp_servers = get_default_mcp_servers()
-
-        # Get tools - use provided or default to all enabled
-        tools = request.tools
-        if tools is None:
-            tools = get_default_tools()
+        # MCP servers and tools default to none selected — user opts in explicitly
+        mcp_servers = request.mcp_servers if request.mcp_servers is not None else []
+        tools = request.tools if request.tools is not None else AgentTools()
 
         session = Session(
             session_id=session_id,
             session_name=request.name or "New Session",
             model=request.model,
+            reasoning_effort=request.reasoning_effort,
             cwd=request.cwd or default_cwd,
             mcp_servers=mcp_servers,
             tools=tools,
@@ -148,6 +149,10 @@ class SessionService:
 
         # Save session metadata to our storage
         storage_service.save_session(session)
+
+        # Track for auto-naming after first agent response
+        if not session.name_set:
+            self._pending_auto_name.add(session_id)
 
         return session
 
@@ -256,25 +261,19 @@ class SessionService:
     async def get_session(self, session_id: str) -> Session | None:
         """Get a session by ID - works for both our sessions and CLI sessions.
         
-        For web-created sessions (first message not sent yet), returns from our storage.
-        For SDK sessions, timestamps come from SDK.
+        Uses SDK metadata cache for timestamps (populated by sidebar list_sessions()).
+        Only calls list_sessions() on cache miss during CLI session adoption.
         """
         # First check our storage for web-created sessions
         stored_meta = storage_service.load_session(session_id)
         
-        # Get SDK sessions to find timestamps
-        sdk_sessions = await copilot_service.list_sessions()
-        sdk_session = None
-        for s in sdk_sessions:
-            sid = getattr(s, "sessionId", None) or getattr(s, "session_id", None)
-            if sid == session_id:
-                sdk_session = s
-                break
+        # Try SDK metadata cache first (populated by sidebar refresh)
+        sdk_session = copilot_service.get_cached_session_metadata(session_id)
         
         # If we have stored metadata (web-created or adopted CLI session)
         if stored_meta:
             if sdk_session:
-                # Session exists in SDK - use SDK timestamps
+                # Session exists in SDK - use SDK timestamps from cache
                 mtime = get_session_mtime(session_id)
                 sdk_start = getattr(sdk_session, "startTime", None)
                 sdk_modified = getattr(sdk_session, "modifiedTime", None)
@@ -293,9 +292,10 @@ class SessionService:
                     except (ValueError, AttributeError):
                         pass
             else:
-                # Web-created session not yet in SDK - use current time
-                created_at = datetime.now(timezone.utc)
-                updated_at = datetime.now(timezone.utc)
+                # Web-created session not yet in SDK (or cache miss) - use file mtime
+                mtime = get_session_mtime(session_id)
+                created_at = mtime
+                updated_at = mtime
             
             return Session(
                 session_id=session_id,
@@ -311,6 +311,17 @@ class SessionService:
                 created_at=created_at,
                 updated_at=updated_at,
             )
+        
+        # No stored metadata — could be a CLI session needing adoption.
+        # Cache miss: fall back to list_sessions() to find it.
+        if not sdk_session:
+            sdk_sessions = await copilot_service.list_sessions()
+            for s in sdk_sessions:
+                sid = getattr(s, "sessionId", None) or getattr(s, "session_id", None)
+                if sid == session_id:
+                    sdk_session = s
+                    break
+        
         if not sdk_session:
             return None  # Session doesn't exist anywhere
         
@@ -336,18 +347,24 @@ class SessionService:
         settings = storage_service.get_settings()
         default_cwd = settings.get("default_cwd", str(os.path.expanduser("~")))
         
+        # Use CWD from SDK session context if available, otherwise fall back to settings
+        sdk_context = getattr(sdk_session, "context", None)
+        session_cwd = getattr(sdk_context, "cwd", None) if sdk_context else None
+        if not session_cwd:
+            session_cwd = default_cwd
+        
         # Use summary as session name if available
         session_name = getattr(sdk_session, "summary", None) or session_id
         
-        # Get defaults for adopted sessions
-        default_mcp = get_default_mcp_servers()
-        default_tools = get_default_tools()
+        # Adopted CLI sessions start with none selected (matching new-session behavior)
+        default_mcp = []
+        default_tools = AgentTools()
         
         session = Session(
             session_id=session_id,
             session_name=session_name,
             model="",  # SDK doesn't provide model in list_sessions
-            cwd=default_cwd,
+            cwd=session_cwd,
             mcp_servers=default_mcp,
             tools=default_tools,
             created_at=created_at,
@@ -356,6 +373,43 @@ class SessionService:
         # Save metadata so it's adopted
         storage_service.save_session(session)
         return session
+
+    def get_session_local(self, session_id: str) -> Session | None:
+        """Get a session from local storage only (no SDK call).
+        
+        Reads session.json and returns a Session object with file-based timestamps.
+        Used by /messages when the session config is needed but list_sessions() is not.
+        """
+        stored_meta = storage_service.load_session(session_id)
+        if not stored_meta:
+            return None
+        
+        mtime = get_session_mtime(session_id)
+        return Session(
+            session_id=session_id,
+            session_name=stored_meta.get("session_name", session_id),
+            model=stored_meta.get("model", ""),
+            cwd=stored_meta.get("cwd"),
+            mcp_servers=_migrate_selections(stored_meta.get("mcp_servers", [])),
+            tools=_migrate_tools(stored_meta.get("tools", {})),
+            system_message=stored_meta.get("system_message"),
+            sub_agents=stored_meta.get("sub_agents", []),
+            agent_id=stored_meta.get("agent_id"),
+            trigger=stored_meta.get("trigger"),
+            created_at=mtime,
+            updated_at=mtime,
+        )
+
+    def should_auto_name(self, session_id: str) -> bool:
+        """Check if session needs auto-naming (without consuming the flag)."""
+        return session_id in self._pending_auto_name
+
+    def consume_auto_name(self, session_id: str) -> bool:
+        """Atomically check and remove from pending set. Returns True if was pending."""
+        if session_id in self._pending_auto_name:
+            self._pending_auto_name.discard(session_id)
+            return True
+        return False
 
     async def get_session_with_messages(self, session_id: str) -> SessionWithMessages | None:
         """Get a session with its message history from SDK, including steps."""

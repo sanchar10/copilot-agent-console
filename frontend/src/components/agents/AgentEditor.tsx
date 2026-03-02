@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import { useAgentStore } from '../../stores/agentStore';
 import { useTabStore, tabId } from '../../stores/tabStore';
 import { useUIStore } from '../../stores/uiStore';
+import { ModelSelector } from '../common/ModelSelector';
 import { listMCPServers } from '../../api/mcp';
 import { getTools } from '../../api/tools';
 import { getEligibleSubAgents } from '../../api/agents';
@@ -53,6 +54,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState('🤖');
   const [model, setModel] = useState(defaultModel);
+  const [reasoningEffort, setReasoningEffort] = useState<string | null>(null);
   const [systemMessage, setSystemMessage] = useState<SystemMessage | null>(null);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [builtinTools, setBuiltinTools] = useState<string[]>([]);
@@ -74,6 +76,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
       setDescription(existingAgent.description);
       setIcon(existingAgent.icon);
       setModel(existingAgent.model || defaultModel);
+      setReasoningEffort(existingAgent.reasoning_effort || null);
       setSystemMessage(existingAgent.system_message?.content ? existingAgent.system_message : null);
       // Load tools from structured fields
       setSelectedTools(existingAgent.tools.custom || []);
@@ -116,6 +119,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
     description,
     icon,
     model,
+    reasoning_effort: reasoningEffort,
     system_message: systemMessage || { mode: 'replace', content: '' },
     tools: {
       custom: selectedTools,
@@ -125,7 +129,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
     mcp_servers: selectedMcpServers,
     sub_agents: selectedSubAgents,
     starter_prompts: starterPrompts.filter(p => p.title.trim() && p.prompt.trim()),
-  }), [name, description, icon, model, systemMessage,
+  }), [name, description, icon, model, reasoningEffort, systemMessage,
     selectedTools, builtinTools, excludedBuiltinTools, selectedMcpServers, selectedSubAgents, starterPrompts]);
 
   const handleSave = async () => {
@@ -248,15 +252,17 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Model</label>
-              <select
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
-              >
-                {availableModels.map((m) => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
-                ))}
-              </select>
+              <ModelSelector
+                models={availableModels}
+                selectedModelId={model}
+                reasoningEffort={reasoningEffort}
+                onModelChange={(modelId, effort) => {
+                  setModel(modelId);
+                  setReasoningEffort(effort);
+                }}
+                onReasoningEffortChange={(effort) => setReasoningEffort(effort)}
+                variant="full"
+              />
             </div>
           </section>
 

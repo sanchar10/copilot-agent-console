@@ -27,6 +27,7 @@ export interface Agent {
   icon: string;
   system_message: SystemMessage;
   model: string;
+  reasoning_effort?: string | null;
   tools: AgentTools;
   mcp_servers: string[];
   sub_agents: string[];
@@ -41,6 +42,7 @@ export interface CreateAgentRequest {
   icon?: string;
   system_message?: SystemMessage;
   model?: string;
+  reasoning_effort?: string | null;
   tools?: AgentTools;
   mcp_servers?: string[];
   sub_agents?: string[];
@@ -53,6 +55,7 @@ export interface UpdateAgentRequest {
   icon?: string;
   system_message?: SystemMessage;
   model?: string;
+  reasoning_effort?: string | null;
   tools?: AgentTools;
   mcp_servers?: string[];
   sub_agents?: string[];

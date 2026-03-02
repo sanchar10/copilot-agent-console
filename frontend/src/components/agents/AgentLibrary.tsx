@@ -67,6 +67,7 @@ function useAgentActions() {
       newSessionSettings: {
         name: `${agent.name} Session`,
         model: agent.model || defaultModel,
+        reasoningEffort: agent.reasoning_effort || null,
         cwd: defaultCwd,
         mcpServers: agent.mcp_servers || [],
         tools: agent.tools || { custom: [], builtin: [], excluded_builtin: [] },

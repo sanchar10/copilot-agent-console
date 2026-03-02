@@ -4,6 +4,7 @@ export interface Session {
   session_id: string;
   session_name: string;
   model: string;
+  reasoning_effort?: string | null;
   cwd?: string;
   mcp_servers?: string[];
   tools?: AgentTools;
@@ -35,6 +36,7 @@ export interface Message {
 
 export interface CreateSessionRequest {
   model: string;
+  reasoning_effort?: string | null;
   name?: string;
   cwd?: string;
   mcp_servers?: string[];

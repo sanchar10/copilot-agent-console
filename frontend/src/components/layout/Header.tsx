@@ -6,11 +6,13 @@ import { TokenUsageSlider } from '../chat/TokenUsageSlider';
 import { RelatedSessions } from '../chat/RelatedSessions';
 import { FolderBrowserModal } from '../common/FolderBrowserModal';
 import { SystemPromptEditor } from '../common/SystemPromptEditor';
+import { ModelSelector } from '../common/ModelSelector';
 import { useProjectStore } from '../../stores/projectStore';
 import type { MCPServer, MCPServerSelections } from '../../types/mcp';
 import type { ToolInfo, ToolSelections } from '../../api/tools';
 import type { AgentTools, SystemMessage, Agent } from '../../types/agent';
 import type { Session } from '../../types/session';
+import type { Model } from '../../api/models';
 
 /** Convert string[] to Record<string, boolean> for selector components */
 function listToSelections(list: string[], allItems: { name: string }[]): Record<string, boolean> {
@@ -28,14 +30,10 @@ function selectionsToList(selections: Record<string, boolean>): string[] {
     .map(([name]) => name);
 }
 
-interface Model {
-  id: string;
-  name: string;
-}
-
 interface HeaderProps {
   sessionName?: string;
   model?: string;
+  reasoningEffort?: string | null;
   cwd?: string;
   isNewSession?: boolean;
   availableModels?: Model[];
@@ -53,7 +51,8 @@ interface HeaderProps {
   subAgentSelections?: string[];
   onRelatedSessionClick?: (sessionId: string) => void;
   onNameChange?: (newName: string) => void;
-  onModelChange?: (newModel: string) => void;
+  onModelChange?: (newModel: string, reasoningEffort?: string | null) => void;
+  onReasoningEffortChange?: (effort: string | null) => void;
   onCwdChange?: (newCwd: string) => void;
   onMcpSelectionsChange?: (selections: string[]) => void;
   onToolSelectionsChange?: (selections: AgentTools) => void;
@@ -63,7 +62,8 @@ interface HeaderProps {
 
 export function Header({ 
   sessionName, 
-  model, 
+  model,
+  reasoningEffort,
   cwd, 
   isNewSession = false,
   availableModels = [],
@@ -80,6 +80,7 @@ export function Header({
   onRelatedSessionClick,
   onNameChange,
   onModelChange,
+  onReasoningEffortChange,
   onCwdChange,
   onMcpSelectionsChange,
   onToolSelectionsChange,
@@ -90,7 +91,6 @@ export function Header({
 }: HeaderProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editName, setEditName] = useState(sessionName || '');
-  const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [showFolderBrowser, setShowFolderBrowser] = useState(false);
   const projects = useProjectStore(s => s.projects);
 
@@ -136,23 +136,6 @@ export function Header({
     }
   };
 
-  // Model selection (only for new sessions)
-  const handleModelClick = () => {
-    if (isNewSession && onModelChange && availableModels.length > 0) {
-      setShowModelDropdown(!showModelDropdown);
-    }
-  };
-
-  const handleModelSelect = (modelId: string) => {
-    if (onModelChange) {
-      onModelChange(modelId);
-    }
-    setShowModelDropdown(false);
-  };
-
-  // Get model display name
-  const modelName = availableModels.find(m => m.id === model)?.name || model;
-
   return (
     <header className="h-14 border-b border-gray-100 dark:border-[#3a3a4e] bg-white dark:bg-[#252536] shadow-sm dark:shadow-black/20 flex items-center px-6 relative z-20">
       <div className="flex items-center gap-3 flex-1 min-w-0 [&>*]:flex-shrink-0">
@@ -184,41 +167,17 @@ export function Header({
 
             {/* Model badge - clickable dropdown for new sessions, static for existing */}
             {model && (
-              <div className="relative">
-                <button
-                  onClick={handleModelClick}
-                  className={`min-w-[80px] h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 ${
-                    isNewSession 
-                      ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/50 cursor-pointer' 
-                      : 'bg-gray-100 dark:bg-[#2a2a3c] text-gray-600 dark:text-gray-400 cursor-default'
-                  }`}
-                  title={isNewSession ? 'Click to change model' : 'Model cannot be changed after session starts'}
-                >
-                  {modelName}
-                  {isNewSession && (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </button>
-                
-                {/* Model dropdown */}
-                {showModelDropdown && (
-                  <div className="absolute top-full left-0 mt-1 bg-white dark:bg-[#2a2a3c] border dark:border-[#3a3a4e] rounded-md shadow-lg dark:shadow-black/20 z-50 min-w-[150px] max-h-60 overflow-y-auto">
-                    {availableModels.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => handleModelSelect(m.id)}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-[#32324a] ${
-                          m.id === model ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' : 'text-gray-700 dark:text-gray-300'
-                        }`}
-                      >
-                        {m.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <ModelSelector
+                models={availableModels}
+                selectedModelId={model}
+                reasoningEffort={reasoningEffort || null}
+                onModelChange={(modelId, effort) => {
+                  if (onModelChange) onModelChange(modelId, effort);
+                }}
+                onReasoningEffortChange={onReasoningEffortChange}
+                disabled={!isNewSession}
+                variant="compact"
+              />
             )}
 
             {/* System Prompt */}
@@ -329,14 +288,6 @@ export function Header({
           <h2 className="text-gray-500 dark:text-gray-400">Select or create a session</h2>
         )}
       </div>
-
-      {/* Close dropdown when clicking outside */}
-      {showModelDropdown && (
-        <div 
-          className="fixed inset-0 z-0" 
-          onClick={() => setShowModelDropdown(false)}
-        />
-      )}
     </header>
   );
 }

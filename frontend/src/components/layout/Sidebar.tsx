@@ -235,18 +235,18 @@ export function Sidebar() {
             .map(([name, cwd]) => {
               const segments = cwd.replace(/\\/g, '/').replace(/\/+$/, '').split('/').filter(Boolean);
               const shortPath = segments.length <= 3 ? cwd : '…/' + segments.slice(-2).join('/');
-              return { name, path: shortPath };
+              return { name, path: shortPath, fullPath: cwd };
             })
             .sort((a, b) => a.name.localeCompare(b.name));
           return folderEntries.length > 1 ? (
             <select
               value={selectedProject || ''}
               onChange={e => selectProject(e.target.value || null)}
-              className="mb-2 flex-shrink-0 w-full max-w-full px-2 py-1 text-xs rounded-lg border border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#2a2a3c] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/40 overflow-hidden text-ellipsis"
+              className="mb-2 flex-shrink-0 w-full min-w-0 max-w-full px-2 py-1 text-xs rounded-lg border border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#2a2a3c] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/40 overflow-hidden text-ellipsis"
             >
               <option value="">All Folders ({folderEntries.length})</option>
-              {folderEntries.map(({ name, path }) => (
-                <option key={name} value={name}>{name} ({path})</option>
+              {folderEntries.map(({ name, fullPath }) => (
+                <option key={name} value={name} title={fullPath}>{name}</option>
               ))}
             </select>
           ) : null;

@@ -1,6 +1,8 @@
 export interface Model {
   id: string;
   name: string;
+  supported_reasoning_efforts?: string[] | null;
+  default_reasoning_effort?: string | null;
 }
 
 interface ModelsResponse {

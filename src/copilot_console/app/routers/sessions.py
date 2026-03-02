@@ -191,9 +191,8 @@ async def enqueue_message(session_id: str, request: MessageCreate) -> dict:
     set_session_context(session_id)
     logger.info(f"Enqueue request: {request.content[:100]}")
 
-    # Verify session exists
-    session = await session_service.get_session(session_id)
-    if not session:
+    # Verify session is active (enqueue requires an active SDK session — zero I/O)
+    if not copilot_service.is_session_active(session_id):
         raise HTTPException(status_code=404, detail="Session not found")
 
     # Must have an active response for enqueue to make sense
@@ -251,6 +250,11 @@ async def abort_session(session_id: str) -> dict:
 async def send_message(session_id: str, request: MessageCreate) -> EventSourceResponse:
     """Send a message and stream the assistant's response via SSE.
     
+    Three paths based on session state:
+    1. New session (is_new_session=True): read session.json for config, create SDK session
+    2. Active session: send directly, zero I/O (SDK has everything cached)
+    3. Inactive session: read session.json for config, re-activate SDK session
+    
     The agent runs in a background task that continues even if the browser
     disconnects. The SSE stream reads from a buffer, so reconnecting will
     resume from where you left off.
@@ -260,50 +264,68 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
     
     logger.info(f"Received message request: {request.content[:100]}{'...' if len(request.content) > 100 else ''}, is_new_session={request.is_new_session}")
     
-    # Verify session exists and get CWD
-    session = await session_service.get_session(session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    # Get CWD for the session (use home dir as fallback)
-    cwd = session.cwd or os.path.expanduser("~")
+    # Determine which path to take
+    session_active = copilot_service.is_session_active(session_id)
     
-    # Get MCP servers for this session
-    mcp_servers_sdk = mcp_service.get_servers_for_sdk(session.mcp_servers)
-    logger.info(f"[SSE] Loading {len(mcp_servers_sdk)} MCP servers for session {session_id}")
-    
-    # Get local/custom tools for this session
-    # Only load custom tools if the user explicitly selected some.
-    # Passing tools=[] when none selected avoids a CLI bug where
-    # tools + workingDirectory causes custom_agents to be silently dropped.
-    tools_sdk = tools_service.get_sdk_tools(session.tools.custom) if session.tools.custom else []
-    logger.info(f"[SSE] Loading {len(tools_sdk)} custom tools for session {session_id}")
-    
-    # Get built-in tool whitelist/blacklist
-    builtin_tools = session.tools.builtin if session.tools.builtin else None
-    excluded_tools = session.tools.excluded_builtin if session.tools.excluded_builtin else None
+    if session_active and not request.is_new_session:
+        # Path 2: Active session — SDK already has all config cached.
+        # No need to read session.json or call list_sessions().
+        logger.info(f"[SSE] Active session path for {session_id}")
+        session = None  # Not needed — SDK handles everything
+        cwd = None
+        model = None
+        reasoning_effort = None
+        mcp_servers_sdk = None
+        tools_sdk = None
+        builtin_tools = None
+        excluded_tools = None
+        system_message = None
+        custom_agents_sdk = None
+    else:
+        # Path 1 (new) or Path 3 (inactive): Read session.json for config
+        session = session_service.get_session_local(session_id)
+        if not session:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        logger.info(f"[SSE] {'New' if request.is_new_session else 'Inactive'} session path for {session_id}")
+        
+        # Get CWD for the session (use home dir as fallback)
+        cwd = session.cwd or os.path.expanduser("~")
+        model = session.model
+        reasoning_effort = session.reasoning_effort
+        
+        # Get MCP servers for this session
+        mcp_servers_sdk = mcp_service.get_servers_for_sdk(session.mcp_servers)
+        logger.info(f"[SSE] Loading {len(mcp_servers_sdk)} MCP servers for session {session_id}")
+        
+        # Get local/custom tools for this session
+        tools_sdk = tools_service.get_sdk_tools(session.tools.custom) if session.tools.custom else []
+        logger.info(f"[SSE] Loading {len(tools_sdk)} custom tools for session {session_id}")
+        
+        # Get built-in tool whitelist/blacklist
+        builtin_tools = session.tools.builtin if session.tools.builtin else None
+        excluded_tools = session.tools.excluded_builtin if session.tools.excluded_builtin else None
 
-    # Get system message from session field
-    system_message = None
-    if session.system_message and session.system_message.get("content"):
-        system_message = {"mode": session.system_message.get("mode", "replace"), "content": session.system_message["content"]}
+        # Get system message from session field
+        system_message = None
+        if session.system_message and session.system_message.get("content"):
+            system_message = {"mode": session.system_message.get("mode", "replace"), "content": session.system_message["content"]}
 
-    # Resolve sub-agents (Agent Teams)
-    custom_agents_sdk = None
-    if session.sub_agents:
-        # Validate sub-agents are still eligible
-        errors = agent_storage_service.validate_sub_agents(
-            session.sub_agents, exclude_agent_id=session.agent_id
-        )
-        if errors:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Sub-agent validation failed: {'; '.join(errors)}"
+        # Resolve sub-agents (Agent Teams)
+        custom_agents_sdk = None
+        if session.sub_agents:
+            errors = agent_storage_service.validate_sub_agents(
+                session.sub_agents, exclude_agent_id=session.agent_id
             )
-        custom_agents_sdk = agent_storage_service.convert_to_sdk_custom_agents(
-            session.sub_agents, mcp_service
-        )
-        logger.info(f"[SSE] Resolved {len(custom_agents_sdk)} sub-agents for session {session_id}")
+            if errors:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Sub-agent validation failed: {'; '.join(errors)}"
+                )
+            custom_agents_sdk = agent_storage_service.convert_to_sdk_custom_agents(
+                session.sub_agents, mcp_service
+            )
+            logger.info(f"[SSE] Resolved {len(custom_agents_sdk)} sub-agents for session {session_id}")
 
     # Add user message to history
     session_service.add_user_message(session_id, request.content)
@@ -318,8 +340,8 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
             logger.info(f"[Background] Starting agent for session {session_id}")
             await copilot_service.send_message_background(
                 session_id=session_id,
-                model=session.model,
-                cwd=cwd,
+                model=model or "",
+                cwd=cwd or os.path.expanduser("~"),
                 prompt=request.content,
                 buffer=buffer,
                 mcp_servers=mcp_servers_sdk,
@@ -331,37 +353,33 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
                 mode=request.mode,
                 attachments=[{"type": a.type, "path": a.path, **({"displayName": a.displayName} if a.displayName else {})} for a in request.attachments] if request.attachments else None,
                 custom_agents=custom_agents_sdk,
+                reasoning_effort=reasoning_effort,
             )
             logger.info(f"[Background] Agent completed for session {session_id}")
             
-            # Auto-name: if name_set is False, try to get summary from SDK
-            # This runs BEFORE buffer.complete() so the SSE done event includes the name
+            # Auto-name: try title_changed event first, fall back to list_sessions()
+            stored_meta = None
             try:
-                stored_meta = storage_service.load_session(session_id)
-                name_set = stored_meta.get("name_set", None) if stored_meta else True
-                # Backward compat: old sessions without name_set field
-                # If name is still default "New Session", treat as not set
-                if name_set is None:
-                    name_set = stored_meta.get("session_name", "New Session") != "New Session"
-                
-                if stored_meta and not name_set:
-                    # Fetch updated session list to get summary
-                    sdk_sessions = await copilot_service.list_sessions()
-                    for sdk_s in sdk_sessions:
-                        sid = getattr(sdk_s, "sessionId", None) or getattr(sdk_s, "session_id", None)
-                        if sid == session_id:
-                            summary = getattr(sdk_s, "summary", None)
-                            if summary and isinstance(summary, str) and summary.strip():
-                                new_name = summary.strip()
-                                # Update storage with the new name
-                                current_session = await session_service.get_session(session_id)
-                                if current_session:
-                                    current_session.session_name = new_name
-                                    storage_service.save_session(current_session)
-                                # Pass to SSE via buffer
-                                buffer.updated_session_name = new_name
-                                logger.info(f"[Background] Auto-named session {session_id}: {new_name}")
-                            break
+                if session_service.consume_auto_name(session_id):
+                    new_name = buffer.updated_session_name  # set by title_changed event
+                    if not new_name:
+                        # Fallback: SDK doesn't always fire title_changed,
+                        # so query list_sessions() for the summary
+                        sdk_sessions = await copilot_service.list_sessions()
+                        for sdk_s in sdk_sessions:
+                            sid = getattr(sdk_s, "sessionId", None) or getattr(sdk_s, "session_id", None)
+                            if sid == session_id:
+                                summary = getattr(sdk_s, "summary", None)
+                                if summary and isinstance(summary, str) and summary.strip():
+                                    new_name = summary.strip()
+                                break
+                    if new_name:
+                        stored_meta = storage_service.load_session(session_id)
+                        if stored_meta:
+                            stored_meta["session_name"] = new_name
+                            storage_service.save_session_raw(session_id, stored_meta)
+                        buffer.updated_session_name = new_name
+                        logger.info(f"[Background] Auto-named session {session_id}: {new_name}")
             except Exception as e:
                 logger.warning(f"[Background] Failed to auto-name session {session_id}: {e}")
             
@@ -371,6 +389,8 @@ async def send_message(session_id: str, request: MessageCreate) -> EventSourceRe
             # Trigger delayed push notification check
             from copilot_console.app.services.notification_manager import notification_manager
             preview = buffer.get_full_content()[:120] if buffer.chunks else ""
+            if not stored_meta:
+                stored_meta = storage_service.load_session(session_id)
             session_name = (buffer.updated_session_name 
                           or (stored_meta.get("session_name") if stored_meta else None) 
                           or session_id[:8])

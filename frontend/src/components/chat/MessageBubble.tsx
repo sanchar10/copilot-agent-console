@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -6,10 +6,11 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { Message, MessageAttachment } from '../../types/message';
 import type { Components } from 'react-markdown';
 import { MermaidDiagram, isMermaidCode } from './MermaidDiagram';
-import { processFileLinks, isFilePath, handleFilePathClick } from '../../utils/processFileLinks';
+import { processFileLinks, isFilePath, resolveFileHref, handleFilePathClick } from '../../utils/processFileLinks';
 
 interface MessageBubbleProps {
   message: Message;
+  cwd?: string | null;
 }
 
 function fileIcon(filename: string): string {
@@ -63,7 +64,8 @@ function AttachmentChips({ attachments }: { attachments: MessageAttachment[] }) 
 }
 
 // Markdown components for rich rendering
-const markdownComponents: Components = {
+function createMarkdownComponents(cwd?: string | null): Components {
+  return {
   // Strip the <pre> wrapper — each code type handles its own container:
   // SyntaxHighlighter uses PreTag="div", MermaidDiagram has its own wrapper
   pre({ children }) {
@@ -138,8 +140,21 @@ const markdownComponents: Components = {
     );
   },
   a({ href, children }) {
+    const resolvedPath = resolveFileHref(href, cwd);
+    if (resolvedPath) {
+      return (
+        <span
+          data-filepath={resolvedPath}
+          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline cursor-pointer"
+          title={`Click to open: ${resolvedPath}`}
+        >
+          📄 {children}
+        </span>
+      );
+    }
+    const safeHref = href && /^www\./i.test(href) ? `https://${href}` : href;
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
         {children}
       </a>
     );
@@ -172,12 +187,14 @@ const markdownComponents: Components = {
   hr() {
     return <hr className="my-4 border-gray-300 dark:border-gray-600" />;
   },
-};
+  };
+}
 
-export const MessageBubble = memo(function MessageBubble({ message }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message, cwd }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
   const isEnqueued = isUser && message.mode === 'enqueue';
+  const mdComponents = useMemo(() => createMarkdownComponents(cwd), [cwd]);
 
   // System messages render as compact inline notifications
   if (isSystem) {
@@ -252,7 +269,7 @@ export const MessageBubble = memo(function MessageBubble({ message }: MessageBub
             </>
           ) : (
             <div className="prose prose-sm max-w-none prose-gray dark:prose-invert">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
                 {message.content}
               </ReactMarkdown>
             </div>
