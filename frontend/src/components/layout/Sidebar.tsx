@@ -12,6 +12,7 @@ import { fetchModels } from '../../api/models';
 import { getSettings } from '../../api/settings';
 import { getActiveAgents } from '../../api/activeAgents';
 import { apiClient } from '../../api/client';
+import { useViewedStore } from '../../stores/viewedStore';
 import { SessionList } from '../session/SessionList';
 import { Button } from '../common/Button';
 
@@ -42,12 +43,15 @@ export function Sidebar() {
     return normalized.split('/').pop() || cwd;
   };
 
-  // Poll for active agents count every 5 seconds
+  const setActiveAgentIds = useViewedStore(s => s.setActiveAgentIds);
+
+  // Poll for active agents every 5 seconds — syncs both count and activeAgents set
   useEffect(() => {
     const fetchActiveCount = async () => {
       try {
         const data = await getActiveAgents();
         setActiveCount(data.count);
+        setActiveAgentIds(new Set(data.sessions.map(s => s.session_id)));
       } catch {
         // Ignore errors for polling
       }
@@ -56,7 +60,7 @@ export function Sidebar() {
     fetchActiveCount();
     const interval = setInterval(fetchActiveCount, 5000);
     return () => clearInterval(interval);
-  }, [setActiveCount]);
+  }, [setActiveCount, setActiveAgentIds]);
 
   useEffect(() => {
     async function loadData() {
