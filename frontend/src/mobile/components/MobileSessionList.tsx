@@ -122,7 +122,17 @@ export function MobileSessionList({ onNotification }: Props) {
                 const sid = data.session_id;
                 // Update stores — spinner → blue dot transition
                 useViewedStore.getState().setAgentActive(sid, false);
-                useSessionStore.getState().updateSessionTimestamp(sid);
+                // Use server completion timestamp if available (same clock as viewed.json)
+                if (data.updated_at) {
+                  const iso = new Date(data.updated_at * 1000).toISOString();
+                  useSessionStore.getState().setSessions(
+                    useSessionStore.getState().sessions.map(s =>
+                      s.session_id === sid ? { ...s, updated_at: iso } : s
+                    )
+                  );
+                } else {
+                  useSessionStore.getState().updateSessionTimestamp(sid);
+                }
                 const session = sessionsRef.current.find(s => s.session_id === sid);
                 onNotificationRef.current({
                   message: `Agent finished: ${session?.session_name || 'Session'}`,

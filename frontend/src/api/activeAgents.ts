@@ -41,7 +41,7 @@ export async function getActiveAgents(): Promise<ActiveAgentsUpdate> {
  */
 export function subscribeToActiveAgents(
   onUpdate: (data: ActiveAgentsUpdate) => void,
-  onCompleted: (sessionId: string) => void,
+  onCompleted: (sessionId: string, updatedAt?: number) => void,
   onError: (error: string) => void
 ): AbortController {
   const controller = new AbortController();
@@ -95,7 +95,7 @@ export function subscribeToActiveAgents(
             if (eventName === 'update') {
               onUpdate(data);
             } else if (eventName === 'completed') {
-              onCompleted(data.session_id);
+              onCompleted(data.session_id, data.updated_at);
             }
           } catch (e) {
             console.error('Failed to parse SSE data:', e);

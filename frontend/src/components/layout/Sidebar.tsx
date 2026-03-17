@@ -10,8 +10,9 @@ import { useProjectStore } from '../../stores/projectStore';
 import { listSessions } from '../../api/sessions';
 import { fetchModels } from '../../api/models';
 import { getSettings } from '../../api/settings';
-import { getActiveAgents } from '../../api/activeAgents';
+import { subscribeToActiveAgents } from '../../api/activeAgents';
 import { apiClient } from '../../api/client';
+import { useViewedStore } from '../../stores/viewedStore';
 import { SessionList } from '../session/SessionList';
 import { Button } from '../common/Button';
 
@@ -42,21 +43,32 @@ export function Sidebar() {
     return normalized.split('/').pop() || cwd;
   };
 
-  // Poll for active agents count every 5 seconds
+  const setActiveAgentIds = useViewedStore(s => s.setActiveAgentIds);
+
+  // Subscribe to active-agents SSE stream — replaces polling
   useEffect(() => {
-    const fetchActiveCount = async () => {
-      try {
-        const data = await getActiveAgents();
+    const controller = subscribeToActiveAgents(
+      (data) => {
         setActiveCount(data.count);
-      } catch {
-        // Ignore errors for polling
+        setActiveAgentIds(new Set(data.sessions.map(s => s.session_id)));
+      },
+      (sessionId, updatedAt) => {
+        // Agent completed: update the session's updated_at so hasUnread() works
+        if (updatedAt) {
+          const iso = new Date(updatedAt * 1000).toISOString();
+          useSessionStore.getState().setSessions(
+            useSessionStore.getState().sessions.map(s =>
+              s.session_id === sessionId ? { ...s, updated_at: iso } : s
+            )
+          );
+        }
+      },
+      (_error) => {
+        // SSE disconnected — will auto-reconnect on next mount
       }
-    };
-    
-    fetchActiveCount();
-    const interval = setInterval(fetchActiveCount, 5000);
-    return () => clearInterval(interval);
-  }, [setActiveCount]);
+    );
+    return () => controller.abort();
+  }, [setActiveCount, setActiveAgentIds]);
 
   useEffect(() => {
     async function loadData() {
