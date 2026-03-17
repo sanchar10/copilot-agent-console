@@ -52,9 +52,16 @@ export function Sidebar() {
         setActiveCount(data.count);
         setActiveAgentIds(new Set(data.sessions.map(s => s.session_id)));
       },
-      (_sessionId) => {
-        // Completed events are handled implicitly: the next "update" event
-        // won't include the completed session, so activeAgents set clears it.
+      (sessionId, updatedAt) => {
+        // Agent completed: update the session's updated_at so hasUnread() works
+        if (updatedAt) {
+          const iso = new Date(updatedAt * 1000).toISOString();
+          useSessionStore.getState().setSessions(
+            useSessionStore.getState().sessions.map(s =>
+              s.session_id === sessionId ? { ...s, updated_at: iso } : s
+            )
+          );
+        }
       },
       (_error) => {
         // SSE disconnected — will auto-reconnect on next mount
