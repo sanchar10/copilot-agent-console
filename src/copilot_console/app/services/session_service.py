@@ -593,7 +593,8 @@ class SessionService:
                         continue
 
                     if isinstance(content, str) and (content.strip() or msg_attachments):
-                        sdk_message_id = _extract_sdk_message_id(data) or getattr(evt, 'id', None)
+                        evt_id = getattr(evt, 'id', None)
+                        sdk_message_id = _extract_sdk_message_id(data) or (str(evt_id) if evt_id else None)
                         messages.append(Message(
                             id=sdk_message_id or str(uuid.uuid4()),
                             sdk_message_id=sdk_message_id,
