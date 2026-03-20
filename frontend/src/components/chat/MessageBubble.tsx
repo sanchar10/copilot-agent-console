@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -193,21 +193,45 @@ function createMarkdownComponents(cwd?: string | null): Components {
   };
 }
 
-function HighlightedText({ text, term }: { text: string; term: string }) {
-  if (!term) return <>{text}</>;
-  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  const parts = text.split(regex);
-  return (
-    <>
-      {parts.map((part, i) =>
-        regex.test(part) ? (
-          <mark key={i} className="bg-yellow-200 dark:bg-yellow-700/60 text-inherit rounded-sm px-0.5">{part}</mark>
-        ) : (
-          part
-        )
-      )}
-    </>
-  );
+function useSearchHighlight(ref: React.RefObject<HTMLElement | null>, term: string | null) {
+  useEffect(() => {
+    const container = ref.current;
+    if (!container || !term) return;
+
+    const marks: HTMLElement[] = [];
+    const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const textNodes: Text[] = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode as Text);
+
+    for (const node of textNodes) {
+      if (!node.nodeValue || !regex.test(node.nodeValue)) continue;
+      regex.lastIndex = 0;
+      const frag = document.createDocumentFragment();
+      let lastIdx = 0;
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(node.nodeValue)) !== null) {
+        if (match.index > lastIdx) frag.appendChild(document.createTextNode(node.nodeValue.slice(lastIdx, match.index)));
+        const mark = document.createElement('mark');
+        mark.className = 'bg-yellow-200 dark:bg-yellow-700/60 text-inherit rounded-sm px-0.5';
+        mark.textContent = match[1];
+        marks.push(mark);
+        frag.appendChild(mark);
+        lastIdx = regex.lastIndex;
+      }
+      if (lastIdx < node.nodeValue.length) frag.appendChild(document.createTextNode(node.nodeValue.slice(lastIdx)));
+      node.parentNode?.replaceChild(frag, node);
+    }
+
+    return () => {
+      for (const mark of marks) {
+        const parent = mark.parentNode;
+        if (!parent) continue;
+        parent.replaceChild(document.createTextNode(mark.textContent || ''), mark);
+        parent.normalize();
+      }
+    };
+  }, [ref, term]);
 }
 
 export const MessageBubble = memo(function MessageBubble({ message, cwd, sessionId }: MessageBubbleProps) {
@@ -216,6 +240,8 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
   const isEnqueued = isUser && message.mode === 'enqueue';
   const mdComponents = useMemo(() => createMarkdownComponents(cwd), [cwd]);
   const searchTerm = useUIStore((s) => s.searchHighlightTerm);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  useSearchHighlight(bodyRef, searchTerm);
 
   // System messages render as compact inline notifications
   if (isSystem) {
@@ -296,7 +322,7 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
         </div>
         
         {/* Message body */}
-        <div onClick={handleFilePathClick} className={`rounded-lg px-4 py-3 ${
+        <div ref={bodyRef} onClick={handleFilePathClick} className={`rounded-lg px-4 py-3 ${
           isEnqueued
             ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700'
             : isUser 
@@ -320,14 +346,12 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
           )}
           {isUser ? (
             <>
-              <div className="whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100">
-                {searchTerm ? <HighlightedText text={message.content || ''} term={searchTerm} /> : (message.content || (message.attachments?.length ? '' : message.content))}
-              </div>
+              <div className="whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100">{message.content || (message.attachments?.length ? '' : message.content)}</div>
               {message.attachments && message.attachments.length > 0 && <AttachmentChips attachments={message.attachments} />}
             </>
           ) : (
             <div className="prose prose-sm max-w-none prose-gray dark:prose-invert">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={searchTerm ? { ...mdComponents, text: ({ children }) => <HighlightedText text={String(children)} term={searchTerm} /> } : mdComponents}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
                 {message.content}
               </ReactMarkdown>
             </div>
