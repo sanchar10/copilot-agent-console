@@ -60,7 +60,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   // Debounced search
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!query || query.length < 3) {
+    if (!query || query.length < 2) {
       setResults([]);
       setLoading(false);
       return;
@@ -185,14 +185,19 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             </svg>
           )}
           <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-gray-400 bg-gray-100 dark:bg-[#1e1e2e] rounded border border-gray-200 dark:border-[#3a3a4e]">ESC</kbd>
+          <button onClick={onClose} className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3a3a4e] transition-colors" title="Close (Esc)">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {/* Results */}
         <div ref={resultsRef} className="overflow-y-auto flex-1 min-h-0">
-          {query.length > 0 && query.length < 3 && !loading && (
-            <div className="px-4 py-8 text-center text-sm text-gray-400">Type 3 or more characters to search</div>
+          {query.length > 0 && query.length < 2 && !loading && (
+            <div className="px-4 py-8 text-center text-sm text-gray-400">Type 2 or more characters to search</div>
           )}
-          {query.length >= 3 && !loading && results.length === 0 && (
+          {query.length >= 2 && !loading && results.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-gray-400">No results found</div>
           )}
           {results.length > 0 && (() => {
