@@ -121,7 +121,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
         );
         if (el) {
           el.classList.add('search-highlight');
-          setTimeout(() => el.classList.remove('search-highlight'), 2000);
+          setTimeout(() => el.classList.remove('search-highlight'), 5000);
         }
       }, 400);
     }
@@ -189,7 +189,10 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
         {/* Results */}
         <div ref={resultsRef} className="overflow-y-auto flex-1 min-h-0">
-          {query.length >= 2 && !loading && results.length === 0 && (
+          {query.length > 0 && query.length < 3 && !loading && (
+            <div className="px-4 py-8 text-center text-sm text-gray-400">Type 3 or more characters to search</div>
+          )}
+          {query.length >= 3 && !loading && results.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-gray-400">No results found</div>
           )}
           {results.length > 0 && (() => {

@@ -118,7 +118,7 @@ html.dark textarea {
   100% { box-shadow: none; background-color: transparent; }
 }
 .search-highlight {
-  animation: search-flash 2s ease-out;
+  animation: search-flash 5s ease-out;
   border-radius: 8px;
 }
 
