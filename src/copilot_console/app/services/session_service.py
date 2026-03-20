@@ -248,15 +248,17 @@ class SessionService:
                 )
                 sessions.append(session)
             else:
-                # CLI-created session - show minimal info, no CWD yet
+                # CLI-created session - show minimal info
                 # Adoption happens when user clicks to view
                 # Use summary as session name if available
                 session_name = getattr(sdk_session, "summary", None) or session_id
+                sdk_context = getattr(sdk_session, "context", None)
+                sdk_cwd = getattr(sdk_context, "cwd", None) if sdk_context else None
                 session = Session(
                     session_id=session_id,
                     session_name=session_name,
                     model="",  # SDK doesn't provide model in list_sessions
-                    cwd=None,  # Not adopted yet
+                    cwd=sdk_cwd,
                     mcp_servers=[],  # No MCP servers yet
                     tools=AgentTools(),  # No tools yet
                     created_at=created_at,
