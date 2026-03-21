@@ -103,10 +103,9 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const session = sessions.find(s => s.session_id === result.session_id);
     if (!session) return;
 
-    // Set search highlight term for keyword highlighting in messages
+    // Set search highlight term early so it's ready when messages render
     if (currentQuery) {
       useUIStore.getState().setSearchHighlight(currentQuery);
-      setTimeout(() => useUIStore.getState().setSearchHighlight(null), 5000);
     }
 
     // Use the shared session opener (same as SessionItem click)
@@ -123,7 +122,12 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           el.classList.add('search-highlight');
           setTimeout(() => el.classList.remove('search-highlight'), 5000);
         }
+        // Clear keyword highlights 5s after scroll (not from click time)
+        setTimeout(() => useUIStore.getState().setSearchHighlight(null), 5000);
       }, 400);
+    } else {
+      // No snippet to scroll to — clear highlight after 5s from now
+      setTimeout(() => useUIStore.getState().setSearchHighlight(null), 5000);
     }
   }, [onClose, sessions]);
 
