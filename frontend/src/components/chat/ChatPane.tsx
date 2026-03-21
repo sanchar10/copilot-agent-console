@@ -386,72 +386,78 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
         onSubAgentSelectionsChange={handleSubAgentSelectionsChange}
       />
 
-      {/* Messages Area */}
-      <div className="relative flex-1 min-h-0">
-        <div className="absolute inset-0 flex">
-          <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4">
-            <div className="max-w-4xl mx-auto space-y-6">
-              {isLoadingMessages && showSpinner ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3">
-                  <svg className="w-6 h-6 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  <p className="text-sm">Loading messages...</p>
-                </div>
-              ) : messages.length === 0 && !isStreaming ? (
-                <div className="flex flex-col items-center justify-center h-full gap-4">
-                  <p className="text-gray-400">Start a conversation...</p>
-                  {starterPrompts.length > 0 && (
-                    <div className="w-full max-w-4xl mx-auto space-y-2 px-4">
-                      {starterPrompts.map((sp, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setPromptToSend(sp.prompt)}
-                          title={sp.prompt}
-                          className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors"
-                        >
-                          <div className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</div>
-                        </button>
-                      ))}
+      {/* Messages Area + Input + Pins Drawer */}
+      <div className="relative flex-1 min-h-0 flex">
+        {/* Chat column: messages + input */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="relative flex-1 min-h-0">
+            <div className="absolute inset-0">
+              <div ref={scrollContainerRef} onScroll={handleScroll} className="h-full overflow-y-auto p-4">
+                <div className="max-w-4xl mx-auto space-y-6">
+                  {isLoadingMessages && showSpinner ? (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3">
+                      <svg className="w-6 h-6 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <p className="text-sm">Loading messages...</p>
                     </div>
+                  ) : messages.length === 0 && !isStreaming ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-4">
+                      <p className="text-gray-400">Start a conversation...</p>
+                      {starterPrompts.length > 0 && (
+                        <div className="w-full max-w-4xl mx-auto space-y-2 px-4">
+                          {starterPrompts.map((sp, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setPromptToSend(sp.prompt)}
+                              title={sp.prompt}
+                              className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors"
+                            >
+                              <div className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      {messages.map((message) => (
+                        <MessageBubble key={message.id} message={message} cwd={session?.cwd} sessionId={sessionId} />
+                      ))}
+                      {isStreaming && <StreamingMessage content={streamingContent} steps={streamingSteps} cwd={session?.cwd} />}
+                    </>
                   )}
+                  <div ref={messagesEndRef} />
                 </div>
-              ) : (
-                <>
-                  {messages.map((message) => (
-                    <MessageBubble key={message.id} message={message} cwd={session?.cwd} sessionId={sessionId} />
-                  ))}
-                  {isStreaming && <StreamingMessage content={streamingContent} steps={streamingSteps} cwd={session?.cwd} />}
-                </>
-              )}
-              <div ref={messagesEndRef} />
+              </div>
             </div>
+
+            {/* Scroll-to-bottom button */}
+            <button
+              onClick={scrollToBottom}
+              className={`absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/80 dark:bg-[#2a2a3c]/80 backdrop-blur text-gray-900 dark:text-gray-100 px-3 py-1.5 rounded-full shadow-lg border border-gray-300 dark:border-gray-600 text-sm flex items-center gap-1.5 hover:bg-white/95 dark:hover:bg-[#2a2a3c]/95 transition-opacity duration-200 z-10 ${showScrollButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+            </button>
           </div>
 
-          {pinsOpen && <PinsDrawer sessionId={sessionId} pins={pins} onClose={() => setPinsOpen(false)} />}
+          {/* Input Area */}
+          <InputBox
+            sessionId={sessionId}
+            promptToSend={promptToSend}
+            onPromptSent={() => setPromptToSend(null)}
+            onMessageSent={handleMessageSent}
+            pinsCount={pins.length}
+            pinsOpen={pinsOpen}
+            onPinsToggle={() => setPinsOpen((v) => !v)}
+          />
         </div>
 
-        {/* Scroll-to-bottom button */}
-        <button
-          onClick={scrollToBottom}
-          className={`absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/80 dark:bg-[#2a2a3c]/80 backdrop-blur text-gray-900 dark:text-gray-100 px-3 py-1.5 rounded-full shadow-lg border border-gray-300 dark:border-gray-600 text-sm flex items-center gap-1.5 hover:bg-white/95 dark:hover:bg-[#2a2a3c]/95 transition-opacity duration-200 z-10 ${showScrollButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-        </button>
+        {/* Pins Drawer — full height beside chat + input */}
+        {pinsOpen && <PinsDrawer sessionId={sessionId} pins={pins} onClose={() => setPinsOpen(false)} />}
       </div>
-
-      {/* Input Area */}
-      <InputBox
-        sessionId={sessionId}
-        promptToSend={promptToSend}
-        onPromptSent={() => setPromptToSend(null)}
-        onMessageSent={handleMessageSent}
-        pinsCount={pins.length}
-        pinsOpen={pinsOpen}
-        onPinsToggle={() => setPinsOpen((v) => !v)}
-      />
     </div>
   );
 });
