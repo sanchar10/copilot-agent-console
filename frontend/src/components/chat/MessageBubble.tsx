@@ -294,19 +294,32 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
               </span>
             )}
           </div>
-
+        </div>
+        
+        {/* Message body */}
+        <div ref={bodyRef} onClick={handleFilePathClick} className={`relative group/pin rounded-lg px-4 py-3 ${
+          isEnqueued
+            ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700'
+            : isUser 
+              ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800' 
+              : 'bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700'
+        }`}>
+          {/* Pin icon — top-right of message body */}
           {canPin && (
             <button
-              className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded border ${isPinned ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300' : 'bg-white/70 dark:bg-[#2a2a3c]/70 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'} hover:border-red-300 dark:hover:border-red-500 hover:text-red-700 dark:hover:text-red-300`}
+              className={`absolute top-2 right-2 p-0.5 rounded transition-opacity ${
+                isPinned ? 'opacity-100' : 'opacity-0 group-hover/pin:opacity-60 hover:!opacity-100'
+              }`}
               title={isPinned ? 'Unpin message' : 'Pin message'}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 const mid = message.sdk_message_id;
                 if (!sessionId || !mid) return;
                 const store = usePinStore.getState();
                 const pins = store.pinsPerSession[sessionId] || [];
                 const existing = pins.find((p) => p.sdk_message_id === mid);
                 if (existing) {
-                  store.deletePin(sessionId, existing.id).catch((e) => console.error('Failed to unpin:', e));
+                  store.deletePin(sessionId, existing.id).catch((err) => console.error('Failed to unpin:', err));
                   return;
                 }
                 const oneLine = message.content.replace(/\s+/g, ' ').trim();
@@ -314,23 +327,12 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
                   sdk_message_id: mid,
                   title: oneLine.slice(0, 80) || undefined,
                   excerpt: oneLine.slice(0, 160) || undefined,
-                }).catch((e) => console.error('Failed to pin:', e));
+                }).catch((err) => console.error('Failed to pin:', err));
               }}
             >
-              {isPinned ? <PinnedIcon size={14} /> : <UnpinnedIcon size={14} />}
-              {isPinned ? 'Pinned' : 'Pin'}
+              {isPinned ? <PinnedIcon size={16} /> : <UnpinnedIcon size={16} />}
             </button>
           )}
-        </div>
-        
-        {/* Message body */}
-        <div ref={bodyRef} onClick={handleFilePathClick} className={`rounded-lg px-4 py-3 ${
-          isEnqueued
-            ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700'
-            : isUser 
-              ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800' 
-              : 'bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700'
-        }`}>
           {!isUser && message.steps && message.steps.length > 0 && (
             <details className="mb-2 text-sm">
               <summary className="cursor-pointer text-gray-600 dark:text-gray-400 select-none">

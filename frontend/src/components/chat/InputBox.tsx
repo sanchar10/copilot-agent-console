@@ -490,90 +490,93 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
         {isUploading && (
           <div className="text-xs text-gray-400 dark:text-gray-500 mb-1">Uploading...</div>
         )}
-        <div className="flex items-end gap-2">
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            className="hidden"
-            onChange={(e) => { if (e.target.files) handleFiles(e.target.files); e.target.value = ''; }}
-          />
-          {/* Mode dropdown (left of attach) */}
+        <div className="flex items-center gap-2">
+          {/* Mode dropdown (outside main input row, left side) */}
           <ModeSelector mode={currentMode} onModeChange={handleModeChange} disabled={isSending} />
-          {/* Attach button */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isDisabled}
-            className="flex-shrink-0 h-12 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 disabled:opacity-50"
-            title="Attach files"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-            </svg>
-          </button>
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            placeholder={isSending
-              ? "Activating session, please wait..."
-              : isStreaming 
-                ? "Type a follow-up... (will be queued for the agent)" 
-                : "Type a message... (Enter to send, Shift+Enter for new line)"}
-            className={`flex-1 resize-none rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[48px] max-h-[200px] dark:bg-[#2a2a3c] dark:text-gray-100 dark:placeholder-gray-500 ${
-              isDragOver ? 'border-blue-400' : isStreaming ? 'border-amber-300 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/20' : 'border-gray-300 dark:border-gray-600'
-            }`}
-            rows={1}
-            disabled={isDisabled}
-          />
-          {/* Send button */}
-          <Button
-            onClick={() => handleSubmit()}
-            disabled={(!input.trim() && attachments.length === 0 && pendingFiles.length === 0) || isDisabled}
-            className="h-12 w-12 p-0"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-          </Button>
-          {/* Stop button — always visible, disabled when not streaming */}
-          <Button
-            onClick={handleAbort}
-            disabled={!isStreaming}
-            className={`h-12 w-12 p-0 ${
-              isStreaming
-                ? 'bg-red-500 hover:bg-red-600'
-                : 'bg-gray-200 dark:bg-gray-700 opacity-40 cursor-not-allowed'
-            }`}
-            title="Stop the agent"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <rect x="6" y="6" width="12" height="12" rx="1" />
-            </svg>
-          </Button>
-          {/* Pin drawer toggle — pinned top-view icon with count badge */}
-          {onPinsToggle && (
+          {/* Main input row — width matches chat bubbles */}
+          <div className="flex-1 flex items-center gap-2">
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              className="hidden"
+              onChange={(e) => { if (e.target.files) handleFiles(e.target.files); e.target.value = ''; }}
+            />
+            {/* Attach button */}
             <button
-              type="button"
-              onClick={onPinsToggle}
-              className={`relative h-12 w-12 flex items-center justify-center rounded-lg transition-colors ${
-                pinsOpen
-                  ? 'bg-red-50 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-800'
-                  : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-              title={pinsOpen ? 'Close pins drawer' : 'Open pins drawer'}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isDisabled}
+              className="flex-shrink-0 h-12 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 disabled:opacity-50"
+              title="Attach files"
             >
-              <PinnedIcon size={20} />
-              {(pinsCount ?? 0) > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-                  {pinsCount}
-                </span>
-              )}
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
             </button>
-          )}
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              placeholder={isSending
+                ? "Activating session, please wait..."
+                : isStreaming 
+                  ? "Type a follow-up... (will be queued for the agent)" 
+                  : "Type a message... (Enter to send, Shift+Enter for new line)"}
+              className={`flex-1 resize-none rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[48px] max-h-[200px] dark:bg-[#2a2a3c] dark:text-gray-100 dark:placeholder-gray-500 ${
+                isDragOver ? 'border-blue-400' : isStreaming ? 'border-amber-300 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/20' : 'border-gray-300 dark:border-gray-600'
+              }`}
+              rows={1}
+              disabled={isDisabled}
+            />
+            {/* Send button */}
+            <Button
+              onClick={() => handleSubmit()}
+              disabled={(!input.trim() && attachments.length === 0 && pendingFiles.length === 0) || isDisabled}
+              className="h-12 w-12 p-0"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </Button>
+            {/* Stop button — always visible, disabled when not streaming */}
+            <Button
+              onClick={handleAbort}
+              disabled={!isStreaming}
+              className={`h-12 w-12 p-0 ${
+                isStreaming
+                  ? 'bg-red-500 hover:bg-red-600'
+                  : 'bg-gray-200 dark:bg-gray-700 opacity-40 cursor-not-allowed'
+              }`}
+              title="Stop the agent"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="6" y="6" width="12" height="12" rx="1" />
+              </svg>
+            </Button>
+            {/* Pin drawer toggle — pinned top-view icon with count badge */}
+            {onPinsToggle && (
+              <button
+                type="button"
+                onClick={onPinsToggle}
+                className={`relative h-12 w-12 flex items-center justify-center rounded-lg transition-colors ${
+                  pinsOpen
+                    ? 'bg-red-50 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-800'
+                    : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                title={pinsOpen ? 'Close pins drawer' : 'Open pins drawer'}
+              >
+                <PinnedIcon size={20} />
+                {(pinsCount ?? 0) > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                    {pinsCount}
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
