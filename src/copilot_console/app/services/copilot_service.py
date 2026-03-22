@@ -1050,7 +1050,7 @@ class CopilotService:
                 yield item
 
         complete_response = "".join(full_response)
-        logger.debug(f"[{session_id}] Agent response: {complete_response}")
+        logger.debug(f"[{session_id}] Agent responded")
 
     async def send_message_background(
         self,
