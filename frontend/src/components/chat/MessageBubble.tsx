@@ -273,9 +273,7 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
           </svg>
         ) : (
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z" />
-          </svg>
+          <span className="text-sm leading-none">🤖</span>
         )}
       </div>
       
@@ -330,7 +328,7 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
                 }).catch((err) => console.error('Failed to pin:', err));
               }}
             >
-              {isPinned ? <PinnedIcon size={20} /> : <UnpinnedIcon size={20} />}
+              {isPinned ? <PinnedIcon size={16} /> : <UnpinnedIcon size={16} />}
             </button>
           )}
           {!isUser && message.steps && message.steps.length > 0 && (
