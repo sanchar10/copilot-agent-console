@@ -9,6 +9,7 @@ import { sendMessage, createSession, connectSession, enqueueMessage, abortSessio
 import type { AttachmentRef, UploadedFile } from '../../api/sessions';
 import { Button } from '../common/Button';
 import { ModeSelector, type AgentMode } from './ModeSelector';
+import { PinnedIcon } from './PinIcons';
 
 // Sessions whose backend SessionClient is confirmed ready.
 // Resets on page refresh — correct since backend clients are also destroyed.
@@ -498,6 +499,8 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
             className="hidden"
             onChange={(e) => { if (e.target.files) handleFiles(e.target.files); e.target.value = ''; }}
           />
+          {/* Mode dropdown (left of attach) */}
+          <ModeSelector mode={currentMode} onModeChange={handleModeChange} disabled={isSending} />
           {/* Attach button */}
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -526,17 +529,7 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
             rows={1}
             disabled={isDisabled}
           />
-          {isStreaming ? (
-            <Button
-              onClick={handleAbort}
-              className="h-12 w-12 p-0 bg-red-500 hover:bg-red-600"
-              title="Stop the agent"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <rect x="6" y="6" width="12" height="12" rx="1" />
-              </svg>
-            </Button>
-          ) : null}
+          {/* Send button */}
           <Button
             onClick={() => handleSubmit()}
             disabled={(!input.trim() && attachments.length === 0 && pendingFiles.length === 0) || isDisabled}
@@ -546,31 +539,42 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </Button>
+          {/* Stop button — always visible, disabled when not streaming */}
+          <Button
+            onClick={handleAbort}
+            disabled={!isStreaming}
+            className={`h-12 w-12 p-0 ${
+              isStreaming
+                ? 'bg-red-500 hover:bg-red-600'
+                : 'bg-gray-200 dark:bg-gray-700 opacity-40 cursor-not-allowed'
+            }`}
+            title="Stop the agent"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <rect x="6" y="6" width="12" height="12" rx="1" />
+            </svg>
+          </Button>
+          {/* Pin drawer toggle — pinned top-view icon with count badge */}
           {onPinsToggle && (
             <button
               type="button"
               onClick={onPinsToggle}
               className={`relative h-12 w-12 flex items-center justify-center rounded-lg transition-colors ${
                 pinsOpen
-                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
-                  : 'text-gray-400 hover:text-amber-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-red-50 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-800'
+                  : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
               title={pinsOpen ? 'Close pins drawer' : 'Open pins drawer'}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 11v6M9 14h6" />
-                <rect x="8" y="2" width="8" height="4" rx="1" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <PinnedIcon size={20} />
               {(pinsCount ?? 0) > 0 && (
-                <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                   {pinsCount}
                 </span>
               )}
             </button>
           )}
         </div>
-        <ModeSelector mode={currentMode} onModeChange={handleModeChange} disabled={isSending} />
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import { useUIStore } from '../../stores/uiStore';
 import type { Components } from 'react-markdown';
 import { MermaidDiagram, isMermaidCode } from './MermaidDiagram';
 import { processFileLinks, isFilePath, resolveFileHref, handleFilePathClick } from '../../utils/processFileLinks';
+import { UnpinnedIcon, PinnedIcon } from './PinIcons';
 
 interface MessageBubbleProps {
   message: Message;
@@ -296,7 +297,7 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
 
           {canPin && (
             <button
-              className={`text-xs px-2 py-0.5 rounded border ${isPinned ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300' : 'bg-white/70 dark:bg-[#2a2a3c]/70 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'} hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-300`}
+              className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded border ${isPinned ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300' : 'bg-white/70 dark:bg-[#2a2a3c]/70 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'} hover:border-red-300 dark:hover:border-red-500 hover:text-red-700 dark:hover:text-red-300`}
               title={isPinned ? 'Unpin message' : 'Pin message'}
               onClick={() => {
                 const mid = message.sdk_message_id;
@@ -316,6 +317,7 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
                 }).catch((e) => console.error('Failed to pin:', e));
               }}
             >
+              {isPinned ? <PinnedIcon size={14} /> : <UnpinnedIcon size={14} />}
               {isPinned ? 'Pinned' : 'Pin'}
             </button>
           )}

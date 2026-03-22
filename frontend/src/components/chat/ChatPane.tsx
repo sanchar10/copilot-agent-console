@@ -10,6 +10,7 @@ import { InputBox, clearReadySession } from './InputBox';
 import { TabBar } from './TabBar';
 import { Header } from '../layout/Header';
 import { AgentLibrary } from '../agents/AgentLibrary';
+import { PinnedIcon } from './PinIcons';
 import { AgentEditor } from '../agents/AgentEditor';
 import { AutomationManager } from '../automations/AutomationManager';
 import { TaskBoard } from '../taskboard/TaskBoard';
@@ -79,7 +80,7 @@ function PinsDrawer({
   return (
     <aside className="w-96 border-l border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-[#1f1f2e]/90 backdrop-blur p-3 overflow-y-auto">
       <div className="flex items-center justify-between gap-2">
-        <div className="font-semibold text-sm text-gray-800 dark:text-gray-100">Pins ({pins.length})</div>
+        <div className="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-1.5"><PinnedIcon size={16} /> Pins ({pins.length})</div>
         <button
           type="button"
           className="text-xs px-2 py-1 rounded border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
