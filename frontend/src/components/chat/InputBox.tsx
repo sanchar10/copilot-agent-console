@@ -456,7 +456,7 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
       addMessage(activeSessionId, {
         id: `system-fleet-${Date.now()}`,
         role: 'system',
-        content: `🚀 Fleet deployed: "${resolvedPrompt}"`,
+        content: `🚀 Fleet deployed: "${resolvedPrompt.length > 100 ? resolvedPrompt.slice(0, 100) + '...' : resolvedPrompt}"`,
         timestamp: new Date().toISOString(),
       });
     }
@@ -583,15 +583,35 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
       // Show palette and filter by typed query
       setShowSlashPalette(true);
       setSlashQuery(value.slice(1));
+    } else if (!activeCommand && value.startsWith('/') && value.includes(' ')) {
+      // Space after a slash command name — auto-complete if exact match
+      const cmdName = value.slice(1, value.indexOf(' '));
+      const matched = SLASH_COMMANDS.find(c => c.name === cmdName);
+      if (matched) {
+        setShowSlashPalette(false);
+        setSlashQuery('');
+        if (matched.executeImmediately) {
+          // Execute immediately (e.g. /help)
+          handleSlashSelect(matched);
+          setInput('');
+        } else {
+          // Set chip and keep the text after the space as prompt
+          setActiveCommand(matched);
+          setInput(value.slice(value.indexOf(' ') + 1));
+        }
+      } else {
+        setShowSlashPalette(false);
+        setSlashQuery('');
+      }
     } else if (showSlashPalette) {
       setShowSlashPalette(false);
       setSlashQuery('');
     }
-  }, [activeCommand, showSlashPalette]);
+  }, [activeCommand, showSlashPalette, handleSlashSelect]);
 
   return (
     <div
-      className={`border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-[#1e1e2e] p-4 ${isDragOver ? 'ring-2 ring-blue-400 bg-blue-50 dark:bg-blue-900/30' : ''}`}
+      className={`border-t border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#1e1e2e] px-6 py-3 ${isDragOver ? 'ring-2 ring-blue-400 bg-blue-50 dark:bg-blue-900/30' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -662,46 +682,40 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
               />
             )}
             <div className="flex items-center gap-2">
-              {/* Slash button or command chip — left inside the textarea row */}
-              {activeCommand ? (
-                <button
-                  onClick={clearActiveCommand}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-500/25 dark:text-blue-100 border border-blue-200 dark:border-blue-400/30 hover:bg-blue-200 dark:hover:bg-blue-500/35 transition-colors flex-shrink-0"
-                  title={`Remove /${activeCommand.name} command`}
-                >
-                  <span>{activeCommand.icon}</span>
-                  <span>/{activeCommand.name}</span>
-                  <span className="ml-0.5 text-blue-400 dark:text-blue-300">×</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => { setShowSlashPalette(!showSlashPalette); setSlashQuery(''); }}
+              {/* Textarea with optional command chip inline */}
+              <div className={`flex-1 min-w-0 flex items-center gap-2 rounded-lg border px-4 py-3 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent dark:bg-[#2a2a3c] ${
+                isDragOver ? 'border-blue-400' : activeCommand ? 'border-blue-300 bg-blue-50/50 dark:border-blue-600 dark:bg-blue-900/10' : isStreaming ? 'border-amber-300 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/20' : 'border-gray-300 dark:border-gray-600'
+              }`}>
+                {/* Command chip — inline inside the input */}
+                {activeCommand && (
+                  <button
+                    onClick={clearActiveCommand}
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-500/25 dark:text-blue-100 border border-blue-200 dark:border-blue-400/30 hover:bg-blue-200 dark:hover:bg-blue-500/35 transition-colors flex-shrink-0"
+                    title={`Remove /${activeCommand.name} command`}
+                  >
+                    <span>{activeCommand.icon}</span>
+                    <span>/{activeCommand.name}</span>
+                    <span className="ml-0.5 text-blue-400 dark:text-blue-300">×</span>
+                  </button>
+                )}
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onPaste={handlePaste}
+                  placeholder={activeCommand
+                    ? (activeCommand.placeholder || `Press Send to execute /${activeCommand.name}`)
+                    : isSending
+                      ? "Activating session, please wait..."
+                      : isStreaming 
+                        ? "Type a follow-up... (will be queued for the agent)" 
+                        : "Type a message... (Enter to send, Shift+Enter for new line)"}
+                  className="flex-1 resize-none max-h-[200px] bg-transparent focus:outline-none dark:text-gray-100 dark:placeholder-gray-500"
+                  rows={1}
                   disabled={isDisabled}
-                  className="h-8 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 disabled:opacity-50 rounded-lg hover:bg-gray-100 dark:hover:bg-[#33334a] transition-colors flex-shrink-0"
-                  title="Slash commands"
-                >
-                  <span className="text-sm font-bold">/</span>
-                </button>
-              )}
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => handleInputChange(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onPaste={handlePaste}
-                placeholder={activeCommand
-                  ? (activeCommand.placeholder || `Press Send to execute /${activeCommand.name}`)
-                  : isSending
-                    ? "Activating session, please wait..."
-                    : isStreaming 
-                      ? "Type a follow-up... (will be queued for the agent)" 
-                      : "Type a message... (Enter to send, Shift+Enter for new line)"}
-                className={`flex-1 resize-none rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[48px] max-h-[200px] dark:bg-[#2a2a3c] dark:text-gray-100 dark:placeholder-gray-500 ${
-                  isDragOver ? 'border-blue-400' : activeCommand ? 'border-blue-300 bg-blue-50/50 dark:border-blue-600 dark:bg-blue-900/10' : isStreaming ? 'border-amber-300 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/20' : 'border-gray-300 dark:border-gray-600'
-                }`}
-                rows={1}
-                disabled={isDisabled}
-              />
+                />
+              </div>
             {/* Send button */}
             <Button
               onClick={() => handleSubmit()}
@@ -710,9 +724,9 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
                   ? (activeCommand.requiresPrompt && !input.trim()) || isDisabled
                   : (!input.trim() && attachments.length === 0 && pendingFiles.length === 0) || isDisabled
               }
-              className="h-12 w-12 p-0"
+              className="h-11 w-11 p-0"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
             </Button>
@@ -720,14 +734,14 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
             <Button
               onClick={handleAbort}
               disabled={!isStreaming}
-              className={`h-12 w-12 p-0 ${
+              className={`h-11 w-11 p-0 ${
                 isStreaming
                   ? 'bg-red-500 hover:bg-red-600'
                   : 'bg-gray-200 dark:bg-gray-700 opacity-40 cursor-not-allowed'
               }`}
               title="Stop the agent"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <rect x="6" y="6" width="12" height="12" rx="1" />
               </svg>
             </Button>
@@ -738,15 +752,15 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
             <button
               type="button"
               onClick={onPinsToggle}
-              className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center rounded-lg transition-colors ${
+              className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center rounded-lg transition-colors ${
                 pinsOpen
                   ? 'bg-red-50 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-800'
                   : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
               title={pinsOpen ? 'Close pins drawer' : 'Open pins drawer'}
             >
-              <PinnedIcon size={20} />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+              <PinnedIcon size={16} />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5">
                 {pinsCount}
               </span>
             </button>

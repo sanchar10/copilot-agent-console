@@ -155,7 +155,7 @@ export function ToolsSelector({
           transition-colors duration-150
           ${disabled 
             ? 'bg-gray-100/80 dark:bg-gray-800/80 text-gray-400 border border-gray-200/60 dark:border-gray-700/60 cursor-not-allowed' 
-            : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-700/60 hover:bg-blue-100 dark:hover:bg-blue-800/40 cursor-pointer'
+            : 'bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/35 hover:bg-blue-100 dark:hover:bg-blue-800/40 cursor-pointer'
           }
         `}
         title={disabledReason || `${enabledCount}/${availableTools.length} custom tools${builtinSummary ? `, built-in: ${draftMode}${builtinSummary}` : ''}`}

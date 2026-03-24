@@ -239,7 +239,7 @@ export function Header({
             {cwd && (
               <button
                 onClick={() => !hasActiveResponse && onCwdChange && setShowFolderBrowser(true)}
-                className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 min-w-0 max-w-[200px] bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-700/60 ${
+                className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 min-w-0 max-w-[200px] bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/35 ${
                   hasActiveResponse || !onCwdChange
                     ? 'cursor-default'
                     : 'hover:bg-blue-100 dark:hover:bg-blue-900/50'

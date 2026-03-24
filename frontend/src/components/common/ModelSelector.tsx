@@ -82,7 +82,7 @@ export function ModelSelector({
         className={isCompact
           ? `min-w-[80px] h-[30px] px-2.5 py-0.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 ${
               !disabled
-                ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 cursor-pointer border border-blue-200/60 dark:border-blue-700/60'
+                ? 'bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer border border-blue-200/60 dark:border-blue-500/35'
                 : 'bg-gray-100 dark:bg-[#2a2a3c] text-gray-600 dark:text-gray-400 cursor-default border border-gray-200/60 dark:border-gray-700/60'
             }`
           : `w-full px-3 py-2 border rounded-lg text-sm flex items-center justify-between transition-colors ${
