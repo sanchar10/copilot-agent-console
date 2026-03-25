@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copilot Console — Visual Management for GitHub Copilot CLI</title>
+  <meta name="description" content="Orchestrate multi-agent sessions, workflows, and automations from a unified control center. Mobile notifications, fleet mode, agentic web browsing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            surface: {
+              900: '#0a0a12',
+              800: '#10101c',
+              700: '#161625',
+              600: '#1e1e30',
+            },
+            accent: {
+              DEFAULT: '#3b82f6',
+              light: '#60a5fa',
+              glow: '#2563eb',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Outfit', sans-serif; background: #0a0a12; color: #e2e8f0; }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Hero gradient mesh */
+    .hero-gradient {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 20%, rgba(99,102,241,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 40% at 20% 30%, rgba(37,99,235,0.06) 0%, transparent 50%);
+    }
+
+    /* Glow effect for hero screenshot */
+    .screenshot-glow {
+      box-shadow:
+        0 0 60px rgba(59,130,246,0.15),
+        0 0 120px rgba(59,130,246,0.05),
+        0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    /* Feature section alternating backgrounds */
+    .feature-section:nth-child(even) {
+      background: linear-gradient(180deg, rgba(16,16,28,0) 0%, rgba(16,16,28,0.6) 50%, rgba(16,16,28,0) 100%);
+    }
+
+    /* Install block glow */
+    .install-glow {
+      background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(99,102,241,0.04) 100%);
+      border: 1px solid rgba(59,130,246,0.15);
+    }
+
+    /* Card hover */
+    .feature-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(59,130,246,0.1);
+    }
+
+    /* Fade in on scroll */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Code block styling */
+    .code-block {
+      background: #161625;
+      border: 1px solid rgba(59,130,246,0.15);
+      border-radius: 12px;
+      position: relative;
+    }
+    .code-block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(59,130,246,0.3), transparent);
+    }
+
+    /* Screenshot placeholder */
+    .screenshot-placeholder {
+      background: linear-gradient(135deg, #161625 0%, #1e1e30 100%);
+      border: 1px dashed rgba(59,130,246,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(148,163,184,0.5);
+      font-size: 0.875rem;
+      border-radius: 12px;
+    }
+
+    /* Subtle grid pattern */
+    .grid-pattern {
+      background-image:
+        linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Nav blur */
+    .nav-blur {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Staggered animation */
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+    .stagger-6 { transition-delay: 0.6s; }
+
+    /* Mobile phone frame */
+    .phone-frame {
+      border-radius: 32px;
+      border: 3px solid rgba(148,163,184,0.15);
+      box-shadow:
+        0 0 0 1px rgba(148,163,184,0.05),
+        0 25px 50px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- ─── NAV ─── -->
+  <nav class="fixed top-0 w-full z-50 nav-blur bg-surface-900/80 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+          <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <span class="font-display font-700 text-lg tracking-tight text-white">Copilot Console</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="#features" class="text-sm text-gray-400 hover:text-white transition-colors hidden sm:block">Features</a>
+        <a href="#install" class="text-sm text-gray-400 hover:text-white transition-colors hidden sm:block">Install</a>
+        <a href="https://github.com/sanchar10/copilot-agent-console" target="_blank"
+           class="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg border border-white/10">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero-gradient grid-pattern pt-32 pb-20 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent-light text-xs font-mono mb-6 fade-in">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+          Built on GitHub Copilot SDK
+        </div>
+        <h1 class="font-display font-800 text-5xl sm:text-6xl lg:text-7xl tracking-tight text-white leading-[1.08] mb-6 fade-in stagger-1">
+          Your Copilot CLI,<br>
+          <span class="bg-gradient-to-r from-accent-light to-indigo-400 bg-clip-text text-transparent">visualized.</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto mb-10 fade-in stagger-2">
+          Orchestrate multi-agent sessions, workflows, and automations from a unified control center.
+          Get mobile notifications. Run fleet operations. Browse the web with AI.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in stagger-3">
+          <a href="#install"
+             class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-display font-600 rounded-xl transition-colors text-sm">
+            Install in 30 seconds →
+          </a>
+          <a href="https://github.com/sanchar10/copilot-agent-console" target="_blank"
+             class="px-6 py-3 bg-white/5 hover:bg-white/10 text-gray-300 font-display font-500 rounded-xl border border-white/10 transition-colors text-sm">
+            View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero screenshot -->
+      <div class="fade-in stagger-4 max-w-5xl mx-auto">
+        <div class="screenshot-glow rounded-xl overflow-hidden border border-white/10">
+          <img src="screenshots/mainscreen-color.jpg" alt="Copilot Console main interface" class="w-full" onerror="this.parentElement.classList.add('screenshot-placeholder');this.parentElement.style.height='400px';this.alt='Screenshot placeholder';this.style.display='none';this.parentElement.innerHTML='📸 Hero screenshot'">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FEATURES ─── -->
+  <div id="features">
+
+    <!-- Feature 1: Visual Session Management -->
+    <section class="feature-section py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="fade-in">
+            <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
+              <span>🖥️</span> Core Experience
+            </div>
+            <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
+              Multi-session visual management
+            </h2>
+            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+              Run multiple Copilot CLI sessions simultaneously in a tabbed interface. Each session gets its own system prompt, model, tools, MCP servers, and working directory. Monitor all agents at a glance — no more juggling terminals.
+            </p>
+            <ul class="space-y-3 text-gray-400">
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Per-session context isolation — model, tools, CWD, system prompt</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Unread indicators across parallel sessions</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Mid-session model switching — change models live, applies on next message</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Rich rendering — Markdown, syntax highlighting, Mermaid diagrams, reasoning steps</span>
+              </li>
+            </ul>
+          </div>
+          <div class="fade-in stagger-2">
+            <div class="screenshot-placeholder aspect-video rounded-xl">📸 Multi-session screenshot</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature 2: Mobile Notifications -->
+    <section class="feature-section py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="order-2 lg:order-1 fade-in stagger-2 flex justify-center">
+            <div class="phone-frame w-[280px]">
+              <img src="screenshots/mobile.jpeg" alt="Mobile companion" class="w-full" onerror="this.parentElement.classList.add('screenshot-placeholder');this.parentElement.style.height='500px';this.style.display='none';this.parentElement.innerHTML='📱 Mobile screenshot'">
+            </div>
+          </div>
+          <div class="order-1 lg:order-2 fade-in">
+            <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
+              <span>📱</span> Never Wait at a Terminal
+            </div>
+            <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
+              Mobile notifications &amp; continuity
+            </h2>
+            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+              Get push notifications on your phone when any agent finishes. Continue the conversation from mobile — reply, review, or start new tasks on the go. Install as a PWA for a native-like experience.
+            </p>
+            <div class="install-glow rounded-xl p-5 mb-6">
+              <p class="text-sm text-gray-300 font-mono">
+                <span class="text-accent-light">$</span> copilot-console --expose --no-sleep<br>
+                <span class="text-gray-500"># Scan QR from Settings, done.</span>
+              </p>
+            </div>
+            <p class="text-gray-500 text-sm">
+              <strong class="text-gray-300">Also works for native CLI sessions</strong> — get notified when any terminal Copilot session finishes, no Console required. Just enable the CLI hook.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature 3: Agentic Web Browsing -->
+    <section class="feature-section py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="fade-in">
+            <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
+              <span>🌐</span> Autonomous Browsing
+            </div>
+            <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
+              Agentic web browsing
+            </h2>
+            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+              Your agent navigates the web autonomously via a bundled Playwright MCP server. Navigate websites, fill forms, extract data, run UI tests — all through natural language. Watch it work in real-time.
+            </p>
+            <ul class="space-y-3 text-gray-400">
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Bundled Playwright MCP server — works out of the box</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Navigate, click, fill forms, extract content</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Screenshots and page analysis in agent reasoning</span>
+              </li>
+            </ul>
+          </div>
+          <div class="fade-in stagger-2">
+            <div class="screenshot-placeholder aspect-video rounded-xl">📸 Web browsing screenshot</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature 4: Fleet Mode -->
+    <section class="feature-section py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="order-2 lg:order-1 fade-in stagger-2">
+            <div class="screenshot-placeholder aspect-video rounded-xl">📸 Fleet mode screenshot</div>
+          </div>
+          <div class="order-1 lg:order-2 fade-in">
+            <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
+              <span>🚀</span> Parallel Agents
+            </div>
+            <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
+              Fleet mode
+            </h2>
+            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+              Fire parallel sub-agents with a single <code class="px-1.5 py-0.5 bg-white/5 rounded text-accent-light font-mono text-base">/fleet</code> command. Each agent works independently on its piece of the problem. Watch multiple AI streams simultaneously.
+            </p>
+            <div class="install-glow rounded-xl p-5">
+              <p class="text-sm text-gray-300 font-mono">
+                <span class="text-accent-light">/fleet</span> analyze this codebase for security issues<br>
+                <span class="text-gray-500"># Spawns parallel sub-agents, streams results live</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature 5: Project Intelligence -->
+    <section class="feature-section py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="fade-in">
+            <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
+              <span>📂</span> Organized by Project
+            </div>
+            <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
+              Project intelligence
+            </h2>
+            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+              Sessions automatically group by project folder. Search across all conversations with keyword highlighting. Pin important messages for quick reference. Your AI history, organized the way you work.
+            </p>
+            <ul class="space-y-3 text-gray-400">
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Folder-based session filtering in the sidebar</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>Full-text cross-session search with keyword highlighting</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span>📌 Pin responses with notes — browse in the pins drawer</span>
+              </li>
+            </ul>
+          </div>
+          <div class="fade-in stagger-2">
+            <div class="screenshot-placeholder aspect-video rounded-xl">📸 Search & pinning screenshot</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ─── FEATURE GRID ─── -->
+  <section class="py-24 px-6 grid-pattern">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 fade-in">
+        <h2 class="font-display font-700 text-3xl sm:text-4xl text-white tracking-tight mb-4">
+          And much more
+        </h2>
+        <p class="text-gray-400 text-lg">Everything you need to orchestrate AI agents at scale.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Card: Agent Library -->
+        <div class="feature-card fade-in stagger-1 bg-surface-700/50 border border-white/5 rounded-xl p-6">
+          <div class="text-2xl mb-3">🤖</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">Agent Library</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Reusable agent personalities with custom prompts, models, tools, and MCP servers. Launch sessions from any agent with one click.</p>
+        </div>
+
+        <!-- Card: Agent Teams -->
+        <div class="feature-card fade-in stagger-2 bg-surface-700/50 border border-white/5 rounded-xl p-6">
+          <div class="text-2xl mb-3">🤝</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">Agent Teams</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Compose agents into teams with automatic delegation. Each sub-agent runs in its own context with specialized tools.</p>
+        </div>
+
+        <!-- Card: Workflows -->
+        <div class="feature-card fade-in stagger-3 bg-surface-700/50 border border-white/5 rounded-xl p-6">
+          <div class="text-2xl mb-3">🔀</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">Workflows</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Multi-agent YAML pipelines. Chain agents deterministically — each step's output flows to the next. Watch events stream in real-time.</p>
+        </div>
+
+        <!-- Card: Automations -->
+        <div class="feature-card fade-in stagger-4 bg-surface-700/50 border border-white/5 rounded-xl p-6">
+          <div class="text-2xl mb-3">⏰</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">Automations</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Cron-scheduled agent runs. Runs dashboard shows all executions — jump into a running agent's chat to watch it work live.</p>
+        </div>
+
+        <!-- Card: MCP & Custom Tools -->
+        <div class="feature-card fade-in stagger-5 bg-surface-700/50 border border-white/5 rounded-xl p-6">
+          <div class="text-2xl mb-3">🔌</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">MCP & Custom Tools</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Global and per-session MCP server management. Drop Python tools into a folder — auto-reload, no restart. Built-in Tool Builder agent.</p>
+        </div>
+
+        <!-- Card: Slash Commands -->
+        <div class="feature-card fade-in stagger-6 bg-surface-700/50 border border-white/5 rounded-xl p-6">
+          <div class="text-2xl mb-3">⌨️</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">Slash Commands</h3>
+          <p class="text-gray-400 text-sm leading-relaxed"><code class="text-accent-light">/fleet</code>, <code class="text-accent-light">/compact</code>, <code class="text-accent-light">/help</code> — inline chips with auto-complete. Type <code class="text-accent-light">/</code> to explore.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── INSTALL ─── -->
+  <section id="install" class="py-24 px-6">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="fade-in">
+        <h2 class="font-display font-700 text-3xl sm:text-4xl text-white tracking-tight mb-4">
+          One command to install
+        </h2>
+        <p class="text-gray-400 text-lg mb-10">
+          Works on Windows 10/11. Checks prerequisites, installs dependencies, and sets up everything.
+        </p>
+      </div>
+
+      <div class="fade-in stagger-1 code-block p-6 text-left mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-3 h-3 rounded-full bg-red-500/60"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-500/60"></div>
+          <div class="w-3 h-3 rounded-full bg-green-500/60"></div>
+          <span class="ml-2 text-xs text-gray-500 font-mono">PowerShell</span>
+        </div>
+        <pre class="font-mono text-sm sm:text-base leading-relaxed overflow-x-auto"><code><span class="text-gray-500"># Install (or upgrade)</span>
+<span class="text-accent-light">irm</span> <span class="text-green-400">https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1</span> <span class="text-accent-light">|</span> <span class="text-accent-light">iex</span>
+
+<span class="text-gray-500"># Start</span>
+<span class="text-accent-light">copilot-console</span>
+
+<span class="text-gray-500"># With mobile companion</span>
+<span class="text-accent-light">copilot-console</span> <span class="text-yellow-300">--expose</span> <span class="text-yellow-300">--no-sleep</span></code></pre>
+      </div>
+
+      <div class="fade-in stagger-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="https://github.com/sanchar10/copilot-agent-console" target="_blank"
+           class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-display font-600 rounded-xl transition-colors text-sm">
+          View on GitHub →
+        </a>
+        <a href="https://github.com/sanchar10/copilot-agent-console/blob/main/docs/guides/INSTALL.md" target="_blank"
+           class="text-sm text-gray-400 hover:text-white transition-colors">
+          Manual install guide
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="border-t border-white/5 py-12 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-6 h-6 rounded-md bg-accent/80 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <span class="font-display font-600 text-sm text-gray-400">Copilot Console</span>
+      </div>
+      <div class="flex items-center gap-6 text-sm text-gray-500">
+        <a href="https://github.com/sanchar10/copilot-agent-console" target="_blank" class="hover:text-gray-300 transition-colors">GitHub</a>
+        <a href="https://github.com/sanchar10/copilot-agent-console/blob/main/README.md" target="_blank" class="hover:text-gray-300 transition-colors">Docs</a>
+        <span>MIT License</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── SCROLL ANIMATION ─── -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
