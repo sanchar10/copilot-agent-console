@@ -157,6 +157,28 @@
         0 25px 50px rgba(0,0,0,0.4);
       overflow: hidden;
     }
+
+    /* Lightbox */
+    .lightbox-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+      cursor: zoom-out;
+      padding: 2rem;
+    }
+    .lightbox-overlay.active { opacity: 1; pointer-events: auto; }
+    .lightbox-overlay img {
+      max-width: 90vw; max-height: 90vh;
+      border-radius: 12px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      transform: scale(0.95);
+      transition: transform 0.25s ease;
+    }
+    .lightbox-overlay.active img { transform: scale(1); }
+    .screenshot-glow img, .phone-frame img { cursor: zoom-in; }
   </style>
 </head>
 <body class="antialiased">
@@ -165,17 +187,17 @@
   <nav class="fixed top-0 w-full z-50 nav-blur bg-surface-900/80 border-b border-white/5">
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="#" class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-          <svg width="22" height="22" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 20 L20 6 A14 14 0 0 1 34 20 Z" fill="rgba(255,255,255,0.15)"/>
-            <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-            <circle cx="20" cy="20" r="9.5" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-            <circle cx="20" cy="20" r="5" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-            <line x1="20" y1="20" x2="31" y2="11" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="26" cy="13" r="2" fill="white"/>
-            <circle cx="14" cy="14" r="1.5" fill="rgba(255,255,255,0.6)"/>
-            <circle cx="24" cy="24" r="1.5" fill="rgba(255,255,255,0.35)"/>
-            <circle cx="20" cy="20" r="2" fill="white"/>
+        <div class="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+          <svg width="26" height="26" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 20 L20 1 A19 19 0 0 1 39 20 Z" fill="rgba(255,255,255,0.25)"/>
+            <circle cx="20" cy="20" r="19" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <circle cx="20" cy="20" r="13.5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+            <circle cx="20" cy="20" r="7.5" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <line x1="20" y1="20" x2="34" y2="7" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="29" cy="10" r="2.5" fill="white"/>
+            <circle cx="10" cy="11" r="2" fill="rgba(255,255,255,0.7)"/>
+            <circle cx="28" cy="28" r="1.5" fill="rgba(255,255,255,0.5)"/>
+            <circle cx="20" cy="20" r="2.5" fill="white"/>
           </svg>
         </div>
         <span class="font-display font-700 text-lg tracking-tight text-white">Copilot Console</span>
@@ -211,7 +233,7 @@
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in stagger-3">
           <a href="#install"
              class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-display font-600 rounded-xl transition-colors text-sm">
-            Install in 30 seconds →
+            Install with one command →
           </a>
           <a href="https://github.com/sanchar10/copilot-agent-console" target="_blank"
              class="px-6 py-3 bg-white/5 hover:bg-white/10 text-gray-300 font-display font-500 rounded-xl border border-white/10 transition-colors text-sm">
@@ -225,6 +247,12 @@
         <div class="screenshot-glow rounded-xl overflow-hidden border border-white/10">
           <img src="screenshots/mainscreen-color.jpg" alt="Copilot Console main interface" class="w-full" onerror="this.parentElement.classList.add('screenshot-placeholder');this.parentElement.style.height='400px';this.alt='Screenshot placeholder';this.style.display='none';this.parentElement.innerHTML='📸 Hero screenshot'">
         </div>
+        <p class="text-center mt-6 text-sm text-gray-400 fade-in stagger-5">
+          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+            <span class="text-accent-light">⚡</span>
+            Every <strong class="text-white">Copilot CLI session</strong>, auto-discovered in Console. Every finish, notified. Continue from <strong class="text-white">CLI</strong>, <strong class="text-white">Desktop</strong>, or <strong class="text-white">Mobile</strong>.
+          </span>
+        </p>
       </div>
     </div>
   </section>
@@ -257,7 +285,7 @@
               </li>
               <li class="flex items-start gap-3">
                 <span class="text-accent mt-0.5">▸</span>
-                <span>Mid-session model switching — change models live, applies on next message</span>
+                <span>Switch models, enqueue messages, attach files &amp; paste images, set modes</span>
               </li>
               <li class="flex items-start gap-3">
                 <span class="text-accent mt-0.5">▸</span>
@@ -266,7 +294,9 @@
             </ul>
           </div>
           <div class="fade-in stagger-2">
-            <div class="screenshot-placeholder aspect-video rounded-xl">📸 Multi-session screenshot</div>
+            <div class="screenshot-glow rounded-xl overflow-hidden border border-white/10">
+              <img src="screenshots/multi-session.jpg" alt="Multi-session management with agent library and session tabs" class="w-full rounded-xl">
+            </div>
           </div>
         </div>
       </div>
@@ -277,8 +307,16 @@
       <div class="max-w-6xl mx-auto">
         <div class="grid lg:grid-cols-2 gap-16 items-center">
           <div class="order-2 lg:order-1 fade-in stagger-2 flex justify-center">
-            <div class="phone-frame w-[280px]">
-              <img src="screenshots/mobile.jpeg" alt="Mobile companion" class="w-full" onerror="this.parentElement.classList.add('screenshot-placeholder');this.parentElement.style.height='500px';this.style.display='none';this.parentElement.innerHTML='📱 Mobile screenshot'">
+            <div class="flex items-center gap-5">
+              <div class="phone-frame w-[160px]">
+                <img src="screenshots/mobile/mobile-notification.jpeg" alt="Push notification on lock screen" class="w-full">
+              </div>
+              <div class="phone-frame w-[160px]">
+                <img src="screenshots/mobile/mobile-session.jpeg" alt="Session list on mobile" class="w-full">
+              </div>
+              <div class="phone-frame w-[160px]">
+                <img src="screenshots/mobile/mobile-chat.jpeg" alt="Chat conversation on mobile" class="w-full">
+              </div>
             </div>
           </div>
           <div class="order-1 lg:order-2 fade-in">
@@ -291,115 +329,125 @@
             <p class="text-gray-400 text-lg leading-relaxed mb-6">
               Get push notifications on your phone when any agent finishes. Continue the conversation from mobile — reply, review, or start new tasks on the go. Install as a PWA for a native-like experience.
             </p>
-            <div class="install-glow rounded-xl p-5 mb-6">
+            <div class="install-glow rounded-xl p-5 mb-5">
               <p class="text-sm text-gray-300 font-mono">
                 <span class="text-accent-light">$</span> copilot-console --expose --no-sleep<br>
                 <span class="text-gray-500"># Scan QR from Settings, done.</span>
               </p>
             </div>
-            <p class="text-gray-500 text-sm">
-              <strong class="text-gray-300">Also works for native CLI sessions</strong> — get notified when any terminal Copilot session finishes, no Console required. Just enable the CLI hook.
+            <p class="text-sm text-gray-400 leading-relaxed flex items-start gap-2">
+              <span class="text-accent-light mt-0.5">⚡</span>
+              <span>Mobile session access and notifications work for every session — terminal or Console. Tap a notification, continues from where the agent left off.</span>
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Feature 3: Agentic Web Browsing -->
+    <!-- Feature 3: Slash Commands & Fleet -->
+    <section class="feature-section py-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="order-2 lg:order-1 fade-in stagger-2 flex flex-col items-center gap-6">
+            <div class="screenshot-glow rounded-xl overflow-hidden inline-block">
+              <img src="screenshots/fleet.jpg" alt="Slash command palette with /fleet, /compact, /help" class="rounded-xl" style="max-width: 200px;">
+            </div>
+            <div class="screenshot-glow rounded-xl overflow-hidden inline-block">
+              <img src="screenshots/fleet-chip.jpg" alt="Inline /fleet chip in input box" class="rounded-xl w-full">
+            </div>
+          </div>
+          <div class="order-1 lg:order-2 fade-in">
+            <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
+              <span>⚡</span> Type / to Explore
+            </div>
+            <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
+              Slash commands &amp; fleet
+            </h2>
+            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+              Type <code class="px-1.5 py-0.5 bg-white/5 rounded text-accent-light font-mono text-base">/</code> to open the command palette. Pick a command, get an inline chip with contextual hints. No flags to memorize, no syntax to look up.
+            </p>
+            <ul class="space-y-3 text-gray-400 mb-6">
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span><code class="text-accent-light font-mono">/fleet</code> — fire parallel sub-agents, watch multiple AI streams simultaneously</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span><code class="text-accent-light font-mono">/compact</code> — compress session context to free up the conversation window</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-accent mt-0.5">▸</span>
+                <span><code class="text-accent-light font-mono">/help</code> — quick reference for available commands and features</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature 4: Workflows -->
     <section class="feature-section py-24 px-6">
       <div class="max-w-6xl mx-auto">
         <div class="grid lg:grid-cols-2 gap-16 items-center">
           <div class="fade-in">
             <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
-              <span>🌐</span> Autonomous Browsing
+              <span>🔀</span> Deterministic Pipelines
             </div>
             <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
-              Agentic web browsing
+              Workflows
             </h2>
             <p class="text-gray-400 text-lg leading-relaxed mb-6">
-              Your agent navigates the web autonomously via a bundled Playwright MCP server. Navigate websites, fill forms, extract data, run UI tests — all through natural language. Watch it work in real-time.
+              Chain agents into deterministic YAML pipelines. Each step's output flows to the next — no prompt drift, no hallucinated routing. Define once, run reliably, watch events stream in real-time.
             </p>
             <ul class="space-y-3 text-gray-400">
               <li class="flex items-start gap-3">
                 <span class="text-accent mt-0.5">▸</span>
-                <span>Bundled Playwright MCP server — works out of the box</span>
+                <span>YAML-defined multi-step agent pipelines</span>
               </li>
               <li class="flex items-start gap-3">
                 <span class="text-accent mt-0.5">▸</span>
-                <span>Navigate, click, fill forms, extract content</span>
+                <span>Built on Agent Framework + Copilot SDK</span>
               </li>
               <li class="flex items-start gap-3">
                 <span class="text-accent mt-0.5">▸</span>
-                <span>Screenshots and page analysis in agent reasoning</span>
+                <span>Live event streaming — watch each step execute</span>
               </li>
             </ul>
           </div>
           <div class="fade-in stagger-2">
-            <div class="screenshot-placeholder aspect-video rounded-xl">📸 Web browsing screenshot</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Feature 4: Fleet Mode -->
-    <section class="feature-section py-24 px-6">
-      <div class="max-w-6xl mx-auto">
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
-          <div class="order-2 lg:order-1 fade-in stagger-2">
-            <div class="screenshot-placeholder aspect-video rounded-xl">📸 Fleet mode screenshot</div>
-          </div>
-          <div class="order-1 lg:order-2 fade-in">
-            <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
-              <span>🚀</span> Parallel Agents
-            </div>
-            <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
-              Fleet mode
-            </h2>
-            <p class="text-gray-400 text-lg leading-relaxed mb-6">
-              Fire parallel sub-agents with a single <code class="px-1.5 py-0.5 bg-white/5 rounded text-accent-light font-mono text-base">/fleet</code> command. Each agent works independently on its piece of the problem. Watch multiple AI streams simultaneously.
-            </p>
-            <div class="install-glow rounded-xl p-5">
-              <p class="text-sm text-gray-300 font-mono">
-                <span class="text-accent-light">/fleet</span> analyze this codebase for security issues<br>
-                <span class="text-gray-500"># Spawns parallel sub-agents, streams results live</span>
-              </p>
+            <div class="screenshot-glow rounded-xl overflow-hidden border border-white/10">
+              <img src="screenshots/workflow-run-dark.jpg" alt="Workflow pipeline running with live event streaming" class="w-full rounded-xl">
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Feature 5: Project Intelligence -->
+    <!-- Feature 5: Project Facilitation -->
     <section class="feature-section py-24 px-6">
       <div class="max-w-6xl mx-auto">
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="text-center max-w-3xl mx-auto mb-12">
           <div class="fade-in">
             <div class="inline-flex items-center gap-2 text-accent-light text-sm font-mono mb-4">
               <span>📂</span> Organized by Project
             </div>
             <h2 class="font-display font-700 text-3xl sm:text-4xl text-white mb-5 tracking-tight">
-              Project intelligence
+              Project facilitation
             </h2>
             <p class="text-gray-400 text-lg leading-relaxed mb-6">
-              Sessions automatically group by project folder. Search across all conversations with keyword highlighting. Pin important messages for quick reference. Your AI history, organized the way you work.
+              Sessions automatically group by project folder. Search across all conversations with keyword highlighting. Pin important messages for quick reference. Your AI history, organized automatically.
             </p>
-            <ul class="space-y-3 text-gray-400">
-              <li class="flex items-start gap-3">
-                <span class="text-accent mt-0.5">▸</span>
-                <span>Folder-based session filtering in the sidebar</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <span class="text-accent mt-0.5">▸</span>
-                <span>Full-text cross-session search with keyword highlighting</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <span class="text-accent mt-0.5">▸</span>
-                <span>📌 Pin responses with notes — browse in the pins drawer</span>
-              </li>
-            </ul>
           </div>
-          <div class="fade-in stagger-2">
-            <div class="screenshot-placeholder aspect-video rounded-xl">📸 Search & pinning screenshot</div>
+        </div>
+        <div class="fade-in stagger-2 flex gap-8 items-stretch justify-center max-w-5xl mx-auto">
+          <div class="screenshot-glow rounded-xl overflow-hidden border border-white/20" style="width: 140px; flex-shrink: 0;">
+            <img src="screenshots/project-sessions.jpg" alt="Project-based session organization" class="w-full h-full object-cover object-top rounded-xl">
+          </div>
+          <div class="screenshot-glow rounded-xl overflow-hidden border border-white/20 flex-1" style="max-width: 420px;">
+            <img src="screenshots/session-search.jpg" alt="Cross-session search with keyword highlighting" class="w-full h-full object-cover object-top rounded-xl">
+          </div>
+          <div class="screenshot-glow rounded-xl overflow-hidden border border-white/20 flex-1" style="max-width: 380px;">
+            <img src="screenshots/pins.jpg" alt="Pinned messages panel" class="w-full h-full object-cover object-top rounded-xl">
           </div>
         </div>
       </div>
@@ -417,46 +465,46 @@
       </div>
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <!-- Card: Agent Library -->
+        <!-- Card: Automations -->
         <div class="feature-card fade-in stagger-1 bg-surface-700/50 border border-white/5 rounded-xl p-6">
+          <div class="text-2xl mb-3">⏰</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">Automations</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Cron-scheduled agent runs. Runs dashboard for all executions — continue any run's conversation or watch a live agent in real-time.</p>
+        </div>
+
+        <!-- Card: Agent Library -->
+        <div class="feature-card fade-in stagger-2 bg-surface-700/50 border border-white/5 rounded-xl p-6">
           <div class="text-2xl mb-3">🤖</div>
           <h3 class="font-display font-600 text-white text-lg mb-2">Agent Library</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Reusable agent personalities with custom prompts, models, tools, and MCP servers. Launch sessions from any agent with one click.</p>
         </div>
 
         <!-- Card: Agent Teams -->
-        <div class="feature-card fade-in stagger-2 bg-surface-700/50 border border-white/5 rounded-xl p-6">
+        <div class="feature-card fade-in stagger-3 bg-surface-700/50 border border-white/5 rounded-xl p-6">
           <div class="text-2xl mb-3">🤝</div>
           <h3 class="font-display font-600 text-white text-lg mb-2">Agent Teams</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Compose agents into teams with automatic delegation. Each sub-agent runs in its own context with specialized tools.</p>
         </div>
 
-        <!-- Card: Workflows -->
-        <div class="feature-card fade-in stagger-3 bg-surface-700/50 border border-white/5 rounded-xl p-6">
-          <div class="text-2xl mb-3">🔀</div>
-          <h3 class="font-display font-600 text-white text-lg mb-2">Workflows</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Multi-agent YAML pipelines. Chain agents deterministically — each step's output flows to the next. Watch events stream in real-time.</p>
-        </div>
-
-        <!-- Card: Automations -->
+        <!-- Card: Files & Images -->
         <div class="feature-card fade-in stagger-4 bg-surface-700/50 border border-white/5 rounded-xl p-6">
-          <div class="text-2xl mb-3">⏰</div>
-          <h3 class="font-display font-600 text-white text-lg mb-2">Automations</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Cron-scheduled agent runs. Runs dashboard shows all executions — jump into a running agent's chat to watch it work live.</p>
+          <div class="text-2xl mb-3">📎</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">Files & Images</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Drag-and-drop files, paste images, attach context to any message. Give your agent the visual and textual context it needs.</p>
         </div>
 
         <!-- Card: MCP & Custom Tools -->
         <div class="feature-card fade-in stagger-5 bg-surface-700/50 border border-white/5 rounded-xl p-6">
           <div class="text-2xl mb-3">🔌</div>
           <h3 class="font-display font-600 text-white text-lg mb-2">MCP & Custom Tools</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Global and per-session MCP server management. Drop Python tools into a folder — auto-reload, no restart. Built-in Tool Builder agent.</p>
+          <p class="text-gray-400 text-sm leading-relaxed">Global and per-session MCP server management. Drop Python functions as custom tools into a folder. Built-in Tool Builder agent.</p>
         </div>
 
-        <!-- Card: Slash Commands -->
+        <!-- Card: Agentic Web Browsing -->
         <div class="feature-card fade-in stagger-6 bg-surface-700/50 border border-white/5 rounded-xl p-6">
-          <div class="text-2xl mb-3">⌨️</div>
-          <h3 class="font-display font-600 text-white text-lg mb-2">Slash Commands</h3>
-          <p class="text-gray-400 text-sm leading-relaxed"><code class="text-accent-light">/fleet</code>, <code class="text-accent-light">/compact</code>, <code class="text-accent-light">/help</code> — inline chips with auto-complete. Type <code class="text-accent-light">/</code> to explore.</p>
+          <div class="text-2xl mb-3">🌐</div>
+          <h3 class="font-display font-600 text-white text-lg mb-2">Agentic Web Browsing</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Bundled Playwright MCP server for autonomous web navigation. Fill forms, extract data, take screenshots — all through natural language.</p>
         </div>
       </div>
     </div>
@@ -508,15 +556,16 @@
   <footer class="border-t border-white/5 py-12 px-6">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-2.5">
-        <div class="w-6 h-6 rounded-md bg-accent/80 flex items-center justify-center">
-          <svg width="16" height="16" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 20 L20 6 A14 14 0 0 1 34 20 Z" fill="rgba(255,255,255,0.15)"/>
-            <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-            <circle cx="20" cy="20" r="9.5" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-            <line x1="20" y1="20" x2="31" y2="11" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="26" cy="13" r="2" fill="white"/>
-            <circle cx="14" cy="14" r="1.5" fill="rgba(255,255,255,0.6)"/>
-            <circle cx="20" cy="20" r="2" fill="white"/>
+        <div class="w-7 h-7 rounded-md bg-accent/80 flex items-center justify-center">
+          <svg width="18" height="18" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 20 L20 1 A19 19 0 0 1 39 20 Z" fill="rgba(255,255,255,0.25)"/>
+            <circle cx="20" cy="20" r="19" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <circle cx="20" cy="20" r="13.5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+            <circle cx="20" cy="20" r="7.5" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <line x1="20" y1="20" x2="34" y2="7" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="29" cy="10" r="2.5" fill="white"/>
+            <circle cx="10" cy="11" r="2" fill="rgba(255,255,255,0.7)"/>
+            <circle cx="20" cy="20" r="2.5" fill="white"/>
           </svg>
         </div>
         <span class="font-display font-600 text-sm text-gray-400">Copilot Console</span>
@@ -540,6 +589,28 @@
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+
+  <!-- Lightbox -->
+  <div class="lightbox-overlay" id="lightbox">
+    <img src="" alt="Enlarged screenshot">
+  </div>
+  <script>
+    const lb = document.getElementById('lightbox');
+    const lbImg = lb.querySelector('img');
+
+    document.querySelectorAll('.screenshot-glow img, .phone-frame img').forEach(img => {
+      img.addEventListener('click', () => {
+        lbImg.src = img.src;
+        lbImg.alt = img.alt;
+        lb.classList.add('active');
+      });
+    });
+
+    lb.addEventListener('click', () => lb.classList.remove('active'));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') lb.classList.remove('active');
+    });
   </script>
 
 </body>
