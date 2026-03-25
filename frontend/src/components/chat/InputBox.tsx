@@ -472,11 +472,30 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
     let sendingCleared = !needsLock; // already unlocked if session was ready
     const clearSendingOnce = () => {
       if (!sendingCleared) {
+        if (activationTimer) clearTimeout(activationTimer);
         readySessions.add(activeSessionId!);
         setSending(null);
         sendingCleared = true;
       }
     };
+
+    // Safety timeout: if activation takes too long, unlock input with error
+    let activationTimer: ReturnType<typeof setTimeout> | null = null;
+    if (needsLock) {
+      activationTimer = setTimeout(() => {
+        if (!sendingCleared) {
+          clearSendingOnce();
+          setStreaming(activeSessionId!, false);
+          setAgentActive(activeSessionId!, false);
+          addMessage(activeSessionId!, {
+            id: `system-timeout-${Date.now()}`,
+            role: 'system',
+            content: '⚠️ Session activation timed out. An MCP server may be unresponsive. Try sending your message again.',
+            timestamp: new Date().toISOString(),
+          });
+        }
+      }, 45_000); // 45s — slightly longer than backend's 30s timeout
+    }
 
     try {
       await sendMessage(
@@ -505,6 +524,7 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
           setTokenUsage(activeSessionId!, usage);
         },
         (_messageId, sessionName) => {
+          if (activationTimer) clearTimeout(activationTimer);
           // All responses already finalized by turn_done / finalizeTurn().
           // Just clean up streaming & agent state.
           setStreaming(activeSessionId!, false);
@@ -523,6 +543,7 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
           }
         },
         (error) => {
+          if (activationTimer) clearTimeout(activationTimer);
           console.error('Message error:', error);
           setStreaming(activeSessionId!, false);
           setSending(null);
@@ -541,6 +562,7 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
         isFleet
       );
     } catch (err) {
+      if (activationTimer) clearTimeout(activationTimer);
       console.error('Failed to send message:', err);
       if (activeSessionId) {
         setStreaming(activeSessionId, false);

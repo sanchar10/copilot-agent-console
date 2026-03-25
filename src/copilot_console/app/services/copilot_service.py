@@ -218,12 +218,15 @@ class SessionClient:
         
         session_opts["working_directory"] = self.cwd
         
-        self.session = await self.client.create_session(**session_opts)
+        self.session = await asyncio.wait_for(
+            self.client.create_session(**session_opts),
+            timeout=30,
+        )
         self.touch()
         logger.info(f"[{self.session_id}] Created SDK session with model={model}, working_directory={self.cwd}, mcp_servers={len(mcp_servers or {})}, tools={len(tools or [])}, system_message={'yes' if system_message else 'no'}, custom_agents={len(custom_agents or [])}")
         return self.session
     
-    async def resume_session(self, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, custom_agents: list[dict] | None = None) -> object | None:
+    async def resume_session(self, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, custom_agents: list[dict] | None = None) -> object:
         """Resume an existing SDK session."""
         await self.start()
         assert self.client is not None
@@ -258,13 +261,22 @@ class SessionClient:
             resume_opts["working_directory"] = self.cwd
             
             logger.info(f"[{self.session_id}] Resuming SDK session with custom_agents={len(custom_agents or [])}")
-            self.session = await self.client.resume_session(self.session_id, **resume_opts)
+            self.session = await asyncio.wait_for(
+                self.client.resume_session(self.session_id, **resume_opts),
+                timeout=30,
+            )
             self.touch()
             logger.info(f"[{self.session_id}] Resumed SDK session with mcp_servers={len(mcp_servers or {})}, tools={len(tools or [])}")
             return self.session
+        except asyncio.TimeoutError:
+            logger.error(f"[{self.session_id}] Session resume timed out after 30s (MCP server may be unresponsive)")
+            raise RuntimeError(
+                f"Session activation timed out after 30s. "
+                f"An MCP server may be unresponsive. Try again or remove problematic MCP servers from this session."
+            )
         except Exception as e:
             logger.warning(f"[{self.session_id}] Could not resume session: {e}")
-            return None
+            raise RuntimeError(f"Failed to resume session: {e}")
     
     async def get_or_create_session(self, model: str, mcp_servers: dict[str, dict] | None = None, tools: list[Tool] | None = None, available_tools: list[str] | None = None, excluded_tools: list[str] | None = None, system_message: dict | None = None, is_new_session: bool = False, custom_agents: list[dict] | None = None, reasoning_effort: str | None = None) -> object:
         """Get existing session or create/resume one."""
@@ -272,17 +284,26 @@ class SessionClient:
             self.touch()
             return self.session
         
-        # For new sessions, skip resume attempt - we know it doesn't exist in SDK
-        if not is_new_session:
-            logger.info(f"[{self.session_id}] Attempting to resume existing session")
-            session = await self.resume_session(mcp_servers, tools, available_tools, excluded_tools, system_message, custom_agents)
-            if session:
-                return session
-        else:
-            logger.info(f"[{self.session_id}] New session - skipping resume attempt")
+        if is_new_session:
+            # New session — create directly
+            logger.info(f"[{self.session_id}] New session - creating")
+            try:
+                return await self.create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, custom_agents, reasoning_effort)
+            except asyncio.TimeoutError:
+                raise RuntimeError(
+                    f"Session creation timed out after 30s. "
+                    f"An MCP server may be unresponsive. Try again or remove problematic MCP servers from this session."
+                )
         
-        # Create new
-        return await self.create_session(model, mcp_servers, tools, available_tools, excluded_tools, system_message, custom_agents, reasoning_effort)
+        # Existing session — resume only, never create
+        logger.info(f"[{self.session_id}] Attempting to resume existing session")
+        session = await self.resume_session(mcp_servers, tools, available_tools, excluded_tools, system_message, custom_agents)
+        if session:
+            return session
+        raise RuntimeError(
+            f"Failed to resume session. The session may be corrupted or an MCP server may be unresponsive. "
+            f"Try again or remove problematic MCP servers from this session."
+        )
 
     async def set_mode(self, mode: str) -> str:
         """Set the agent mode (interactive/plan/autopilot) on the active session."""
