@@ -4,7 +4,7 @@ Orchestrate local GitHub Copilot multi-agent sessions, workflows, and automation
 
 ![Copilot Console](https://img.shields.io/badge/Copilot-Console-blue?style=flat-square)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows)
-![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square)
+![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square)
 ![License MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
 ![Main Interface](docs/screenshots/mainscreen-color.jpg)
@@ -21,20 +21,18 @@ A visual management layer on top of [GitHub Copilot CLI](https://docs.github.com
 
 | | Feature | Description |
 |---|---|---|
-| 🖥️ | **Visual Session Management** | Multiple sessions in a tabbed interface with per-session system prompt, model, tools, agent, and working directory |
-| 🚀 | **Fleet Mode & Slash Commands** | Fire parallel sub-agents with `/fleet` — orchestrate multiple AI streams simultaneously. `/compact`, `/help` with inline chips and auto-complete |
-| 📌 | **Message Pinning** | Pin important responses with optional notes for follow-up; browse them in the pins drawer |
-| 🔍 | **Cross-Session Search** | Full-text search across all sessions with keyword highlighting |
-| 🌐 | **Agentic Web Browsing** | Autonomous web navigation via bundled Playwright MCP server |
+| 🖥️ | **Visual Session Management** | Multiple sessions in a tabbed interface with per-session context management: system prompt, model, tools, MCP servers, agents, and working directory |
+| 🔀 | **Workflows** | Multi-agent YAML pipelines using [Microsoft Agent Framework](https://github.com/microsoft/agent-framework) — chain agents deterministically and watch events stream in real-time |
+| ⚡ | **Slash Commands & Fleet** | Type `/` for command palette — `/fleet` fires parallel sub-agents, `/compact` compresses context, `/help` for quick reference. Inline chips with auto-complete |
+| ⏰ | **Automations** | Cron-scheduled agent runs with a Runs dashboard and live session access |
+| 📂 | **Project Facilitation** | Folder-based session filtering, cross-session search with keyword highlighting, pin responses with notes |
 | 🤖 | **Agent Library** | Reusable agent personalities with custom prompts, models, tools, and MCP servers |
 | 🤝 | **Agent Teams** | Compose agents into teams with automatic delegation to specialized sub-agents |
-| 🔀 | **Workflows** | Multi-agent YAML pipelines using [Microsoft Agent Framework](https://github.com/microsoft/agent-framework) — chain agents deterministically and watch events stream in real-time |
-| ⏰ | **Automations** | Cron-scheduled agent runs with a Runs dashboard and live session access |
+| 🌐 | **Agentic Web Browsing** | Autonomous web navigation via bundled Playwright MCP server |
 | 🔌 | **MCP Servers** | Global and app-level MCP config with per-session server / tool toggling |
-| 🔧 | **Custom Tools** | Drop Python tools into `~/.copilot-console/tools/` — auto-reload, no restart |
+| 🔧 | **Custom Tools** | Drop Python functions into `~/.copilot-console/tools/` to easily create selectable agent tools |
+| 📎 | **Files & Images** | Drag-and-drop files and paste images into messages to give agents visual and textual context |
 | 🎨 | **Rich Rendering** | Markdown, syntax highlighting, Mermaid diagrams, streaming, reasoning steps |
-| 📎 | **File Attachments and Images** | Drag-and-drop files into messages, including pasting images |
-| 📂 | **Project Facilitation** | Folder-based session filtering, project pins view & search *(coming soon)* |
 
 ---
 
@@ -54,7 +52,7 @@ Start Copilot Console with `--expose --no-sleep`, scan the QR code from Settings
 
 <!-- TODO: screenshot of CLI notification on phone -->
 
-Zero config — the installer adds a CLI hook. Enable the setting to receive notifications for all CLI sessions. A standalone feature for CLI users who haven't adopted Console.
+Zero config — the installer adds a CLI hook. Enable the setting to receive notifications for all CLI sessions. A standalone feature for CLI users even without using Console.
 
 ---
 

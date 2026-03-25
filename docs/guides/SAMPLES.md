@@ -1,6 +1,6 @@
 # Packaged Samples
 
-Copilot Console ships with pre-built agents, workflows, automations, and tools to get you started. You can find them in the Agent Library, Workflow Library, and Tools sections.
+Copilot Console ships with pre-built agents, workflows, automations, and tools to get you started. You can find them in the Agent Library, Workflows, and Tools sections.
 
 ---
 

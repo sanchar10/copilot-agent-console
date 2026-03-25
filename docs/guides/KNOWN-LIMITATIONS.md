@@ -34,7 +34,7 @@ effective tools = sub-agent's whitelist MINUS parent's exclusions
 
 ## Sub-Agents Cannot Be Nested
 
-An agent that has sub-agents cannot itself be used as a sub-agent. Only leaf agents (no sub-agents of their own) are eligible for the sub-agent role. This is a github copilot constriant. 
+An agent that has sub-agents cannot itself be used as a sub-agent. Only leaf agents (no sub-agents of their own) are eligible for the sub-agent role. This is a GitHub Copilot constraint. 
 
 ## Sub-Agent Eligibility Requirements
 
