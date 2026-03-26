@@ -127,7 +127,13 @@ Copilot Console ships with pre-built agents, workflows, automations, and tools t
 
 | File | Description |
 |------|-------------|
-| `system_tools.py` | System utilities (clipboard, notifications, etc.) |
+| `system_tools.py` | System info (hostname, OS, CPU cores, disk usage) |
+
+### MCP Servers
+
+| Name | Description |
+|------|-------------|
+| Weather Server | Local MCP server using Open-Meteo API — no API key required |
 
 ---
 

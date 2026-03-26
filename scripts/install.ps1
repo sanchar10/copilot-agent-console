@@ -18,8 +18,8 @@ if (-not $python) {
 }
 $pyVer = (python --version 2>&1) -replace 'Python\s*', ''
 $pyMajor, $pyMinor = $pyVer.Split('.')[0..1] | ForEach-Object { [int]$_ }
-if ($pyMajor -lt 3 -or ($pyMajor -eq 3 -and $pyMinor -lt 10)) {
-    Write-Host "  [ERROR] Python 3.10+ required (found $pyVer)" -ForegroundColor Red
+if ($pyMajor -lt 3 -or ($pyMajor -eq 3 -and $pyMinor -lt 11)) {
+    Write-Host "  [ERROR] Python 3.11+ required (found $pyVer)" -ForegroundColor Red
     exit 1
 }
 Write-Host "  [OK] Python $pyVer" -ForegroundColor Green
@@ -200,6 +200,99 @@ if ($ac) {
 } else {
     Write-Host "  [OK] Installed" -ForegroundColor Green
     Write-Host "  [NOTE] Restart your terminal, then run 'copilot-console'." -ForegroundColor Yellow
+}
+
+# --- Optional: CLI Session Notifications ---
+Write-Host ""
+Write-Host "  Optional: CLI Session Notifications" -ForegroundColor Cyan
+Write-Host "  Get notified on your phone when any Copilot CLI terminal session finishes." -ForegroundColor DarkGray
+Write-Host "  Can also be enabled later in Console Settings or via 'cli-notify on'." -ForegroundColor DarkGray
+Write-Host ""
+$setupNotify = Read-Host "  Enable CLI session notifications? (y/N)"
+if ($setupNotify -eq 'y' -or $setupNotify -eq 'Y') {
+    $cliNotify = Get-Command cli-notify -ErrorAction SilentlyContinue
+    if ($cliNotify) {
+        cli-notify on 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  [OK] CLI notifications enabled" -ForegroundColor Green
+        } else {
+            Write-Host "  [WARN] Failed to enable. Run 'cli-notify on' manually." -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "  [WARN] cli-notify not found. Restart terminal and run 'cli-notify on'." -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "  Skipped. Enable later in Console Settings or run 'cli-notify on'." -ForegroundColor DarkGray
+}
+
+# --- Optional: Agentic Web Browsing (Playwright MCP) ---
+Write-Host ""
+Write-Host "  Optional: Agentic Web Browsing" -ForegroundColor Cyan
+Write-Host "  Adds autonomous web navigation via Playwright MCP server." -ForegroundColor DarkGray
+Write-Host "  Requires ~200MB for browser binaries (Chromium)." -ForegroundColor DarkGray
+Write-Host ""
+$setupPlaywright = Read-Host "  Enable agentic web browsing? (y/N)"
+if ($setupPlaywright -eq 'y' -or $setupPlaywright -eq 'Y') {
+    # Install Playwright browsers
+    Write-Host "  Installing Playwright browsers (this may take a minute)..." -ForegroundColor Yellow
+    npx playwright install chromium 2>&1 | ForEach-Object {
+        $line = $_.ToString()
+        if ($line -match 'Downloading|chromium') { Write-Host "  $line" -ForegroundColor DarkGray }
+    }
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  [OK] Playwright browsers installed" -ForegroundColor Green
+    } else {
+        Write-Host "  [WARN] Playwright install failed. Run 'npx playwright install chromium' manually." -ForegroundColor Yellow
+    }
+
+    # Add Playwright MCP server to mcp-config.json
+    $mcpConfigPath = "$env:USERPROFILE\.copilot-console\mcp-config.json"
+    $addPlaywright = $true
+    if (Test-Path $mcpConfigPath) {
+        try {
+            $existingConfig = Get-Content $mcpConfigPath -Raw | ConvertFrom-Json
+            if ($existingConfig.mcpServers.PSObject.Properties.Name -contains 'playwright') {
+                Write-Host "  [OK] Playwright MCP server already configured" -ForegroundColor Green
+                $addPlaywright = $false
+            }
+        } catch { }
+    }
+    if ($addPlaywright) {
+        # Ensure directory exists
+        $mcpDir = Split-Path $mcpConfigPath
+        if (-not (Test-Path $mcpDir)) { New-Item -ItemType Directory -Path $mcpDir -Force | Out-Null }
+
+        if (Test-Path $mcpConfigPath) {
+            try {
+                $config = Get-Content $mcpConfigPath -Raw | ConvertFrom-Json
+                $playwrightServer = @{
+                    type = "local"
+                    command = "npx"
+                    tools = @("*")
+                    args = @("@playwright/mcp@latest")
+                }
+                $config.mcpServers | Add-Member -MemberType NoteProperty -Name "playwright" -Value $playwrightServer
+                $config | ConvertTo-Json -Depth 5 | Set-Content $mcpConfigPath -Encoding UTF8
+            } catch {
+                Write-Host "  [WARN] Failed to update mcp-config.json. Add playwright server manually." -ForegroundColor Yellow
+            }
+        } else {
+            $newConfig = @{
+                mcpServers = @{
+                    playwright = @{
+                        type = "local"
+                        command = "npx"
+                        tools = @("*")
+                        args = @("@playwright/mcp@latest")
+                    }
+                }
+            }
+            $newConfig | ConvertTo-Json -Depth 5 | Set-Content $mcpConfigPath -Encoding UTF8
+        }
+        Write-Host "  [OK] Playwright MCP server added to config" -ForegroundColor Green
+    }
+} else {
+    Write-Host "  Skipped. Enable later — see docs/guides/INSTALL.md" -ForegroundColor DarkGray
 }
 
 # --- Optional: Mobile Companion (devtunnel) ---
