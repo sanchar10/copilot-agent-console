@@ -229,23 +229,11 @@ if ($setupNotify -eq 'y' -or $setupNotify -eq 'Y') {
 Write-Host ""
 Write-Host "  Optional: Agentic Web Browsing" -ForegroundColor Cyan
 Write-Host "  Adds autonomous web navigation via Playwright MCP server." -ForegroundColor DarkGray
-Write-Host "  Requires ~200MB for browser binaries (Chromium)." -ForegroundColor DarkGray
+Write-Host "  Uses your system browser (Edge or Chrome)." -ForegroundColor DarkGray
 Write-Host ""
 $setupPlaywright = Read-Host "  Enable agentic web browsing? (y/N)"
 if ($setupPlaywright -eq 'y' -or $setupPlaywright -eq 'Y') {
-    # Install Playwright browsers
-    Write-Host "  Installing Playwright browsers (this may take a minute)..." -ForegroundColor Yellow
-    npx playwright install chromium 2>&1 | ForEach-Object {
-        $line = $_.ToString()
-        if ($line -match 'Downloading|chromium') { Write-Host "  $line" -ForegroundColor DarkGray }
-    }
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "  [OK] Playwright browsers installed" -ForegroundColor Green
-    } else {
-        Write-Host "  [WARN] Playwright install failed. Run 'npx playwright install chromium' manually." -ForegroundColor Yellow
-    }
-
-    # Add Playwright MCP server to mcp-config.json
+    # Add Playwright MCP server to mcp-config.json (uses system browser, no extra install needed)
     $mcpConfigPath = "$env:USERPROFILE\.copilot-console\mcp-config.json"
     $addPlaywright = $true
     if (Test-Path $mcpConfigPath) {

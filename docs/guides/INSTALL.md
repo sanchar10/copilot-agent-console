@@ -148,15 +148,9 @@ cli-notify off
 
 ## Optional: Agentic Web Browsing (Playwright MCP)
 
-Enable autonomous web navigation by adding the [Playwright MCP server](https://github.com/microsoft/playwright-mcp).
+Enable autonomous web navigation by adding the [Playwright MCP server](https://github.com/microsoft/playwright-mcp). It uses your system browser (Edge or Chrome) — no extra browser install needed.
 
-### Step 1: Install Playwright browsers
-
-```powershell
-npx playwright install chromium
-```
-
-### Step 2: Add to MCP config
+### Add to MCP config
 
 Add the following to `~/.copilot-console/mcp-config.json` (create it if it doesn't exist). If the file already has content, add `playwright` inside the existing `mcpServers` object:
 
