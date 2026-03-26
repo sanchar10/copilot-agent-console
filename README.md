@@ -13,7 +13,7 @@ Orchestrate local GitHub Copilot multi-agent sessions, workflows, and automation
 
 A visual management layer on top of [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli). Built with the [Copilot Python SDK](https://github.com/github/copilot-sdk).
 
-> **Platform:** Windows only (tested on Windows 10/11). Releases upcoming for macOS/Linux.
+> **Platform:** Windows only (tested on Windows 10/11). Releases pending for macOS/Linux.
 
 ---
 
@@ -40,7 +40,7 @@ A visual management layer on top of [GitHub Copilot CLI](https://docs.github.com
 
 Access Copilot Console sessions from your phone — get push notifications when agents finish, monitor progress, and reply on the go. No more waiting at a terminal for agent responses. Install as a PWA for a native-like experience.
 
-<img src="docs/screenshots/mobile.jpeg" alt="Mobile Companion" height="350">
+<img src="docs/screenshots/mobile/mobile-session.jpeg" alt="Mobile Companion" height="350">
 
 Start Copilot Console with `--expose --no-sleep`, scan the QR code from Settings on your phone, and you're set. See [Mobile Companion](docs/guides/MOBILE-COMPANION.md).
 
@@ -128,14 +128,16 @@ All data is stored in `C:\Users\<username>\.copilot-console\`:
 ```
 .copilot-console\
 ├── settings.json        # Default model, working directory
-├── sessions\            # Chat session history
+├── mcp-config.json      # MCP server configurations (global)
+├── sessions\            # Session metadata and settings
 ├── agents\              # Agent library definitions
 ├── workflows\           # Workflow YAML definitions
 ├── workflow-runs\       # Workflow run history and working directories
 ├── automations\         # Automation definitions
 ├── task-runs\           # Automation run history
 ├── tools\               # Custom Python tools (drop .py files here)
-├── mcp-servers\         # MCP server configurations
+├── mcp-servers\         # Drop-in MCP server scripts (stdio / local)
+├── logs\                # Application logs
 └── viewed.json          # Read/unread tracking
 ```
 
