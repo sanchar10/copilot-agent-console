@@ -11,7 +11,6 @@ Before installing Copilot Console, ensure the following are available. All comma
 | **Node.js** | 18 or higher | `node --version` |
 | **GitHub Copilot CLI** | Latest | `copilot --version` |
 | **GitHub Copilot subscription** | Active | [github.com/settings/copilot](https://github.com/settings/copilot) |
-| **ripgrep** | Latest | `rg --version` |
 | **devtunnel** *(optional)* | Latest | `devtunnel --version` |
 
 ### Step 1: Install Python
@@ -52,20 +51,7 @@ Authenticate with GitHub (required before first use):
 copilot login
 ```
 
-### Step 4: Install ripgrep
-
-Required for cross-session search. Install via winget:
-
-```powershell
-winget install BurntSushi.ripgrep.MSVC
-```
-
-Verify:
-```powershell
-rg --version
-```
-
-### Step 5: Install devtunnel (Optional — for Mobile Companion)
+### Step 4: Install devtunnel (Optional — for Mobile Companion)
 
 Only needed if you want to access Copilot Console from your phone via `--expose`.
 
@@ -118,6 +104,32 @@ pip install https://github.com/sanchar10/copilot-agent-console/releases/download
 ```
 
 > **Note:** If `copilot-console` is not found after install, your Python scripts directory may not be on PATH. Option A (pipx) handles this automatically.
+
+## Install Agent Framework
+
+Required for workflow orchestration. Agent Framework is pre-release and needs the `--pre` flag:
+
+```powershell
+pip install agent-framework --pre
+```
+
+If you used pipx, also inject it into the pipx venv:
+```powershell
+pipx inject copilot-console agent-framework --pip-args="--pre"
+```
+
+## Install ripgrep
+
+Required for cross-session content search:
+
+```powershell
+winget install BurntSushi.ripgrep.MSVC
+```
+
+Verify:
+```powershell
+rg --version
+```
 
 ## Verify Installation
 
