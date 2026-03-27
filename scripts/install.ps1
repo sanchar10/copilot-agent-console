@@ -226,29 +226,6 @@ if (-not $rg) {
     Write-Host "  [OK] ripgrep $(rg --version | Select-Object -First 1)" -ForegroundColor Green
 }
 
-# --- Optional: CLI Session Notifications ---
-Write-Host ""
-Write-Host "  Optional: CLI Session Notifications" -ForegroundColor Cyan
-Write-Host "  Get notified on your phone when any Copilot CLI terminal session finishes." -ForegroundColor DarkGray
-Write-Host "  Can also be enabled later in Console Settings or via 'cli-notify on'." -ForegroundColor DarkGray
-Write-Host ""
-$setupNotify = Read-Host "  Enable CLI session notifications? (y/N)"
-if ($setupNotify -eq 'y' -or $setupNotify -eq 'Y') {
-    $cliNotify = Get-Command cli-notify -ErrorAction SilentlyContinue
-    if ($cliNotify) {
-        cli-notify on 2>&1 | Out-Null
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "  [OK] CLI notifications enabled" -ForegroundColor Green
-        } else {
-            Write-Host "  [WARN] Failed to enable. Run 'cli-notify on' manually." -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "  [WARN] cli-notify not found. Restart terminal and run 'cli-notify on'." -ForegroundColor Yellow
-    }
-} else {
-    Write-Host "  Skipped. Enable later in Console Settings or run 'cli-notify on'." -ForegroundColor DarkGray
-}
-
 # --- Optional: Agentic Web Browsing (Playwright MCP) ---
 Write-Host ""
 Write-Host "  Optional: Agentic Web Browsing" -ForegroundColor Cyan
@@ -307,20 +284,35 @@ if ($setupPlaywright -eq 'y' -or $setupPlaywright -eq 'Y') {
     Write-Host "  Skipped. Enable later — see docs/guides/INSTALL.md" -ForegroundColor DarkGray
 }
 
-# --- Optional: Mobile Companion (devtunnel) ---
+# --- Optional: Mobile Access & CLI Notifications ---
+$mobileEnabled = $false
 Write-Host ""
-Write-Host "  Optional: Mobile Companion" -ForegroundColor Cyan
-Write-Host "  Access Copilot Console from your phone via secure tunnel." -ForegroundColor DarkGray
+Write-Host "  Optional: Mobile Access & CLI Notifications" -ForegroundColor Cyan
+Write-Host "  Access sessions from your phone, get push notifications when" -ForegroundColor DarkGray
+Write-Host "  any Copilot CLI session finishes. Requires devtunnel." -ForegroundColor DarkGray
 Write-Host ""
-$setupMobile = Read-Host "  Enable Mobile Companion? Requires devtunnel (y/N)"
+$setupMobile = Read-Host "  Enable mobile access & notifications? (y/N)"
 if ($setupMobile -eq 'y' -or $setupMobile -eq 'Y') {
+    # Enable CLI notifications
+    $cliNotify = Get-Command cli-notify -ErrorAction SilentlyContinue
+    if ($cliNotify) {
+        cli-notify on 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  [OK] CLI notifications enabled" -ForegroundColor Green
+        } else {
+            Write-Host "  [WARN] Failed to enable. Run 'cli-notify on' manually." -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "  [WARN] cli-notify not found. Restart terminal and run 'cli-notify on'." -ForegroundColor Yellow
+    }
+
+    # Install devtunnel
     $devtunnel = Get-Command devtunnel -ErrorAction SilentlyContinue
     if (-not $devtunnel) {
         Write-Host "  Installing devtunnel..." -ForegroundColor Yellow
         $winget = Get-Command winget -ErrorAction SilentlyContinue
         if ($winget) {
             winget install Microsoft.devtunnel --accept-source-agreements --accept-package-agreements --disable-interactivity 2>&1 | Out-Null
-            # Refresh PATH for current session
             $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
             $devtunnel = Get-Command devtunnel -ErrorAction SilentlyContinue
         }
@@ -343,22 +335,27 @@ if ($setupMobile -eq 'y' -or $setupMobile -eq 'Y') {
         devtunnel user login
         if ($LASTEXITCODE -eq 0) {
             Write-Host "  [OK] devtunnel authenticated" -ForegroundColor Green
+            $mobileEnabled = $true
         } else {
             Write-Host "  [WARN] devtunnel login failed. Run 'devtunnel user login' manually." -ForegroundColor Yellow
         }
-        Write-Host ""
-        Write-Host "  Mobile Companion ready! Start with:" -ForegroundColor Green
-        Write-Host "     copilot-console --expose                   # Work/school account" -ForegroundColor Cyan
-        Write-Host "     copilot-console --expose --allow-anonymous  # Personal account" -ForegroundColor Cyan
-        Write-Host "  Then open Settings in the UI and scan the QR code from your phone." -ForegroundColor DarkGray
     }
 } else {
-    Write-Host "  Skipped. You can set up later:" -ForegroundColor DarkGray
-    Write-Host "     winget install Microsoft.devtunnel" -ForegroundColor DarkGray
-    Write-Host "     devtunnel user login" -ForegroundColor DarkGray
-    Write-Host "     copilot-console --expose" -ForegroundColor DarkGray
+    Write-Host "  Skipped. Enable later — see docs/guides/MOBILE-COMPANION.md" -ForegroundColor DarkGray
 }
 
+# --- Done ---
 Write-Host ""
-Write-Host "  Ready! Run 'copilot-console' to start." -ForegroundColor Cyan
+if ($mobileEnabled) {
+    Write-Host "  Ready! Complete mobile setup:" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "    1. Run:  copilot-console --expose --no-sleep" -ForegroundColor White
+    Write-Host "    2. Open Settings -> scan QR code on your phone" -ForegroundColor White
+    Write-Host "    3. Install as PWA when prompted" -ForegroundColor White
+    Write-Host "    4. Allow notifications when the browser asks" -ForegroundColor White
+    Write-Host ""
+    Write-Host "  After this, CLI notifications work automatically." -ForegroundColor DarkGray
+} else {
+    Write-Host "  Ready! Run 'copilot-console' to start." -ForegroundColor Cyan
+}
 Write-Host ""
