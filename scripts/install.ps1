@@ -191,6 +191,9 @@ if ($usedPipx -and $afInstalled) {
 }
 
 # --- Verify ---
+# Refresh PATH to pick up newly installed commands (pipx or pip)
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
 $ac = Get-Command copilot-console -ErrorAction SilentlyContinue
 if (-not $ac) {
     # pip --user installs to user Scripts dir - find and add to PATH
