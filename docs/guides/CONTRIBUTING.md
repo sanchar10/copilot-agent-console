@@ -20,8 +20,8 @@ For contributors who want to modify the code.
 
 ```powershell
 # Clone the repo
-git clone https://github.com/sanchar10/copilot-agent-console.git
-cd copilot-agent-console
+git clone https://github.com/sanchar10/copilot-console.git
+cd copilot-console
 
 # Install Python dependencies (creates .venv automatically, handles pre-release)
 uv sync --prerelease=allow
@@ -42,8 +42,8 @@ uv run npm run dev
 
 ```powershell
 # Clone the repo
-git clone https://github.com/sanchar10/copilot-agent-console.git
-cd copilot-agent-console
+git clone https://github.com/sanchar10/copilot-console.git
+cd copilot-console
 
 # Create and activate a virtual environment
 python -m venv .venv

@@ -9,7 +9,7 @@ Orchestrate local GitHub Copilot multi-agent sessions, workflows, and automation
 
 ![Main Interface](docs/screenshots/mainscreen-color.jpg)
 
-> 🌐 **[Visit the Copilot Console website →](https://sanchar10.github.io/copilot-agent-console)** for a full feature showcase with screenshots and demos.
+> 🌐 **[Visit the Copilot Console website →](https://sanchar10.github.io/copilot-console)** for a full feature showcase with screenshots and demos.
 
 A visual management layer on top of [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli). Built with the [Copilot Python SDK](https://github.com/github/copilot-sdk).
 
@@ -61,7 +61,7 @@ Enable via `cli-notify on` from the command line, or toggle in Console Settings.
 One command to install (or upgrade):
 
 ```powershell
-irm https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/sanchar10/copilot-console/main/scripts/install.ps1 | iex
 ```
 
 Then start:

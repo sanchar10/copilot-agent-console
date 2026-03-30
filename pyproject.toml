@@ -64,10 +64,10 @@ copilot-console = "copilot_console.cli:main"
 cli-notify = "copilot_console.cli_notify:main"
 
 [project.urls]
-Homepage = "https://github.com/sanchar10/copilot-agent-console"
-Documentation = "https://github.com/sanchar10/copilot-agent-console#readme"
-Repository = "https://github.com/sanchar10/copilot-agent-console"
-Issues = "https://github.com/sanchar10/copilot-agent-console/issues"
+Homepage = "https://github.com/sanchar10/copilot-console"
+Documentation = "https://github.com/sanchar10/copilot-console#readme"
+Repository = "https://github.com/sanchar10/copilot-console"
+Issues = "https://github.com/sanchar10/copilot-console/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/copilot_console"]

@@ -1,7 +1,7 @@
 # Copilot Console - One-click installer for Windows
-# Usage: irm https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1 | iex
+# Usage: irm https://raw.githubusercontent.com/sanchar10/copilot-console/main/scripts/install.ps1 | iex
 
-$REPO = "sanchar10/copilot-agent-console"
+$REPO = "sanchar10/copilot-console"
 
 Write-Host ""
 Write-Host "  Copilot Console Installer" -ForegroundColor Cyan

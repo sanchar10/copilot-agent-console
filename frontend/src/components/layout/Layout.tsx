@@ -10,7 +10,7 @@ interface UpdateInfo {
   release_url?: string;
 }
 
-const INSTALL_CMD = 'irm https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1 | iex';
+const INSTALL_CMD = 'irm https://raw.githubusercontent.com/sanchar10/copilot-console/main/scripts/install.ps1 | iex';
 
 function UpdateBanner({ info, onDismiss }: { info: UpdateInfo; onDismiss: () => void }) {
   return (

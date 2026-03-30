@@ -87,7 +87,7 @@ async def check_for_update() -> dict:
     import httpx
     from copilot_console import __version__
 
-    repo = "sanchar10/copilot-agent-console"
+    repo = "sanchar10/copilot-console"
     url = f"https://api.github.com/repos/{repo}/releases/latest"
 
     try:

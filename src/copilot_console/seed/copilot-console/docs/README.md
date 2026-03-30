@@ -88,7 +88,7 @@ The install script checks prerequisites, installs any missing dependencies, and 
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/sanchar10/copilot-agent-console/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/sanchar10/copilot-console/main/scripts/install.ps1 | iex
 ```
 
 Then start:
