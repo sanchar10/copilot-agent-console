@@ -3,11 +3,14 @@
 import ctypes
 import os
 import platform
+import re
 import subprocess
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
+
+from copilot_console.app.services.storage_service import storage_service
 
 router = APIRouter(prefix="/filesystem", tags=["filesystem"])
 
@@ -117,6 +120,78 @@ async def browse_directory(path: str | None = Query(None, description="Directory
 
 class OpenFileRequest(BaseModel):
     path: str
+    session_id: str | None = None
+
+
+_WEB_SCHEME_RE = re.compile(r"^[a-z][a-z0-9+.\-]*://", re.IGNORECASE)
+_KNOWN_NON_FILE_SCHEMES = {"http", "https", "mailto", "tel", "sms", "data", "ftp", "file"}
+
+
+def _is_web_url(candidate: str) -> bool:
+    """Return True for things the UI shouldn't be sending to /open."""
+    if not candidate:
+        return False
+    if candidate.startswith("//"):  # protocol-relative
+        return True
+    if candidate.lower().startswith("www."):
+        return True
+    if _WEB_SCHEME_RE.match(candidate):
+        return True
+    # mailto:/tel:/sms: etc. without //
+    head, sep, _ = candidate.partition(":")
+    if sep and head and head.lower() in _KNOWN_NON_FILE_SCHEMES:
+        return True
+    return False
+
+
+def _resolve_candidate(candidate: str, session_id: str | None) -> Path:
+    """Resolve a candidate path to an existing local Path or raise HTTPException.
+
+    Precedence:
+      1. Web scheme -> 400 (UI bug; should have been caught client-side).
+      2. Absolute path that exists -> return it.
+      3. Relative/bare with session_id -> join against session.cwd; return if exists.
+      4. Otherwise -> 404.
+    """
+    raw = (candidate or "").strip()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Empty path")
+
+    if _is_web_url(raw):
+        raise HTTPException(
+            status_code=400,
+            detail="Web URLs should be opened in the browser, not via /open",
+        )
+
+    expanded = Path(raw).expanduser()
+
+    if expanded.is_absolute():
+        if expanded.exists():
+            return expanded
+        raise HTTPException(status_code=404, detail=f"File not found: {raw}")
+
+    # Relative or bare name — needs session context.
+    if not session_id:
+        raise HTTPException(
+            status_code=400,
+            detail="session_id required to resolve relative or bare path",
+        )
+
+    session_meta = storage_service.load_session(session_id)
+    if not session_meta:
+        raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
+
+    cwd_raw = session_meta.get("cwd")
+    if not cwd_raw:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Session {session_id} has no cwd",
+        )
+    cwd = Path(str(cwd_raw)).expanduser()
+    joined = (cwd / expanded).resolve()
+    if joined.exists():
+        return joined
+    raise HTTPException(status_code=404, detail=f"File not found: {raw}")
 
 
 class OpenWithRequest(BaseModel):
@@ -172,14 +247,18 @@ async def open_with(request: OpenWithRequest) -> dict:
 
 @router.post("/open")
 async def open_file(request: OpenFileRequest) -> dict:
-    """Open a file with the OS default application.
+    """Open a file or folder with the OS default application.
 
-    Accepts paths starting with ``~`` (expanded to the user's home directory)
-    so callers can pass the same display-friendly form shown in the UI.
+    Accepts:
+      - Absolute paths (Windows drive, UNC, POSIX) — opened directly if they exist.
+      - ``~``-prefixed paths — expanded against the user's home directory.
+      - Relative paths or bare filenames — resolved against the session's cwd
+        (``session_id`` is required in this case).
+
+    Web URLs (``http(s):``, ``mailto:``, ``//host``, ``www.``) are rejected with
+    400; the frontend should render those as native ``<a target="_blank">``.
     """
-    file_path = Path(request.path).expanduser()
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail=f"File not found: {request.path}")
+    file_path = _resolve_candidate(request.path, request.session_id)
 
     try:
         system = platform.system()

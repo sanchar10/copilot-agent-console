@@ -193,6 +193,7 @@ export function useSlashCommands(sessionId?: string) {
             content: result.answer,
             timestamp: new Date().toISOString(),
             kind: 'help',
+            helpSessionId: result.session_id,
           });
         } catch (err) {
           addMessage(sessionId, {

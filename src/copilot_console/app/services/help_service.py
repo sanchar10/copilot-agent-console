@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import asyncio
 
-from copilot_console.app.config import APP_HOME, DEFAULT_CWD
+from copilot_console.app.config import APP_HOME
 from copilot_console.app.models.agent import AgentTools
 from copilot_console.app.models.session import SessionCreate
 from copilot_console.app.services.copilot_service import copilot_service
@@ -30,6 +30,7 @@ _HELP_VERSION_KEY = "help_session_app_version"
 _HELP_SESSION_NAME = "Copilot Console Help"
 _HELP_TRIGGER = "help"
 _HELP_TIMEOUT_SECONDS = 120
+_HELP_CWD = str(APP_HOME / "docs")
 
 _lock = asyncio.Lock()
 
@@ -139,7 +140,7 @@ async def _get_or_create_help_session() -> tuple[str, bool, str]:
     session = await session_service.create_session(SessionCreate(
         model=model,
         name=_HELP_SESSION_NAME,
-        cwd=DEFAULT_CWD,
+        cwd=_HELP_CWD,
         mcp_servers=[],
         tools=AgentTools(builtin=["view"]),
         system_message={"mode": "replace", "content": _build_system_prompt()},
@@ -183,7 +184,7 @@ async def ask_help(question: str) -> dict:
                 copilot_service.send_message_background(
                     session_id=session_id,
                     model=model,
-                    cwd=DEFAULT_CWD,
+                    cwd=_HELP_CWD,
                     prompt=q,
                     buffer=buffer,
                     available_tools=tools_builtin,

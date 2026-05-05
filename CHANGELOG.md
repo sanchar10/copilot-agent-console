@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.8.7
+
+### Release Summary
+
+Citation pipeline overhaul. File / folder references in chat messages are now reliably detected, classified per-platform (Windows / POSIX / macOS), and resolved against the right working directory on click — including for `/help` responses, which now route through the help agent's `docs/` cwd. Plain-text references (no markdown link wrapping), nested markdown like `<span>`-wrapped text, and edge cases such as `/etc/hosts`, `/Users/me/Documents`, and `workspace\folder-name` all work. False positives on prose like `if/else`, `application/json`, `3/4`, and regex escapes (`\d`, `\n`) have been eliminated.
+
+### 🐛 Fixes
+
+- **File citations now work for plain-text paths** — `frontend/src/utils/citation.tsx` introduces a strict per-platform scanner regex (Windows / UNC / POSIX-sysroot / POSIX-with-extension / `~/path` / Windows-relative / POSIX-relative-with-ext / bare filename). Previously only markdown-linked paths were detected.
+- **Recursive scanner walks into `<span>`, `<em>` etc.** — `processChildrenForCitations` no longer skips text wrapped in inline elements.
+- **`/etc/hosts`, `/usr/bin/ls`, `/Users/me/Documents` etc. now classify as files** — added POSIX system-root allowlist (Linux + macOS roots: `Users`, `Applications`, `Library`, `System`, `Volumes`, `private`).
+- **Help responses resolve under `docs/`** — `MessageBubble` wraps help messages in an inner `CitationProvider` keyed on `helpSessionId` so the help agent's cwd is used instead of the chat session's cwd.
+- **Server-side resolution endpoint** (`src/copilot_console/app/routers/filesystem.py`) — 4-tier precedence: web URL → 400, absolute path → open if exists, relative + session cwd → join, else 404 with toast.
+- **No more clickable false positives** — `if/else`, `application/json`, `Read/write`, `true/false`, `3/4`, `16/9`, `\d`, `\n`, `www.example.com/page/article` all stay plain text.
+- **Removed legacy `processFileLinks.tsx`** — replaced by the consolidated `citation.tsx`.
+
+### ⚠️ Known Limitations
+
+- **Single-segment relative folders** in plain text (e.g. `Desktop/`, `Documents/`) are not auto-detected — indistinguishable from prose like `etc/`, `or/`. Workaround: use absolute path or wrap in markdown link.
+- **CommonMark backslash escapes** — paths like `C:\Users\sandee\.copilot\…` get the `\.` stripped by the CommonMark parser. LLM-side issue; out of scope.
+
+---
+
 ## v0.8.6
 
 ### Release Summary

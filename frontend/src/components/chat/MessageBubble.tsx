@@ -6,9 +6,12 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { Message, MessageAttachment } from '../../types/message';
 import { usePinStore } from '../../stores/pinStore';
 import { useUIStore } from '../../stores/uiStore';
-import type { Components } from 'react-markdown';
 import { MermaidDiagram, isMermaidCode } from './MermaidDiagram';
-import { processFileLinks, isFilePath, resolveFileHref, handleFilePathClick } from '../../utils/processFileLinks';
+import {
+  createCitationMarkdownComponents,
+  handleCitationClick,
+  CitationProvider,
+} from '../../utils/citation';
 import { UnpinnedIcon, PinnedIcon } from './PinIcons';
 import { fileIcon } from '../../utils/fileIcon';
 import { formatTimestamp } from '../../utils/formatTimestamp';
@@ -55,177 +58,74 @@ function AttachmentChips({ attachments }: { attachments: MessageAttachment[] }) 
   );
 }
 
-// Markdown components for rich rendering
-function createMarkdownComponents(cwd?: string | null): Components {
-  return {
-  // Strip the <pre> wrapper — each code type handles its own container:
-  // SyntaxHighlighter uses PreTag="div", MermaidDiagram has its own wrapper
-  pre({ children }) {
-    return <>{children}</>;
-  },
-  code({ className, children }) {
-    const match = /language-(\w+)/.exec(className || '');
-    const language = match ? match[1] : undefined;
-    const codeContent = String(children).replace(/\n$/, '');
-    const isInline = !match && !String(children).includes('\n');
-    
-    // Render mermaid diagrams
-    if (isMermaidCode(language)) {
-      return <MermaidDiagram code={codeContent} className="my-3" />;
-    }
-    
-    if (isInline) {
-      const text = String(children);
-      if (isFilePath(text)) {
-        return (
-          <code
-            data-filepath={text}
-            className="bg-blue-50/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono cursor-pointer hover:underline"
-          >
-            📄 {children}
-          </code>
-        );
+// Markdown components for rich rendering — uses the unified citation factory
+// with a syntax-highlighting fenced-code renderer + mermaid support.
+function createMarkdownComponents(): import('react-markdown').Components {
+  const base = createCitationMarkdownComponents({
+    renderFencedCode: ({ language, codeContent }) => {
+      if (isMermaidCode(language)) {
+        return <MermaidDiagram code={codeContent} className="my-3" />;
       }
       return (
-        <code className="bg-gray-100 dark:bg-[#1e1e2e] text-pink-600 dark:text-pink-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
-          {children}
-        </code>
-      );
-    }
-    
-    return (
-      <div className="relative group my-3">
-        <div className="absolute top-2 right-2 flex flex-col items-center z-10 group/copy">
-          <button
-            onClick={(e) => {
-              navigator.clipboard.writeText(codeContent).catch(() => {
-                const ta = document.createElement('textarea');
-                ta.value = codeContent;
-                ta.style.position = 'fixed';
-                ta.style.left = '-9999px';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-              });
+        <div className="relative group my-3">
+          <div className="absolute top-2 right-2 flex flex-col items-center z-10 group/copy">
+            <button
+              onClick={(e) => {
+                navigator.clipboard.writeText(codeContent).catch(() => {
+                  const ta = document.createElement('textarea');
+                  ta.value = codeContent;
+                  ta.style.position = 'fixed';
+                  ta.style.left = '-9999px';
+                  document.body.appendChild(ta);
+                  ta.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(ta);
+                });
 
-              const btn = e.currentTarget as HTMLElement;
-              const icon = btn.querySelector('.copy-icon');
-              const check = btn.querySelector('.check-icon');
-              const label = btn.parentElement?.querySelector('.copy-label');
-              if (icon) icon.classList.add('hidden');
-              if (check) check.classList.remove('hidden');
-              if (label) label.classList.add('hidden');
-              setTimeout(() => {
-                if (icon) icon.classList.remove('hidden');
-                if (check) check.classList.add('hidden');
-                if (label) label.classList.remove('hidden');
-              }, 1500);
-            }}
-            className="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gray-600/80 transition-colors"
+                const btn = e.currentTarget as HTMLElement;
+                const icon = btn.querySelector('.copy-icon');
+                const check = btn.querySelector('.check-icon');
+                const label = btn.parentElement?.querySelector('.copy-label');
+                if (icon) icon.classList.add('hidden');
+                if (check) check.classList.remove('hidden');
+                if (label) label.classList.add('hidden');
+                setTimeout(() => {
+                  if (icon) icon.classList.remove('hidden');
+                  if (check) check.classList.add('hidden');
+                  if (label) label.classList.remove('hidden');
+                }, 1500);
+              }}
+              className="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gray-600/80 transition-colors"
+            >
+              <svg className="copy-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" strokeWidth="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" strokeWidth="2" />
+              </svg>
+              <svg className="check-icon w-4 h-4 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </button>
+            <span className="copy-label text-[11px] text-gray-400 opacity-0 group-hover/copy:opacity-100 transition-opacity">Copy</span>
+          </div>
+          {language && (
+            <span className="absolute top-2 left-3 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              {language}
+            </span>
+          )}
+          <SyntaxHighlighter
+            style={oneDark as any}
+            language={language || 'text'}
+            PreTag="div"
+            className="rounded-lg !my-0"
+            customStyle={{ fontSize: '0.9rem', lineHeight: '1.5' }}
           >
-            <svg className="copy-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <rect x="9" y="9" width="13" height="13" rx="2" strokeWidth="2" />
-              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" strokeWidth="2" />
-            </svg>
-            <svg className="check-icon w-4 h-4 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </button>
-          <span className="copy-label text-[11px] text-gray-400 opacity-0 group-hover/copy:opacity-100 transition-opacity">Copy</span>
+            {codeContent}
+          </SyntaxHighlighter>
         </div>
-        {language && (
-          <span className="absolute top-2 left-3 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-            {language}
-          </span>
-        )}
-        <SyntaxHighlighter
-          style={oneDark as any}
-          language={language || 'text'}
-          PreTag="div"
-          className="rounded-lg !my-0"
-          customStyle={{ fontSize: '0.9rem', lineHeight: '1.5' }}
-        >
-          {codeContent}
-        </SyntaxHighlighter>
-      </div>
-    );
-  },
-  table({ children }) {
-    return (
-      <div className="overflow-x-auto my-3">
-        <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
-          {children}
-        </table>
-      </div>
-    );
-  },
-  thead({ children }) {
-    return <thead className="bg-gray-100 dark:bg-[#2a2a3c]">{children}</thead>;
-  },
-  th({ children }) {
-    return (
-      <th className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-left font-semibold text-sm">
-        {children}
-      </th>
-    );
-  },
-  td({ children }) {
-    return (
-      <td className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm">
-        {children}
-      </td>
-    );
-  },
-  a({ href, children }) {
-    const resolvedPath = resolveFileHref(href, cwd);
-    if (resolvedPath) {
-      return (
-        <span
-          data-filepath={resolvedPath}
-          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline cursor-pointer"
-          title={`Click to open: ${resolvedPath}`}
-        >
-          📄 {children}
-        </span>
       );
-    }
-    const safeHref = href && /^www\./i.test(href) ? `https://${href}` : href;
-    return (
-      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
-        {children}
-      </a>
-    );
-  },
-  ul({ children }) {
-    return <ul className="list-disc list-inside my-2 space-y-1">{children}</ul>;
-  },
-  ol({ children }) {
-    return <ol className="list-decimal list-inside my-2 space-y-1">{children}</ol>;
-  },
-  blockquote({ children }) {
-    return (
-      <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 my-3">
-        {children}
-      </blockquote>
-    );
-  },
-  h1({ children }) {
-    return <h1 className="text-xl font-bold mt-4 mb-2">{children}</h1>;
-  },
-  h2({ children }) {
-    return <h2 className="text-lg font-bold mt-3 mb-2">{children}</h2>;
-  },
-  h3({ children }) {
-    return <h3 className="text-base font-bold mt-3 mb-1">{children}</h3>;
-  },
-  p({ children }) {
-    return <p className="my-2">{processFileLinks(children)}</p>;
-  },
-  hr() {
-    return <hr className="my-4 border-gray-300 dark:border-gray-600" />;
-  },
-  };
+    },
+  });
+  return base;
 }
 
 function useSearchHighlight(ref: React.RefObject<HTMLElement | null>, term: string | null) {
@@ -269,11 +169,11 @@ function useSearchHighlight(ref: React.RefObject<HTMLElement | null>, term: stri
   }, [ref, term]);
 }
 
-export const MessageBubble = memo(function MessageBubble({ message, cwd, sessionId, onPinCreated }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message, sessionId, onPinCreated }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
   const isEnqueued = isUser && message.mode === 'enqueue';
-  const mdComponents = useMemo(() => createMarkdownComponents(cwd), [cwd]);
+  const mdComponents = useMemo(() => createMarkdownComponents(), []);
   const searchTerm = useUIStore((s) => s.searchHighlightTerm);
   const bodyRef = useRef<HTMLDivElement>(null);
   useSearchHighlight(bodyRef, searchTerm);
@@ -346,7 +246,7 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
         </div>
         
         {/* Message body */}
-        <div ref={bodyRef} onClick={handleFilePathClick} className={`relative rounded-lg px-4 py-3 ${
+        <div ref={bodyRef} onClick={handleCitationClick} className={`relative rounded-lg px-4 py-3 ${
           isHelp && !isUser
             ? 'bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/40'
             : isEnqueued
@@ -492,9 +392,17 @@ export const MessageBubble = memo(function MessageBubble({ message, cwd, session
             </>
           ) : (
             <div className="prose prose-sm max-w-none prose-gray dark:prose-invert">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
-                {message.content}
-              </ReactMarkdown>
+              {isHelp && message.helpSessionId ? (
+                <CitationProvider sessionId={message.helpSessionId}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                    {message.content}
+                  </ReactMarkdown>
+                </CitationProvider>
+              ) : (
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                  {message.content}
+                </ReactMarkdown>
+              )}
             </div>
           )}
         </div>

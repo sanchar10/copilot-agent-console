@@ -27,6 +27,12 @@ export interface Message {
    * make clear they are NOT part of the primary agent's conversation context.
    */
   kind?: 'help';
+  /**
+   * For `kind === 'help'` messages: the /help agent's own session id, used to
+   * resolve file citations against the help agent's cwd (~/.copilot-console/docs)
+   * rather than the host tab's cwd.
+   */
+  helpSessionId?: string;
 }
 
 export interface StreamingMessage {

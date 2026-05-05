@@ -1,6 +1,6 @@
 # Copilot Console
 
-Orchestrate local GitHub Copilot multi-agent sessions, workflows, and automations from a unified control center with live activity.
+> **Copilot CLI, organized.** A friendly visual front-end for [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli) — every session in one window, with per-task MCP servers, agents, and workflows. Plus a phone view of the whole console. Copilot CLI still does all the real work; Console just makes it nicer to live in.
 
 ![Copilot Console](https://img.shields.io/badge/Copilot-Console-blue?style=flat-square)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows)
@@ -11,17 +11,29 @@ Orchestrate local GitHub Copilot multi-agent sessions, workflows, and automation
 
 ![Main Interface](docs/screenshots/mainscreen-color.jpg)
 
+<!-- TODO(launch): replace the static screenshot above with a 5–10s looping GIF showing
+     (1) four sessions in the sidebar, (2) clicking to switch, (3) per-session context
+     panel changing. Recording: see docs/launch/demo-checklist.md -->
+
 > 🌐 **[Visit the Copilot Console website →](https://sanchar10.github.io/copilot-console)** for a full feature showcase with screenshots and demos.
 
-A visual management layer on top of [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli). Built with the [Copilot Python SDK](https://github.com/github/copilot-sdk).
+### Why you might want this
 
-> **Why?** Sessions pile up fast across repos and tasks. Context gets lost between threads. You are stuck at your desk waiting for agent to finish. Console solves these with a visual layer on top of Copilot CLI — organize work, control context per session, search across everything, and monitor from anywhere. Move beyond chat to effectively managing your work.
+Copilot CLI is great. But by Wednesday afternoon you have 8 sessions open across 6 repos, you're not sure which terminal asked which question, and switching between them is terminal-tab gymnastics. Console gives you:
 
-> **Platform:** Windows, macOS, and Linux (Ubuntu 22.04+).
+- 🪟 **Every session in one window** — click to switch, see what each one is doing at a glance
+- 🧰 **Per-session context** — different MCP servers, agents, models, and working directory per task
+- 🔁 **Workflows & automations** — chain agents, schedule runs, repeat the boring stuff
+- 🔍 **Find what you did last week** — search across every past session, pin responses with notes
+- 📱 **Phone view of the whole console** — every session, search, workflows, push notifications
+
+> **A note on mobile:** GitHub's built-in [`/remote`](https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/copilot-cli/use-copilot-cli/steer-remotely) command is a great way to steer a single CLI session from your phone via GitHub Mobile. Console's mobile view takes it further — every session, search, workflows, and the agent library, all from one place — and works for sessions outside GitHub.com-hosted repos too. Use whichever fits.
+
+Built on the [Copilot Python SDK](https://github.com/github/copilot-sdk). Open source, MIT-licensed, one-line install, runs locally. **Platform:** Windows, macOS, Linux (Ubuntu 22.04+).
 
 ---
 
-## Features
+## Full feature list
 
 | | Feature | Description |
 |---|---|---|

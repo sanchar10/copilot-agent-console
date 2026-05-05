@@ -4,6 +4,7 @@ import { useChatStore } from '../../stores/chatStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useTabStore } from '../../stores/tabStore';
 import { MessageBubble } from './MessageBubble';
+import { CitationProvider } from '../../utils/citation';
 import { usePinStore } from '../../stores/pinStore';
 import { StreamingMessage } from './StreamingMessage';
 import { ElicitationCard, ResolvedElicitationCard } from './ElicitationCard';
@@ -424,9 +425,15 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
                         </div>
                       )}
                       {messages.map((message) => (
-                        <MessageBubble key={message.id} message={message} cwd={session?.cwd} sessionId={sessionId} onPinCreated={handlePinCreated} />
+                        <CitationProvider key={message.id} sessionId={sessionId} cwd={session?.cwd}>
+                          <MessageBubble message={message} cwd={session?.cwd} sessionId={sessionId} onPinCreated={handlePinCreated} />
+                        </CitationProvider>
                       ))}
-                      {isStreaming && (streamingContent || streamingSteps.length > 0) && <StreamingMessage content={streamingContent} steps={streamingSteps} cwd={session?.cwd} />}
+                      {isStreaming && (streamingContent || streamingSteps.length > 0) && (
+                        <CitationProvider sessionId={sessionId} cwd={session?.cwd}>
+                          <StreamingMessage content={streamingContent} steps={streamingSteps} cwd={session?.cwd} />
+                        </CitationProvider>
+                      )}
                       {/* Resolved elicitations */}
                       {(resolvedElicitationsForSession || []).map((re, i) => (
                         <ResolvedElicitationCard key={`resolved-${i}`} resolved={re} schema={re.schema} />

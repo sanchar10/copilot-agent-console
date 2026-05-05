@@ -2,8 +2,10 @@ import { useRef, useEffect, useMemo, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { ChatStep } from '../../types/message';
-import type { Components } from 'react-markdown';
-import { processFileLinks, isFilePath, resolveFileHref, handleFilePathClick } from '../../utils/processFileLinks';
+import {
+  createCitationMarkdownComponents,
+  handleCitationClick,
+} from '../../utils/citation';
 
 interface StreamingMessageProps {
   content: string;
@@ -82,107 +84,14 @@ function splitSegments(content: string): Segment[] {
   return segments;
 }
 
-// --- Markdown components for text segments only (no code blocks) ---
-
-function createStreamingMarkdownComponents(cwd?: string | null): Components {
-  return {
-  pre({ children }) {
-    return <>{children}</>;
-  },
-  code({ children }) {
-    // Only inline code reaches here — all fenced blocks are handled by splitSegments
-    const text = String(children);
-    if (isFilePath(text)) {
-      return (
-        <code
-          data-filepath={text}
-          className="bg-blue-50/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono cursor-pointer hover:underline"
-        >
-          📄 {children}
-        </code>
-      );
-    }
-    return (
-      <code className="bg-gray-100 dark:bg-[#1e1e2e] text-pink-600 dark:text-pink-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
-        {children}
-      </code>
-    );
-  },
-  table({ children }) {
-    return (
-      <div className="overflow-x-auto my-3">
-        <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
-          {children}
-        </table>
-      </div>
-    );
-  },
-  thead({ children }) {
-    return <thead className="bg-gray-100 dark:bg-[#2a2a3c]">{children}</thead>;
-  },
-  th({ children }) {
-    return (
-      <th className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-left font-semibold text-sm">
-        {children}
-      </th>
-    );
-  },
-  td({ children }) {
-    return (
-      <td className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm">
-        {children}
-      </td>
-    );
-  },
-  a({ href, children }) {
-    const resolvedPath = resolveFileHref(href, cwd);
-    if (resolvedPath) {
-      return (
-        <span
-          data-filepath={resolvedPath}
-          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline cursor-pointer"
-          title={`Click to open: ${resolvedPath}`}
-        >
-          📄 {children}
-        </span>
-      );
-    }
-    const safeHref = href && /^www\./i.test(href) ? `https://${href}` : href;
-    return (
-      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
-        {children}
-      </a>
-    );
-  },
-  ul({ children }) {
-    return <ul className="list-disc list-inside my-2 space-y-1">{children}</ul>;
-  },
-  ol({ children }) {
-    return <ol className="list-decimal list-inside my-2 space-y-1">{children}</ol>;
-  },
-  blockquote({ children }) {
-    return (
-      <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 my-3">
-        {children}
-      </blockquote>
-    );
-  },
-  h1({ children }) {
-    return <h1 className="text-xl font-bold mt-4 mb-2">{children}</h1>;
-  },
-  h2({ children }) {
-    return <h2 className="text-lg font-bold mt-3 mb-2">{children}</h2>;
-  },
-  h3({ children }) {
-    return <h3 className="text-base font-bold mt-3 mb-1">{children}</h3>;
-  },
-  p({ children }) {
-    return <p className="my-2">{processFileLinks(children)}</p>;
-  },
-  hr() {
-    return <hr className="my-4 border-gray-300 dark:border-gray-600" />;
-  },
-  };
+// --- Markdown components for text segments only (no fenced code blocks) ---
+//
+// Fenced code blocks are extracted by splitSegments and rendered separately
+// via StreamingCodeBlock, so the factory's default <pre> renderer never gets
+// reached. Inline code, links, and paragraphs go through the unified citation
+// pipeline.
+function createStreamingMarkdownComponents(): import('react-markdown').Components {
+  return createCitationMarkdownComponents();
 }
 
 // --- Code segment renderer (stable <pre> — no heavy components) ---
@@ -204,11 +113,11 @@ function StreamingCodeBlock({ segment }: { segment: CodeSegment }) {
 
 // --- Main component ---
 
-export function StreamingMessage({ content, steps, cwd }: StreamingMessageProps) {
+export function StreamingMessage({ content, steps }: StreamingMessageProps) {
   const stepsRef = useRef<HTMLDivElement>(null);
   const stepsUserScrolledRef = useRef(false);
   const stepsIsProgrammaticRef = useRef(false);
-  const mdComponents = useMemo(() => createStreamingMarkdownComponents(cwd), [cwd]);
+  const mdComponents = useMemo(() => createStreamingMarkdownComponents(), []);
 
   // Auto-scroll steps only if user hasn't manually scrolled up
   useEffect(() => {
@@ -245,7 +154,7 @@ export function StreamingMessage({ content, steps, cwd }: StreamingMessageProps)
         </div>
 
         {/* Message body */}
-        <div onClick={handleFilePathClick} className="rounded-lg px-4 py-3 bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700">
+        <div onClick={handleCitationClick} className="rounded-lg px-4 py-3 bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700">
           {steps && steps.length > 0 && (
             <div className="mb-2 text-sm">
               <div className="text-gray-600 dark:text-gray-400 font-medium mb-2">
