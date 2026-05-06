@@ -256,15 +256,15 @@
 
       <!-- Hero video (click-to-play with screenshot poster) -->
       <div class="fade-in stagger-4 max-w-5xl mx-auto">
-        <div class="screenshot-glow rounded-xl overflow-hidden border border-white/10 bg-surface-800">
+        <div class="screenshot-glow rounded-xl overflow-hidden border border-white/10 bg-surface-800" style="aspect-ratio: 1920 / 968;">
           <video
             controls
             preload="metadata"
             poster="screenshots/mainscreen-color.jpg"
-            class="w-full block"
+            class="w-full h-full block object-cover"
             aria-label="Copilot Console product demo">
             <source src="screenshots/demo.mp4" type="video/mp4">
-            <img src="screenshots/mainscreen-color.jpg" alt="Copilot Console main interface" class="w-full">
+            <img src="screenshots/mainscreen-color.jpg" alt="Copilot Console main interface" class="w-full h-full object-cover">
           </video>
         </div>
         <p class="text-center mt-6 text-sm text-gray-400 fade-in stagger-5">
