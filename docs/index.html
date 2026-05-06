@@ -4,7 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Copilot Console — Visual Management for GitHub Copilot CLI</title>
-  <meta name="description" content="Orchestrate multi-agent sessions, workflows, and automations from a unified control center. Mobile notifications, fleet mode, agentic web browsing.">
+  <meta name="description" content="A visual control center for the GitHub Copilot CLI. Manage parallel sessions, agents, and workflows from one window — with cross-session search and mobile access wherever you are.">
+
+  <!-- Open Graph / Twitter card for rich link previews -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sanchar10.github.io/copilot-console/">
+  <meta property="og:title" content="Copilot Console — Visual Management for GitHub Copilot CLI">
+  <meta property="og:description" content="A visual control center for the GitHub Copilot CLI. Manage parallel sessions, agents, and workflows from one window — with cross-session search and mobile access wherever you are.">
+  <meta property="og:image" content="https://sanchar10.github.io/copilot-console/screenshots/mainscreen-color.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Copilot Console — Visual Management for GitHub Copilot CLI">
+  <meta name="twitter:description" content="A visual control center for the GitHub Copilot CLI. Manage parallel sessions, agents, and workflows from one window.">
+  <meta name="twitter:image" content="https://sanchar10.github.io/copilot-console/screenshots/mainscreen-color.jpg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -227,13 +239,13 @@
           <span class="bg-gradient-to-r from-accent-light to-indigo-400 bg-clip-text text-transparent">visualized.</span>
         </h1>
         <p class="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-4xl mx-auto mb-10 fade-in stagger-2">
-          Copilot CLI is powerful — but sessions pile up, context gets lost across tasks, and you're tied to the desk.
-          Console gives you visual session management, per-session context control, cross-session search, and mobile access. Move beyond chat to effectively managing your work.
+          A visual control center for the GitHub Copilot CLI. Manage parallel sessions, agents, and workflows
+          from one window &mdash; with cross-session search and mobile access wherever you are.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in stagger-3">
           <a href="#install"
              class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-display font-600 rounded-xl transition-colors text-sm">
-            Install with one command →
+            Get started →
           </a>
           <a href="https://github.com/sanchar10/copilot-console" target="_blank"
              class="px-6 py-3 bg-white/5 hover:bg-white/10 text-gray-300 font-display font-500 rounded-xl border border-white/10 transition-colors text-sm">
@@ -242,15 +254,23 @@
         </div>
       </div>
 
-      <!-- Hero screenshot -->
+      <!-- Hero video (click-to-play with screenshot poster) -->
       <div class="fade-in stagger-4 max-w-5xl mx-auto">
-        <div class="screenshot-glow rounded-xl overflow-hidden border border-white/10">
-          <img src="screenshots/mainscreen-color.jpg" alt="Copilot Console main interface" class="w-full" onerror="this.parentElement.classList.add('screenshot-placeholder');this.parentElement.style.height='400px';this.alt='Screenshot placeholder';this.style.display='none';this.parentElement.innerHTML='📸 Hero screenshot'">
+        <div class="screenshot-glow rounded-xl overflow-hidden border border-white/10 bg-surface-800">
+          <video
+            controls
+            preload="metadata"
+            poster="screenshots/mainscreen-color.jpg"
+            class="w-full block"
+            aria-label="Copilot Console product demo">
+            <source src="screenshots/demo.mp4" type="video/mp4">
+            <img src="screenshots/mainscreen-color.jpg" alt="Copilot Console main interface" class="w-full">
+          </video>
         </div>
         <p class="text-center mt-6 text-sm text-gray-400 fade-in stagger-5">
           <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
             <span class="text-accent-light">⚡</span>
-            Every <strong class="text-white">Copilot CLI session</strong>, auto-discovered in Console. Every finish, notified. Continue from <strong class="text-white">CLI</strong>, <strong class="text-white">Desktop</strong>, or <strong class="text-white">Mobile</strong>.
+            Every <strong class="text-white">Copilot CLI session</strong>, auto-discovered. Continue from <strong class="text-white">CLI</strong>, <strong class="text-white">Desktop</strong>, or <strong class="text-white">Mobile</strong>.
           </span>
         </p>
       </div>
