@@ -179,6 +179,22 @@ def setup_logging(level: int = logging.INFO) -> None:
     logging.getLogger("tzlocal").setLevel(logging.WARNING)
     logging.getLogger("apscheduler").setLevel(logging.WARNING)
 
+    # Suppress benign OpenTelemetry context-detach errors. These are emitted by
+    # OTEL's `_RUNTIME_CONTEXT.detach()` when an async generator (e.g. an
+    # agent_framework workflow span) is cancelled in a different asyncio Task
+    # context than the one that created it — typical for SSE streams cancelled
+    # mid-flight when the UI navigates away. The workflow itself completes
+    # correctly; only the trace span doesn't close cleanly. See
+    # https://github.com/open-telemetry/opentelemetry-python/issues/2606
+    class _OtelContextDetachFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            msg = record.getMessage()
+            if "Failed to detach context" in msg:
+                return False
+            return True
+
+    logging.getLogger("opentelemetry.context").addFilter(_OtelContextDetachFilter())
+
     logging.info(f"Logging initialized. Logs dir: {LOGS_DIR}")
 
 
