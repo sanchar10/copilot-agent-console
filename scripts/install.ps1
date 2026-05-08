@@ -154,20 +154,36 @@ Write-Host ""
 
 # Resolve latest wheel URL from GitHub releases
 Write-Host "  Fetching latest release..." -ForegroundColor DarkGray
-try {
-    $releaseInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/$REPO/releases/latest" -Headers @{ "User-Agent" = "copilot-console-installer" }
-    $WHL_URL = ($releaseInfo.assets | Where-Object { $_.name -like "*.whl" } | Select-Object -First 1).browser_download_url
-    if (-not $WHL_URL) {
-        Write-Host "  [ERROR] No .whl found in latest release." -ForegroundColor Red
-        Write-Host "     Check https://github.com/$REPO/releases" -ForegroundColor Yellow
-        Stop-Installer 1
+$releaseInfo = $null
+$lastErr = $null
+for ($attempt = 1; $attempt -le 3; $attempt++) {
+    try {
+        $releaseInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/$REPO/releases/latest" -Headers @{ "User-Agent" = "copilot-console-installer" }
+        break
+    } catch {
+        $lastErr = $_
+        if ($attempt -lt 3) {
+            Write-Host "     Attempt $attempt failed ($($_.Exception.Message)); retrying..." -ForegroundColor DarkYellow
+            Start-Sleep -Seconds 2
+        }
     }
-    Write-Host "  [OK] Found $($releaseInfo.tag_name)" -ForegroundColor Green
-} catch {
+}
+if (-not $releaseInfo) {
     Write-Host "  [ERROR] Failed to fetch latest release from GitHub." -ForegroundColor Red
+    if ($lastErr) {
+        Write-Host "     Cause: $($lastErr.Exception.Message)" -ForegroundColor Yellow
+    }
+    Write-Host "     If this persists, you may be rate-limited by the GitHub API (60 requests/hour per IP)." -ForegroundColor Yellow
     Write-Host "     Check https://github.com/$REPO/releases for manual download." -ForegroundColor Yellow
     Stop-Installer 1
 }
+$WHL_URL = ($releaseInfo.assets | Where-Object { $_.name -like "*.whl" } | Select-Object -First 1).browser_download_url
+if (-not $WHL_URL) {
+    Write-Host "  [ERROR] No .whl found in latest release." -ForegroundColor Red
+    Write-Host "     Check https://github.com/$REPO/releases" -ForegroundColor Yellow
+    Stop-Installer 1
+}
+Write-Host "  [OK] Found $($releaseInfo.tag_name)" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "  ┌─────────────────────────────────────────────────────┐" -ForegroundColor Yellow
