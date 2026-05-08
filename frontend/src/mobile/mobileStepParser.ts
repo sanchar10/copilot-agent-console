@@ -26,7 +26,12 @@ export function parseSteps(steps: ChatStep[]): ParsedStep[] {
     if (consumed.has(i)) continue;
     const s = steps[i];
 
-    // Skip report_intent — noise
+    // Skip report_intent and bare-title "Intent" — both are surfaced via
+    // the input-area indicator and treated as transient noise here.
+    if (s.title === 'Intent') {
+      consumed.add(i);
+      continue;
+    }
     if (s.title === 'Tool: report_intent' || s.title?.includes('report_intent')) {
       consumed.add(i);
       // Also consume its matching "done"

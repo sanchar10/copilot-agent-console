@@ -15,7 +15,7 @@ import {
 import { UnpinnedIcon, PinnedIcon } from './PinIcons';
 import { fileIcon } from '../../utils/fileIcon';
 import { formatTimestamp } from '../../utils/formatTimestamp';
-import { hideStepsByToolName } from '../../utils/stepFilter';
+import { hideStepsByToolName, hideStepsByTitle, HIDDEN_STEP_TITLES } from '../../utils/stepFilter';
 
 interface MessageBubbleProps {
   message: Message;
@@ -286,10 +286,11 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
             </button>
           )}
           {!isUser && message.steps && message.steps.length > 0 && (() => {
-            // Hide raw rows for report_intent (already surfaced via 📌 indicator).
-            // ask_user / elicitation are kept here so the parser below can render
-            // them as styled "💬 Asked user → answer" blocks.
-            const steps = hideStepsByToolName(message.steps, ['report_intent']);
+            // Hide raw rows for report_intent (surfaced via input-area indicator)
+            // and bare-title "Intent" rows (assistant.intent SDK channel —
+            // transient by design). ask_user / elicitation are kept here so the
+            // parser below can render them as styled "💬 Asked user → answer" blocks.
+            const steps = hideStepsByTitle(hideStepsByToolName(message.steps, ['report_intent']), HIDDEN_STEP_TITLES);
             if (steps.length === 0) return null;
             // Parse ask_user/elicitation tool pairs for styled rendering
             type ParsedStep = { type: 'regular'; step: typeof steps[0] } | { type: 'ask_user'; question: string; answer: string } | { type: 'elicitation'; message: string; response: string };

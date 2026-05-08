@@ -14,6 +14,18 @@ import type { ChatStep } from '../types/message';
  */
 export const STEPS_WITH_DEDICATED_UI = ['ask_user', 'elicitation', 'report_intent'] as const;
 
+/**
+ * Step titles (verbatim, no `Tool:` prefix) that should be hidden from the
+ * steps panel because they are surfaced via a transient UI channel instead.
+ *
+ * - "Intent": new SDK 1.0.0b2 emits `assistant.intent` events as a bare-title
+ *   step. The intent is also pulled into `latestIntent` (chatStore) and shown
+ *   live in the input-area placeholder while streaming. Treating it as
+ *   transient avoids duplicating the same information in the persisted
+ *   message timeline.
+ */
+export const HIDDEN_STEP_TITLES = ['Intent'] as const;
+
 const TOOL_ID_REGEX = /(?:^|\s)id=(\S+)/;
 
 function extractToolId(detail: string | undefined): string | null {
@@ -64,4 +76,22 @@ export function hideStepsByToolName(steps: ChatStep[] | undefined, toolNames: re
     result.push(s);
   }
   return result;
+}
+
+/**
+ * Filter out steps whose title matches any in `titles` exactly.
+ *
+ * Pure function — does not mutate input. Use for steps that come through a
+ * non-tool channel (e.g., `assistant.intent` → title `"Intent"`) and have a
+ * dedicated transient UI surface elsewhere.
+ *
+ * @param steps Steps to filter
+ * @param titles Literal titles to hide
+ * @returns New array with matching rows removed
+ */
+export function hideStepsByTitle(steps: ChatStep[] | undefined, titles: readonly string[]): ChatStep[] {
+  if (!steps || steps.length === 0) return [];
+  if (titles.length === 0) return steps.slice();
+  const hide = new Set(titles);
+  return steps.filter((s) => !(s.title && hide.has(s.title)));
 }

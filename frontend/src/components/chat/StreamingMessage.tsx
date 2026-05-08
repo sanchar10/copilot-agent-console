@@ -6,7 +6,7 @@ import {
   createCitationMarkdownComponents,
   handleCitationClick,
 } from '../../utils/citation';
-import { hideStepsByToolName, STEPS_WITH_DEDICATED_UI } from '../../utils/stepFilter';
+import { hideStepsByToolName, hideStepsByTitle, STEPS_WITH_DEDICATED_UI, HIDDEN_STEP_TITLES } from '../../utils/stepFilter';
 
 interface StreamingMessageProps {
   content: string;
@@ -121,9 +121,10 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
   const mdComponents = useMemo(() => createStreamingMarkdownComponents(), []);
 
   // Hide raw rows for tools that already have dedicated UI surfaces
-  // (ask_user / elicitation cards, 📌 latest-intent indicator).
+  // (ask_user / elicitation cards, latest-intent indicator) and bare-title
+  // rows like "Intent" that are surfaced transiently elsewhere.
   const visibleSteps = useMemo(
-    () => hideStepsByToolName(steps, STEPS_WITH_DEDICATED_UI),
+    () => hideStepsByTitle(hideStepsByToolName(steps, STEPS_WITH_DEDICATED_UI), HIDDEN_STEP_TITLES),
     [steps],
   );
 

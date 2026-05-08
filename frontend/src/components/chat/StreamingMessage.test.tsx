@@ -36,7 +36,7 @@ describe('StreamingMessage', () => {
     const { container } = render(
       <StreamingMessage
         content=""
-        steps={[{ title: 'Intent', detail: 'Doing the thing' }]}
+        steps={[{ title: 'Tool: edit', detail: 'editing file' }]}
       />,
     );
     const borderedShell = container.querySelector('.rounded-lg.border');

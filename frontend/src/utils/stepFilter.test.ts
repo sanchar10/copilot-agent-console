@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hideStepsByToolName, STEPS_WITH_DEDICATED_UI } from './stepFilter';
+import { hideStepsByToolName, hideStepsByTitle, STEPS_WITH_DEDICATED_UI, HIDDEN_STEP_TITLES } from './stepFilter';
 import type { ChatStep } from '../types/message';
 
 const mk = (title: string, detail?: string): ChatStep => ({ title, detail });
@@ -103,6 +103,51 @@ describe('hideStepsByToolName', () => {
     ];
     const before = JSON.stringify(steps);
     hideStepsByToolName(steps, ['report_intent']);
+    expect(JSON.stringify(steps)).toBe(before);
+  });
+});
+
+describe('hideStepsByTitle', () => {
+  const mk = (title: string, detail?: string) => ({ title, detail, kind: 'info' as const });
+
+  it('returns empty for undefined / empty input', () => {
+    expect(hideStepsByTitle(undefined, ['Intent'])).toEqual([]);
+    expect(hideStepsByTitle([], ['Intent'])).toEqual([]);
+  });
+
+  it('returns a copy (not the same reference) when titles is empty', () => {
+    const steps = [mk('Intent', 'doing things')];
+    const out = hideStepsByTitle(steps, []);
+    expect(out).toEqual(steps);
+    expect(out).not.toBe(steps);
+  });
+
+  it('removes steps with matching title verbatim', () => {
+    const steps = [
+      mk('Intent', 'planning'),
+      mk('Tool: edit'),
+      mk('Intent', 'reviewing'),
+    ];
+    const out = hideStepsByTitle(steps, ['Intent']);
+    expect(out).toHaveLength(1);
+    expect(out[0].title).toBe('Tool: edit');
+  });
+
+  it('does NOT match prefixed titles like "Tool: Intent"', () => {
+    const steps = [mk('Tool: Intent', 'foo'), mk('Intent', 'bar')];
+    const out = hideStepsByTitle(steps, ['Intent']);
+    expect(out).toHaveLength(1);
+    expect(out[0].title).toBe('Tool: Intent');
+  });
+
+  it('HIDDEN_STEP_TITLES exports include "Intent"', () => {
+    expect(HIDDEN_STEP_TITLES).toContain('Intent');
+  });
+
+  it('does not mutate the input array', () => {
+    const steps = [mk('Intent', 'a'), mk('Tool: edit')];
+    const before = JSON.stringify(steps);
+    hideStepsByTitle(steps, ['Intent']);
     expect(JSON.stringify(steps)).toBe(before);
   });
 });
