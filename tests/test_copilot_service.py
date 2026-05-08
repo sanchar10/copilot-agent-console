@@ -377,7 +377,31 @@ class TestEnqueueAndAbort:
             result = await svc.enqueue_message("s1", "do something")
             assert result["status"] == "enqueued"
             assert result["message_id"] == "msg-123"
-            mock_session.send.assert_awaited_once()
+            # Regression guard for v0.9.0 SDK 1.0.0b2 upgrade: prompt MUST be passed
+            # positionally as a string and mode/attachments MUST be kwargs. Passing
+            # a dict positionally silently broke enqueue end-to-end (every call
+            # arrived as immediate mode with a stringified-dict prompt).
+            mock_session.send.assert_awaited_once_with("do something", mode="enqueue")
+        asyncio.run(_run())
+
+    def test_enqueue_message_with_attachments_uses_kwargs(self, monkeypatch, tmp_path):
+        async def _run():
+            svc = _make_copilot_service(monkeypatch, tmp_path)
+
+            mock_session = MagicMock()
+            mock_session.send = AsyncMock(return_value="msg-456")
+
+            mock_client = MagicMock()
+            mock_client.session = mock_session
+            mock_client.touch = MagicMock()
+            svc._session_clients["s1"] = mock_client
+
+            attachments = [{"type": "file", "path": "/tmp/x.txt"}]
+            result = await svc.enqueue_message("s1", "see file", attachments=attachments)
+            assert result["status"] == "enqueued"
+            mock_session.send.assert_awaited_once_with(
+                "see file", mode="enqueue", attachments=attachments
+            )
         asyncio.run(_run())
 
     def test_abort_session_calls_sdk_abort(self, monkeypatch, tmp_path):

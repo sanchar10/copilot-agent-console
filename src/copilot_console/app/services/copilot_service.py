@@ -1026,10 +1026,14 @@ class CopilotService:
 
         session = client.session
         client.touch()
-        send_opts: dict = {"prompt": prompt, "mode": "enqueue"}
+        # SDK 1.0.0b2 changed session.send() signature: prompt is positional,
+        # everything else is keyword-only. Passing a dict as the first arg silently
+        # stringifies it into the prompt and drops mode (defaults to immediate),
+        # which broke enqueue end-to-end. Always use kwargs for mode/attachments.
+        send_kwargs: dict = {"mode": "enqueue"}
         if attachments:
-            send_opts["attachments"] = attachments
-        message_id = await session.send(send_opts)
+            send_kwargs["attachments"] = attachments
+        message_id = await session.send(prompt, **send_kwargs)
         logger.debug(f"[{session_id}] Enqueued message: {prompt[:100]}... -> {message_id}")
         return {"status": "enqueued", "message_id": message_id}
 
