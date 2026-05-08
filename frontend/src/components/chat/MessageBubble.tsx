@@ -15,6 +15,7 @@ import {
 import { UnpinnedIcon, PinnedIcon } from './PinIcons';
 import { fileIcon } from '../../utils/fileIcon';
 import { formatTimestamp } from '../../utils/formatTimestamp';
+import { hideStepsByToolName } from '../../utils/stepFilter';
 
 interface MessageBubbleProps {
   message: Message;
@@ -285,8 +286,12 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
             </button>
           )}
           {!isUser && message.steps && message.steps.length > 0 && (() => {
+            // Hide raw rows for report_intent (already surfaced via 📌 indicator).
+            // ask_user / elicitation are kept here so the parser below can render
+            // them as styled "💬 Asked user → answer" blocks.
+            const steps = hideStepsByToolName(message.steps, ['report_intent']);
+            if (steps.length === 0) return null;
             // Parse ask_user/elicitation tool pairs for styled rendering
-            const steps = message.steps;
             type ParsedStep = { type: 'regular'; step: typeof steps[0] } | { type: 'ask_user'; question: string; answer: string } | { type: 'elicitation'; message: string; response: string };
             const parsed: ParsedStep[] = [];
             const consumed = new Set<number>();

@@ -6,6 +6,7 @@ import {
   createCitationMarkdownComponents,
   handleCitationClick,
 } from '../../utils/citation';
+import { hideStepsByToolName, STEPS_WITH_DEDICATED_UI } from '../../utils/stepFilter';
 
 interface StreamingMessageProps {
   content: string;
@@ -119,6 +120,13 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
   const stepsIsProgrammaticRef = useRef(false);
   const mdComponents = useMemo(() => createStreamingMarkdownComponents(), []);
 
+  // Hide raw rows for tools that already have dedicated UI surfaces
+  // (ask_user / elicitation cards, 📌 latest-intent indicator).
+  const visibleSteps = useMemo(
+    () => hideStepsByToolName(steps, STEPS_WITH_DEDICATED_UI),
+    [steps],
+  );
+
   // Auto-scroll steps only if user hasn't manually scrolled up
   useEffect(() => {
     if (stepsRef.current && !stepsUserScrolledRef.current) {
@@ -126,7 +134,7 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
       stepsRef.current.scrollTop = stepsRef.current.scrollHeight;
       requestAnimationFrame(() => { stepsIsProgrammaticRef.current = false; });
     }
-  }, [steps?.length]);
+  }, [visibleSteps.length]);
 
   const handleStepsScroll = useCallback(() => {
     if (stepsIsProgrammaticRef.current) return;
@@ -155,13 +163,13 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
 
         {/* Message body */}
         <div onClick={handleCitationClick} className="rounded-lg px-4 py-3 bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700">
-          {steps && steps.length > 0 && (
+          {visibleSteps.length > 0 && (
             <div className="mb-2 text-sm">
               <div className="text-gray-600 dark:text-gray-400 font-medium mb-2">
-                Steps ({steps.length})
+                Steps ({visibleSteps.length})
               </div>
               <div ref={stepsRef} onScroll={handleStepsScroll} className="text-gray-700 dark:text-gray-300 max-h-[300px] overflow-y-auto pr-1">
-                {steps.map((s, idx) => (
+                {visibleSteps.map((s, idx) => (
                   <div key={idx}>
                     {idx > 0 && <hr className="border-gray-200 dark:border-gray-700/50 mx-3 my-1.5" />}
                     <div className="border-l-2 border-emerald-300 pl-3 py-1">
