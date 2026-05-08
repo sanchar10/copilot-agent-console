@@ -288,11 +288,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
   addStreamingStep: (sessionId, step) =>
     set((state) => {
       const current = state.streamingPerSession[sessionId] || emptyStreamingState;
-      // Extract intent from report_intent tool calls
+      // Extract intent from report_intent tool calls (legacy SDK path) or
+      // assistant.intent SDK events (new SDK path; backend emits as "Intent").
       let latestIntent = current.latestIntent;
       if (step.title === 'Tool: report_intent' && step.detail) {
         const match = step.detail.match(/"intent":\s*"([^"]+)"/);
         if (match) latestIntent = match[1];
+      } else if (step.title === 'Intent' && step.detail) {
+        latestIntent = step.detail;
       }
       return {
         streamingPerSession: {

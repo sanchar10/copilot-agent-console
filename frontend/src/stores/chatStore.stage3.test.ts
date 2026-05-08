@@ -128,6 +128,36 @@ describe('chatStore — Stage 3 characterization', () => {
       });
       expect(useChatStore.getState().streamingPerSession['s1'].latestIntent).toBe('Second');
     });
+
+    it('extracts intent from "Intent" step (assistant.intent SDK event)', () => {
+      useChatStore.getState().setStreaming('s1', true);
+      useChatStore.getState().addStreamingStep('s1', {
+        title: 'Intent',
+        detail: 'Choosing visit places',
+      });
+      expect(useChatStore.getState().streamingPerSession['s1'].latestIntent).toBe('Choosing visit places');
+    });
+
+    it('does not set latestIntent from "Intent" step with empty detail', () => {
+      useChatStore.getState().setStreaming('s1', true);
+      useChatStore.getState().addStreamingStep('s1', {
+        title: 'Intent',
+      });
+      expect(useChatStore.getState().streamingPerSession['s1'].latestIntent).toBeNull();
+    });
+
+    it('latest "Intent" step wins when both report_intent and Intent fire', () => {
+      useChatStore.getState().setStreaming('s1', true);
+      useChatStore.getState().addStreamingStep('s1', {
+        title: 'Tool: report_intent',
+        detail: '{"intent": "From tool"}',
+      });
+      useChatStore.getState().addStreamingStep('s1', {
+        title: 'Intent',
+        detail: 'From SDK event',
+      });
+      expect(useChatStore.getState().streamingPerSession['s1'].latestIntent).toBe('From SDK event');
+    });
   });
 
   // --- elicitation ---

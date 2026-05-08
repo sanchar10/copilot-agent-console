@@ -161,7 +161,10 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
           <span className="ml-2 inline-block w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
         </div>
 
-        {/* Message body */}
+        {/* Message body — hidden when there's nothing to show (e.g., during an
+            ask_user pause where the only step is filtered out). Avatar+label
+            above stay visible so the streaming indicator still conveys activity. */}
+        {(visibleSteps.length > 0 || content.length > 0) && (
         <div onClick={handleCitationClick} className="rounded-lg px-4 py-3 bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700">
           {visibleSteps.length > 0 && (
             <div className="mb-2 text-sm">
@@ -193,6 +196,7 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
