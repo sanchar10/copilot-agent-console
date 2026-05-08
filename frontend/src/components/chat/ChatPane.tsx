@@ -101,7 +101,10 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
     setShowScrollButton(!nearBottom);
   }, [isNearBottom]);
 
-  // Auto-scroll: only when user hasn't scrolled up
+  // Auto-scroll: only when user hasn't scrolled up.
+  // Deps include pendingAskUser/Elicitation and resolvedElicitations because
+  // their cards mount/unmount below messagesEndRef and add height to the page;
+  // without them in deps the new card lands below the viewport.
   useEffect(() => {
     if (isActive && !userScrolledUpRef.current) {
       isProgrammaticScrollRef.current = true;
@@ -109,7 +112,7 @@ const SessionTabContent = memo(function SessionTabContent({ sessionId, isActive 
       // Use setTimeout to ensure all scroll events from instant scroll have fired
       setTimeout(() => { isProgrammaticScrollRef.current = false; }, 50);
     }
-  }, [messages, streamingContent, streamingSteps, isActive]);
+  }, [messages, streamingContent, streamingSteps, isActive, pendingAskUserForSession, pendingElicitationForSession, resolvedElicitationsForSession]);
 
   // Re-engage auto-scroll when streaming stops (but don't hide button — user may still be scrolled up)
   useEffect(() => {
