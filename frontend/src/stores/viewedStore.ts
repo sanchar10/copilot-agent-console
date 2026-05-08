@@ -36,7 +36,10 @@ export const useViewedStore = create<ViewedState>((set, get) => ({
 
   loadViewedTimestamps: async () => {
     try {
-      const timestamps = await withRetry(() => getViewedTimestamps());
+      const timestamps = await withRetry(
+        () => getViewedTimestamps(),
+        { maxAttempts: 8, initialDelayMs: 2000, maxDelayMs: 2000 },
+      );
       set({ lastViewed: timestamps, isLoaded: true });
     } catch (error) {
       console.error('[ViewedStore] Failed to load viewed timestamps after retries:', error);

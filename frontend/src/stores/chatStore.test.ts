@@ -210,4 +210,34 @@ describe('chatStore', () => {
       expect(useChatStore.getState().getTokenUsage('s1')).toBeNull();
     });
   });
+
+  // --- updateMessageEverywhere ---
+  describe('updateMessageEverywhere', () => {
+    it('patches a message regardless of which session holds it', () => {
+      const { addMessage, updateMessageEverywhere } = useChatStore.getState();
+      addMessage('__new_session__', makeMsg({ id: 'help-1', content: 'loading...' }));
+      addMessage('s1', makeMsg({ id: 'other', content: 'unrelated' }));
+      updateMessageEverywhere('help-1', { content: 'answer' });
+      expect(useChatStore.getState().messagesPerSession['__new_session__'][0].content).toBe('answer');
+      expect(useChatStore.getState().messagesPerSession['s1'][0].content).toBe('unrelated');
+    });
+
+    it('finds the message after it has been migrated to a different session key', () => {
+      const { addMessage, setMessages, clearSessionMessages, updateMessageEverywhere } = useChatStore.getState();
+      addMessage('__new_session__', makeMsg({ id: 'help-1', content: 'loading...' }));
+      const sentinel = useChatStore.getState().messagesPerSession['__new_session__'];
+      setMessages('real-id', sentinel);
+      clearSessionMessages('__new_session__');
+      updateMessageEverywhere('help-1', { content: 'answer' });
+      expect(useChatStore.getState().messagesPerSession['real-id'][0].content).toBe('answer');
+    });
+
+    it('is a no-op when the message id is not found anywhere', () => {
+      const { addMessage, updateMessageEverywhere } = useChatStore.getState();
+      addMessage('s1', makeMsg({ id: 'a' }));
+      const before = useChatStore.getState().messagesPerSession;
+      updateMessageEverywhere('missing', { content: 'x' });
+      expect(useChatStore.getState().messagesPerSession).toEqual(before);
+    });
+  });
 });

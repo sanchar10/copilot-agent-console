@@ -142,6 +142,11 @@ function ensureSource(channel: EventChannel): void {
 
   src.addEventListener('open', () => {
     channel.reconnectAttempts = 0;
+    // Server is reachable again — clear any "server unreachable" toast that
+    // a prior SSE failure (or a fetch TypeError) may have surfaced.
+    import('../stores/toastStore').then(({ useToastStore }) => {
+      useToastStore.getState().removeToast('server-down');
+    }).catch(() => { /* noop */ });
   });
 
   src.addEventListener('error', () => {

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 const mockCloseTab = vi.fn();
@@ -101,6 +101,11 @@ describe('AgentEditor', () => {
 
   it('renders model selector with available models', () => {
     render(<AgentEditor agentId="new" />);
+    // New agents default to "Use app default" (model=null) — ModelSelector is
+    // hidden by design (avoid pinning a model that may change). Toggle off the
+    // checkbox to expose the selector.
+    expect(screen.getByText('Use app default')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Use app default'));
     expect(screen.getByText('GPT-4')).toBeInTheDocument();
   });
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "copilot-console"
-version = "0.8.7"
+version = "0.9.0"
 description = "Copilot Console - A feature-rich console for GitHub Copilot agents"
 readme = "README.md"
 license = "MIT"
@@ -43,21 +43,21 @@ dependencies = [
     "httpx>=0.26.0",
     "sse-starlette>=2.0.0",
     "aiofiles>=23.0.0",
-    "github-copilot-sdk==0.3.0",
+    "github-copilot-sdk==1.0.0b2",
     "apscheduler>=3.10.0,<4.0.0",
     "pywebpush>=2.0.0",
-    # Workflow engine — pinned to known-good versions. These were previously in
-    # an optional [workflows] extra that the install scripts never enabled, so
-    # fresh installs hit ImportError when AF unconstrained-floated to 1.2.x
-    # (which renamed BaseContextProvider -> ContextProvider, breaking GHCP
-    # b260225's import). DO NOT bump without validating:
+    # Workflow engine — pinned to known-good versions, all part of a single
+    # coordinated release train. As of the May 7, 2026 upgrade, the SDK and
+    # AF packages ship in lockstep: agent-framework-github-copilot
+    # 1.0.0b260507 hard-pins github-copilot-sdk==1.0.0b2. Always bump the
+    # whole set together. DO NOT bump without validating:
     #   - workflow_engine.py SDK compat shim still applies
     #   - _declarative_state_seeder still works against State internals
-    #   - newer agent-framework-github-copilot releases hard-pin
-    #     github-copilot-sdk==0.2.1 — incompatible with our 0.3.0 pin above.
-    "agent-framework==1.0.0rc2",
-    "agent-framework-github-copilot==1.0.0b260225",
-    "agent-framework-declarative==1.0.0b260219",
+    #   - the AF GHCP release pins to the same SDK we declare above
+    #     (check requires_dist on PyPI before bumping).
+    "agent-framework==1.3.0",
+    "agent-framework-github-copilot==1.0.0b260507",
+    "agent-framework-declarative==1.0.0b260507",
 ]
 
 [project.optional-dependencies]

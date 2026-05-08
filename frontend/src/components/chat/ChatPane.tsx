@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback, useState, useMemo, memo } from 'react';
 import { useSessionStore } from '../../stores/sessionStore';
 import { useChatStore } from '../../stores/chatStore';
+import { NEW_SESSION_KEY } from '../../constants/sessions';
 import { useUIStore } from '../../stores/uiStore';
 import { useTabStore } from '../../stores/tabStore';
 import { MessageBubble } from './MessageBubble';
@@ -488,6 +489,10 @@ export function ChatPane() {
   const { sessions, isNewSession, newSessionSettings, availableMcpServers, availableTools, updateNewSessionSettings } = useSessionStore();
   const { availableModels } = useUIStore();
   const { tabs, activeTabId, openTab: openGenericTab, switchTab: switchGenericTab } = useTabStore();
+  // /help bubbles produced in the new-session pane (before a real session
+  // exists) are stored under the NEW_SESSION_KEY sentinel. They get migrated
+  // to the real sessionId by InputBox after createSession succeeds.
+  const newSessionMessages = useChatStore((s) => s.messagesPerSession[NEW_SESSION_KEY]) || [];
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
   const activeSessionId = activeTab?.type === 'session' ? activeTab.sessionId || null : null;
@@ -657,30 +662,40 @@ export function ChatPane() {
             onSubAgentSelectionsChange={handleNewSessionSubAgentChange}
           />
           <div className="flex-1 overflow-y-auto p-4">
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <div className="text-center text-gray-500 dark:text-gray-400">
-                <svg className="w-16 h-16 mx-auto mb-4 text-blue-300 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <p className="text-lg font-medium dark:text-gray-100">How can I help you today?</p>
-                <p className="text-sm mt-1 text-gray-400 dark:text-gray-500">Type a message to start a new session</p>
+            {newSessionMessages.length > 0 ? (
+              <div className="space-y-3 max-w-4xl mx-auto">
+                {newSessionMessages.map((message) => (
+                  <CitationProvider key={message.id} sessionId={NEW_SESSION_KEY} cwd={newSessionSettings.cwd}>
+                    <MessageBubble message={message} cwd={newSessionSettings.cwd} sessionId={NEW_SESSION_KEY} />
+                  </CitationProvider>
+                ))}
               </div>
-              {newSessionStarterPrompts.length > 0 && (
-                <div className="w-full max-w-4xl mx-auto space-y-2 px-4">
-                  {newSessionStarterPrompts.map((sp, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setNewSessionPromptToSend(sp.prompt)}
-                      title={sp.prompt}
-                      className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors"
-                    >
-                      <div className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</div>
-                    </button>
-                  ))}
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full gap-4">
+                <div className="text-center text-gray-500 dark:text-gray-400">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-blue-300 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <p className="text-lg font-medium dark:text-gray-100">How can I help you today?</p>
+                  <p className="text-sm mt-1 text-gray-400 dark:text-gray-500">Type a message to start a new session</p>
                 </div>
-              )}
-            </div>
+                {newSessionStarterPrompts.length > 0 && (
+                  <div className="w-full max-w-4xl mx-auto space-y-2 px-4">
+                    {newSessionStarterPrompts.map((sp, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setNewSessionPromptToSend(sp.prompt)}
+                        title={sp.prompt}
+                        className="w-full text-left px-4 py-2.5 rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/50 dark:bg-[#2a2a3c]/50 hover:bg-white/80 dark:hover:bg-[#2a2a3c]/80 transition-colors"
+                      >
+                        <div className="font-medium text-gray-700 dark:text-gray-200">{sp.title}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{sp.prompt}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <InputBox promptToSend={newSessionPromptToSend} onPromptSent={() => setNewSessionPromptToSend(null)} agentPickerItems={newSessionAgentPickerItems} />
         </div>

@@ -5,8 +5,9 @@ Automations are separate — one agent can have multiple automations with differ
 """
 
 from datetime import datetime, timezone
+from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class SystemMessage(BaseModel):
@@ -49,8 +50,19 @@ class AgentBase(BaseModel):
         default_factory=SystemMessage,
         description="System prompt configuration"
     )
-    model: str = Field(default="claude-sonnet-4", description="Model to use")
+    model: str | None = Field(
+        default=None,
+        description="Model to use. None/absent means 'use the app default model from Settings'.",
+    )
     reasoning_effort: str | None = Field(default=None, description="Reasoning effort level (low/medium/high/xhigh) for models that support it")
+
+    @field_validator("model", mode="before")
+    @classmethod
+    def _empty_string_to_none(cls, v: Any) -> Any:
+        # Back-compat: legacy agent JSON files have "model": "" — coerce to None.
+        if isinstance(v, str) and v.strip() == "":
+            return None
+        return v
     tools: AgentTools = Field(
         default_factory=AgentTools,
         description="Tool configuration"

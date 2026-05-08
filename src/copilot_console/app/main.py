@@ -106,6 +106,15 @@ async def lifespan(app: FastAPI):
     from copilot_console.app.services.notification_manager import notification_manager
     await notification_manager.check_unread_on_startup()
     logger.info("Copilot Console started successfully")
+    # Open the browser now that the server is fully accepting requests.
+    # URL is set by cli.py when --no-browser was not passed.
+    _browser_url = os.environ.get("COPILOT_OPEN_BROWSER_URL")
+    if _browser_url:
+        try:
+            from copilot_console.cli import open_browser_now
+            open_browser_now(_browser_url)
+        except Exception as e:
+            logger.warning(f"Failed to open browser: {e}")
     yield
     # Shutdown
     logger.info("Shutting down Copilot Console...")

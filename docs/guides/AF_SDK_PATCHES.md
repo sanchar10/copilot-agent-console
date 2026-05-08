@@ -14,15 +14,19 @@ Patches may become unnecessary as the upstream SDKs mature.
 
 **Installed versions at time of writing:**
 
-- `agent-framework==1.0.0rc2`
-- `agent-framework-core==1.0.0rc2`
-- `agent-framework-declarative==1.0.0b260219`
-- `agent-framework-github-copilot==1.0.0b260225`
-- `github-copilot-sdk==0.3.0`
+- `agent-framework==1.3.0`
+- `agent-framework-core==1.3.0`
+- `agent-framework-declarative==1.0.0b260507`
+- `agent-framework-github-copilot==1.0.0b260507`
+- `github-copilot-sdk==1.0.0b2` (bundles Copilot CLI 1.0.43-0)
 
-Both patches live in `src/copilot_console/app/services/workflow_engine.py`
-and are applied at module import — without them the app fails to start
-or oneshot declarative workflows silently drop user input.
+Patch 1 (input seeding) lives in `src/copilot_console/app/services/workflow_engine.py`
+and is applied at run time — without it, oneshot declarative workflows may silently
+drop user input on older AF builds. Verification under the upgraded stack is pending
+(see "When to remove" below).
+
+Patch 2 (the SDK 0.3.0 compat shim) was **removed in the May 2026 upgrade** — see §2
+below for the historical record.
 
 ---
 
@@ -41,18 +45,39 @@ or oneshot declarative workflows silently drop user input.
 
 ---
 
-## 2. AF-GHCP / Copilot SDK 0.3.0 Compatibility Shim — ✅ Active
+## 2. AF-GHCP / Copilot SDK 0.3.0 Compatibility Shim — 🗑️ Removed (May 2026)
 
-| | |
-|---|---|
-| **File** | `src/copilot_console/app/services/workflow_engine.py` |
-| **Function** | `_apply_sdk_compat_shim()` (auto-invoked at import via the `try` block at module top) |
-| **Status** | **Active and required.** Without it, `from agent_framework_github_copilot import GitHubCopilotAgent` raises `ImportError` and `_AF_GHCP_AVAILABLE` becomes `False`, disabling all Agent Framework features. |
-| **SDK gap** | `agent-framework-github-copilot==1.0.0b260225` was built against `github-copilot-sdk` 0.1.x dict-style options. SDK 0.3.0 (1) **removed the `copilot.types` module entirely** and (2) reshaped the constructor / session APIs from `dict` config to dataclasses (`SubprocessConfig`) and keyword args. AF-GHCP imports/calls that no longer resolve. |
-| **What we patch (7 things)** | (1) **Synthetic `copilot.types` module** built by `_build_copilot_types_module()` and registered in `sys.modules` before AF-GHCP imports. Re-exports symbols from their new homes — `MCPServerConfig`, `PermissionRequest`, `PermissionRequestResult`, `ResumeSessionConfig`, `SessionConfig`, `SystemMessageConfig` (now in `copilot.session`), `Tool`, `ToolInvocation`, `ToolResult` (now in `copilot.tools`), plus `CopilotClientOptions` and `MessageOptions` aliased to plain `dict` (TypedDicts that no longer exist; AF-GHCP only uses them as annotations). (2) Wrap `CopilotClient.__init__` to convert dict options → `SubprocessConfig`. (3) Wrap `CopilotClient.create_session` to unpack dict config as `**kwargs`. (4) Wrap `CopilotClient.resume_session` similarly. (5) Wrap `CopilotSession.send_and_wait` to extract `prompt` from dict. (6) Wrap `CopilotSession.send` similarly. (7) Each wrap is marked with a `_PATCH_SENTINEL` attribute so re-imports / hot-reload don't double-wrap. |
-| **Scope / overhead** | All wraps are transparent for non-dict callers — they `isinstance(config, dict)` and fall through to the original method when our own code passes the native 0.3.0 kwargs/dataclass API (which `copilot_service.py` and `session_client.py` do). Overhead per call: one `isinstance` check (~50 ns). |
-| **Guards** | `_SDK_PATCHED` global prevents whole-shim re-entry; per-method `_PATCH_SENTINEL` prevents per-method double-wrap; the synthetic types module is only registered when neither `sys.modules["copilot.types"]` nor `copilot.types` already exists. |
-| **When to remove** | When AF-GHCP releases a build targeting `github-copilot-sdk>=0.3.0`. At that point the `from copilot.types import …` lines in AF-GHCP will resolve natively and the wrap-around APIs will use kwargs natively too — the shim becomes a no-op (`isinstance` always `False`) and is safe to delete. Quick test: comment out the `_apply_sdk_compat_shim()` call and run `python -c "from agent_framework_github_copilot import GitHubCopilotAgent"`. If it succeeds, you can also delete `_build_copilot_types_module()` and the six wrappers. |
+**Removed when the project upgraded to the coordinated stack** of
+`github-copilot-sdk==1.0.0b2` + `agent-framework-github-copilot==1.0.0b260507`
+(both released May 6–7, 2026). The newer AF-GHCP imports SDK symbols natively
+(no synthetic `copilot.types` module needed) and uses kwargs throughout
+(no method wrapping needed). Verified by:
+
+```
+python -c "from agent_framework_github_copilot import GitHubCopilotAgent"
+```
+
+succeeding without any module-level shim, and by the full backend test suite
+passing (656 tests).
+
+For the historical record, the shim previously did 7 things:
+
+1. Synthesised a `copilot.types` module (re-exporting `MCPServerConfig`,
+   `PermissionRequest`, `PermissionRequestResult`, `ResumeSessionConfig`,
+   `SessionConfig`, `SystemMessageConfig`, `Tool`, `ToolInvocation`,
+   `ToolResult`, `CopilotClientOptions`, `MessageOptions`) and registered it
+   in `sys.modules` before AF-GHCP imported.
+2. Wrapped `CopilotClient.__init__` to convert dict options → `SubprocessConfig`.
+3. Wrapped `CopilotClient.create_session` to unpack dict config as `**kwargs`.
+4. Wrapped `CopilotClient.resume_session` similarly.
+5. Wrapped `CopilotSession.send_and_wait` to extract `prompt` from dict.
+6. Wrapped `CopilotSession.send` similarly.
+7. Marked each wrap with a `_PATCH_SENTINEL` attribute to prevent double-wrap on
+   re-import / hot-reload.
+
+If a future SDK or AF release breaks the bare import again, the git history
+around `_apply_sdk_compat_shim()` and `_build_copilot_types_module()` shows
+the pattern that worked before.
 
 ---
 
@@ -71,15 +96,6 @@ or oneshot declarative workflows silently drop user input.
    and the AF source to find the new state-management API and rewrite
    the seeder against it.
 
-### Patch 2 (SDK 0.3.0 Compat Shim)
+### Patch 2 (SDK 0.3.0 Compat Shim) — Removed
 
-1. Check the AF-GHCP release notes or `pyproject.toml` for a version
-   that requires `github-copilot-sdk>=0.3.0`.
-2. If yes, upgrade the AF package, then comment out `_apply_sdk_compat_shim()`
-   and try `python -c "from agent_framework_github_copilot import GitHubCopilotAgent"`.
-3. If the import succeeds **and** workflow runs still complete end-to-end
-   (`pytest tests/test_workflows.py`), delete `_apply_sdk_compat_shim()`,
-   `_build_copilot_types_module()`, and the `_PATCH_SENTINEL` /
-   `_SDK_PATCHED` globals.
-4. If the import still fails or runs error out, keep the shim — it's
-   transparent (single `isinstance` check per call) for native callers.
+This patch was deleted in the May 2026 stack upgrade. Nothing to verify.

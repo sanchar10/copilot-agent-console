@@ -105,8 +105,9 @@ export function Sidebar() {
     async function loadData() {
       setLoading(true);
       try {
-        const [sessionsData, modelsData, settingsData, authData] = await withRetry(() =>
-          Promise.all([listSessions(), fetchModels(), getSettings(), getAuthStatus()])
+        const [sessionsData, modelsData, settingsData, authData] = await withRetry(
+          () => Promise.all([listSessions(), fetchModels(), getSettings(), getAuthStatus()]),
+          { maxAttempts: 8, initialDelayMs: 2000, maxDelayMs: 2000 },
         );
         setSessions(sessionsData);
         setAvailableModels(modelsData);

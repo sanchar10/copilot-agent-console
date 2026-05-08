@@ -18,6 +18,7 @@ from copilot_console.app.services.task_run_storage_service import task_run_stora
 from copilot_console.app.services.session_service import session_service
 from copilot_console.app.services.mcp_service import mcp_service
 from copilot_console.app.services.agent_storage_service import agent_storage_service
+from copilot_console.app.services.model_resolver import resolve_agent_model
 from copilot_console.app.services.tools_service import get_tools_service
 from copilot_console.app.services.logging_service import get_logger
 from copilot_console.app.config import DEFAULT_CWD
@@ -78,9 +79,30 @@ class TaskRunnerService:
             task_run_storage_service.save_run(run)
             logger.info(f"[task-run:{run.id}] Starting agent={agent.id} prompt={run.prompt[:80]!r}")
 
-            # Create a proper session with metadata (trigger=automation, agent_id set)
+            # Resolve model + reasoning_effort up front. If unresolvable, fail loudly
+            # — never let an empty model reach the SDK (it silently produces a no-op
+            # turn, which is invisible to the user).
+            try:
+                resolved_model, resolved_effort = resolve_agent_model(agent)
+            except ValueError as e:
+                logger.error(f"[task-run:{run.id}] Cannot resolve model: {e}")
+                run.status = TaskRunStatus.FAILED
+                run.error = str(e)
+                run.completed_at = datetime.now(timezone.utc)
+                if run.started_at:
+                    run.duration_seconds = (run.completed_at - run.started_at).total_seconds()
+                task_run_storage_service.save_run(run)
+                return
+            logger.info(
+                f"[task-run:{run.id}] Resolved model={resolved_model} "
+                f"reasoning_effort={resolved_effort or 'n/a'}"
+            )
+
+            # Create a proper session with metadata (trigger=automation, agent_id set).
+            # session.json captures the resolved model — becomes source of truth.
             session_request = SessionCreate(
-                model=agent.model,
+                model=resolved_model,
+                reasoning_effort=resolved_effort,
                 name=run.prompt[:80],
                 cwd=run.cwd or DEFAULT_CWD,
                 mcp_servers=agent.mcp_servers or [],
@@ -132,7 +154,7 @@ class TaskRunnerService:
                 await asyncio.wait_for(
                     self._copilot.send_message_background(
                         session_id=session_id,
-                        model=agent.model,
+                        model=resolved_model,
                         cwd=run.cwd or DEFAULT_CWD,
                         prompt=run.prompt,
                         buffer=buffer,
@@ -143,6 +165,7 @@ class TaskRunnerService:
                         system_message=system_message,
                         is_new_session=True,
                         custom_agents=custom_agents_sdk,
+                        reasoning_effort=resolved_effort,
                     ),
                     timeout=max_runtime_minutes * 60,
                 )

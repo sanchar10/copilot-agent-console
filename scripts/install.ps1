@@ -287,6 +287,20 @@ if ($ac) {
     Write-Host "  [NOTE] Restart your terminal, then run 'copilot-console'." -ForegroundColor Yellow
 }
 
+# Clear cached /help session id on install/upgrade so /help recreates fresh
+# against the newly-installed app + bundled CLI. Idempotent; silent no-op if
+# the file or key are absent.
+$settingsFile = "$env:USERPROFILE\.copilot-console\settings.json"
+if (Test-Path $settingsFile) {
+    try {
+        $s = Get-Content $settingsFile -Raw | ConvertFrom-Json
+        if ($s.PSObject.Properties.Name -contains 'help_session_id') {
+            $s.PSObject.Properties.Remove('help_session_id')
+            $s | ConvertTo-Json -Depth 10 | Set-Content $settingsFile -Encoding UTF8
+        }
+    } catch {}
+}
+
 # --- Install ripgrep (for cross-session search) ---
 $rg = Get-Command rg -ErrorAction SilentlyContinue
 if (-not $rg) {

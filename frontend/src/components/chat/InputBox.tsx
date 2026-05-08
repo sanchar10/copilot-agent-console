@@ -17,6 +17,7 @@ import { SlashCommandPalette } from './SlashCommandPalette';
 import { fileIcon } from '../../utils/fileIcon';
 import { useFileUpload } from './useFileUpload';
 import { useSlashCommands } from './useSlashCommands';
+import { NEW_SESSION_KEY } from '../../constants/sessions';
 
 // Sessions whose backend SessionClient is confirmed ready — now in chatStore.
 // Legacy helpers re-exported for backward compatibility with tests and TabBar.
@@ -250,6 +251,17 @@ export function InputBox({ sessionId, promptToSend, onPromptSent, onMessageSent,
         openGenericTab({ id: tabId.session(session.session_id), type: 'session', label: session.session_name, sessionId: session.session_id });
         await connectSession(session.session_id);
         activeSessionId = session.session_id;
+        // Migrate any /help bubbles from the new-session sentinel into this real
+        // session. /help can run before the session is created (sentinel keeps
+        // the bubbles in chatStore); now that we have a real id, copy them over
+        // so they appear in the session's history. updateMessageEverywhere on
+        // any in-flight askHelp() responses will then patch the real-id copy.
+        const sentinelMessages = useChatStore.getState().messagesPerSession[NEW_SESSION_KEY];
+        if (sentinelMessages && sentinelMessages.length > 0) {
+          const existing = useChatStore.getState().messagesPerSession[session.session_id] || [];
+          useChatStore.getState().setMessages(session.session_id, [...sentinelMessages, ...existing]);
+          useChatStore.getState().clearSessionMessages(NEW_SESSION_KEY);
+        }
       } catch (err) {
         console.error('Failed to create session:', err);
         const msg = err instanceof TypeError ? 'Server unavailable — could not create session' : (err instanceof Error ? err.message : 'Failed to create session');

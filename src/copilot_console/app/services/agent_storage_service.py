@@ -40,8 +40,14 @@ class AgentStorageService:
         return candidate
 
     def save_agent(self, agent: Agent) -> None:
-        """Save an agent definition to disk."""
-        data = agent.model_dump()
+        """Save an agent definition to disk.
+
+        `model` is omitted from the JSON when not set (the agent will use the
+        app default at runtime). reasoning_effort is similarly omitted when None.
+        """
+        # exclude_none keeps optional fields like `model` and `reasoning_effort`
+        # out of the JSON when not set, instead of storing literal nulls.
+        data = agent.model_dump(exclude_none=True)
         data["created_at"] = agent.created_at.isoformat()
         data["updated_at"] = agent.updated_at.isoformat()
         atomic_write(

@@ -69,6 +69,14 @@ interface ChatState {
   // Setters
   setMessages: (sessionId: string, messages: Message[]) => void;
   addMessage: (sessionId: string, message: Message) => void;
+  updateMessage: (sessionId: string, messageId: string, patch: Partial<Message>) => void;
+  /**
+   * Patch a message wherever it lives by messageId, scanning all sessions.
+   * Used by /help so that a placeholder bubble created under the new-session
+   * sentinel can still be patched after the user activates the session and
+   * the bubble has been migrated to the real sessionId.
+   */
+  updateMessageEverywhere: (messageId: string, patch: Partial<Message>) => void;
   appendStreamingContent: (sessionId: string, content: string) => void;
   addStreamingStep: (sessionId: string, step: ChatStep) => void;
   setTokenUsage: (sessionId: string, usage: TokenUsage) => void;
@@ -229,6 +237,44 @@ export const useChatStore = create<ChatState>((set, get) => ({
         [sessionId]: [...(state.messagesPerSession[sessionId] || []), message],
       },
     })),
+
+  updateMessage: (sessionId, messageId, patch) =>
+    set((state) => {
+      const existing = state.messagesPerSession[sessionId];
+      if (!existing) return state;
+      const idx = existing.findIndex((m) => m.id === messageId);
+      if (idx === -1) return state;
+      const updated = [...existing];
+      updated[idx] = { ...updated[idx], ...patch };
+      return {
+        messagesPerSession: {
+          ...state.messagesPerSession,
+          [sessionId]: updated,
+        },
+      };
+    }),
+
+  updateMessageEverywhere: (messageId, patch) =>
+    set((state) => {
+      let mutatedKey: string | null = null;
+      let mutatedArr: Message[] | null = null;
+      for (const key of Object.keys(state.messagesPerSession)) {
+        const arr = state.messagesPerSession[key];
+        const idx = arr.findIndex((m) => m.id === messageId);
+        if (idx === -1) continue;
+        mutatedKey = key;
+        mutatedArr = [...arr];
+        mutatedArr[idx] = { ...mutatedArr[idx], ...patch };
+        break;
+      }
+      if (!mutatedKey || !mutatedArr) return state;
+      return {
+        messagesPerSession: {
+          ...state.messagesPerSession,
+          [mutatedKey]: mutatedArr,
+        },
+      };
+    }),
 
   appendStreamingContent: (sessionId, content) => {
     // Buffer deltas and flush on a timer for batching

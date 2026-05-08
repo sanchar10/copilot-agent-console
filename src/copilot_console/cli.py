@@ -7,7 +7,6 @@ import sys
 import time
 import webbrowser
 from pathlib import Path
-from threading import Timer
 
 def check_copilot_sdk():
     """Check if github-copilot-sdk is available."""
@@ -45,19 +44,16 @@ def initialize_app_directory():
     return app_home
 
 
-def open_browser_delayed(url: str, delay: float = 0.5):
-    """Open browser after server is confirmed ready (or fallback delay)."""
-    import urllib.request
-    def _open():
-        # Poll until server responds (max ~8 seconds)
-        for _ in range(16):
-            try:
-                urllib.request.urlopen(url, timeout=0.5)
-                break
-            except Exception:
-                time.sleep(0.5)
+def open_browser_now(url: str) -> None:
+    """Open the URL in the default browser.
+
+    Called from the FastAPI lifespan once startup completes, so the server
+    is already accepting requests by the time the page makes its first request.
+    """
+    try:
         webbrowser.open(url)
-    Timer(delay, _open).start()
+    except Exception:
+        pass
 
 def main():
     """Main entry point for Copilot Console."""
@@ -141,11 +137,12 @@ def main():
   Server:    http://{args.host}:{args.port}
     """)
     
-    # Open browser (delayed)
+    # Open browser (handed off to lifespan startup so it fires only after the
+    # server is fully ready — see app/main.py)
     if not args.no_browser:
         url = f"http://{args.host}:{args.port}"
-        print(f"  Opening browser to {url}...")
-        open_browser_delayed(url)
+        os.environ["COPILOT_OPEN_BROWSER_URL"] = url
+        print(f"  Will open browser to {url} once server is ready...")
     
     # Prevent sleep if requested
     if args.no_sleep:

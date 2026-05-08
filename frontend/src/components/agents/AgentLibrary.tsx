@@ -129,7 +129,7 @@ function AgentCard({ agent, membership }: { agent: Agent; membership: TeamMember
         {agent.description || 'No description'}
       </p>
       <div className="flex items-center gap-2 mt-3 text-xs text-gray-400 dark:text-gray-500 flex-wrap">
-        <span>{agent.model || 'default'}</span>
+        <span>{agent.model || 'app default'}</span>
         {isTeam(agent) && (
           <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-1.5 py-0.5 rounded font-medium" title="Has sub-agents">
             👥 {agent.sub_agents.length}
@@ -180,7 +180,7 @@ function AgentRow({ agent, membership }: { agent: Agent; membership: TeamMembers
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{agent.description || 'No description'}</p>
       </div>
-      <span className="text-[11px] text-gray-400 dark:text-gray-500 flex-shrink-0 hidden sm:block">{agent.model || 'default'}</span>
+      <span className="text-[11px] text-gray-400 dark:text-gray-500 flex-shrink-0 hidden sm:block">{agent.model || 'app default'}</span>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
         <span
           onClick={(e) => handleAutomations(agent, e)}
@@ -269,7 +269,7 @@ export function AgentLibrary() {
       switch (sort) {
         case 'name-asc': return a.name.localeCompare(b.name);
         case 'name-desc': return b.name.localeCompare(a.name);
-        case 'model': return a.model.localeCompare(b.model) || a.name.localeCompare(b.name);
+        case 'model': return (a.model || '').localeCompare(b.model || '') || a.name.localeCompare(b.name);
         case 'updated': return (b.updated_at || '').localeCompare(a.updated_at || '');
         default: return 0;
       }

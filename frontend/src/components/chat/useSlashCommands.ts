@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useChatStore } from '../../stores/chatStore';
 import { useSessionStore } from '../../stores/sessionStore';
+import { NEW_SESSION_KEY } from '../../constants/sessions';
 import type { SlashCommand } from './slashCommands';
 import { SLASH_COMMANDS } from './slashCommands';
 import { compactSession, selectAgent, deselectAgent, updateSession } from '../../api/sessions';
@@ -162,13 +163,17 @@ export function useSlashCommands(sessionId?: string) {
   }, []);
 
   const executeSlashCommand = useCallback(async (cmd: SlashCommand, _prompt: string) => {
-    if (!sessionId) return;
+    // /help is special: it can run in the new-session pane (no real sessionId yet).
+    // Bubbles are stored under the NEW_SESSION_KEY sentinel and migrated to the
+    // real sessionId once the user sends their first message (see InputBox).
+    // All other slash commands require a real session.
+    if (cmd.name !== 'help' && !sessionId) return;
     try {
       if (cmd.name === 'compact') {
-        await compactSession(sessionId);
+        await compactSession(sessionId!);
         // Lifecycle (compaction_start/complete) and the resulting usage_info
         // refresh arrive on the global SSE channel; we just acknowledge here.
-        addMessage(sessionId, {
+        addMessage(sessionId!, {
           id: `system-compact-${Date.now()}`,
           role: 'system',
           content: '✓ Context compaction started…',
@@ -177,37 +182,49 @@ export function useSlashCommands(sessionId?: string) {
       } else if (cmd.name === 'help') {
         const question = _prompt.trim();
         if (!question) return;
+        // Use the real sessionId when activated; fall back to the new-session
+        // sentinel so /help works before the session has been created.
+        const targetKey = sessionId ?? NEW_SESSION_KEY;
         // Show the user's question as a normal user bubble, tagged kind:'help'.
-        addMessage(sessionId, {
+        addMessage(targetKey, {
           id: `help-q-${Date.now()}`,
           role: 'user',
           content: question,
           timestamp: new Date().toISOString(),
           kind: 'help',
         });
+        // Placeholder assistant bubble so the user gets immediate feedback
+        // while askHelp() is in flight (can take 5-30s). Replaced in-place
+        // when the answer (or error) arrives. We use updateMessageEverywhere
+        // so the patch lands correctly even if the bubble was migrated from
+        // the sentinel to a real sessionId during the await.
+        const placeholderId = `help-pending-${Date.now()}`;
+        addMessage(targetKey, {
+          id: placeholderId,
+          role: 'assistant',
+          content: '⏳ Help is thinking…',
+          timestamp: new Date().toISOString(),
+          kind: 'help',
+        });
         try {
           const result = await askHelp(question);
-          addMessage(sessionId, {
+          useChatStore.getState().updateMessageEverywhere(placeholderId, {
             id: `help-a-${Date.now()}`,
-            role: 'assistant',
             content: result.answer,
             timestamp: new Date().toISOString(),
-            kind: 'help',
             helpSessionId: result.session_id,
           });
         } catch (err) {
-          addMessage(sessionId, {
+          useChatStore.getState().updateMessageEverywhere(placeholderId, {
             id: `help-err-${Date.now()}`,
-            role: 'assistant',
             content: `❌ Help request failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
             timestamp: new Date().toISOString(),
-            kind: 'help',
           });
         }
       }
     } catch (err) {
       console.error(`Failed to execute /${cmd.name}:`, err);
-      addMessage(sessionId, {
+      addMessage(sessionId ?? NEW_SESSION_KEY, {
         id: `system-error-${Date.now()}`,
         role: 'system',
         content: `❌ Failed to execute /${cmd.name}: ${err instanceof Error ? err.message : 'Unknown error'}`,

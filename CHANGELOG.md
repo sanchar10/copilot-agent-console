@@ -1,5 +1,52 @@
 # Changelog
 
+## v0.9.0
+
+### Release Summary
+
+Major release driven by a coordinated upgrade of the entire **GitHub Copilot SDK + Agent Framework** stack — the previous v0.8.x train shipped a hidden incompatibility that disabled the workflow engine on every install (see Fixes below). This release also fixes a silent failure in automation runs on machines without a CLI default model, makes `agent.model` properly optional throughout the stack, simplifies the `/help` cache to be installer-driven, replaces the cold-start exponential retry with snappier linear polling, and makes the production browser-open fire exactly when the server is ready instead of after a fixed wait.
+
+### 🔥 Critical fix
+
+- **Workflow engine no longer disabled by SDK pin mismatch** — v0.8.x pinned `github-copilot-sdk==0.3.0` but `agent-framework-github-copilot==1.0.0b260225` hard-pinned `github-copilot-sdk==0.2.1`. pip installed both, but at runtime AF GHCP detected the mismatch and printed *"agent_framework_github_copilot not compatible with installed copilot SDK. Workflow engine will be unavailable."* — silently disabling all workflows for every v0.8.x user. The full SDK+AF stack is now bumped in lockstep so the dependency graph is consistent: `github-copilot-sdk 0.3.0 → 1.0.0b2`, `agent-framework rc2 → 1.3.0`, `agent-framework-github-copilot b260225 → b260507`, `agent-framework-declarative b260219 → b260507`. AF GHCP `1.0.0b260507` hard-pins `github-copilot-sdk==1.0.0b2`, matching our declaration.
+
+### 🐛 Fixes
+
+- **Automation no-output bug** — `app/services/task_runner_service.py` now resolves `(model, reasoning_effort)` via the new `model_resolver.resolve_agent_model()` helper before launching the session. Previously, an empty string `model` flowed through to the SDK, which treated it as falsy and silently omitted the field from the JSON-RPC payload — leaving the CLI to fall back to its own internal default (which doesn't exist on a fresh machine). Affected the seeded **Daily Tech Brief** automation, plus any "Run Now" from an agent without an explicit model.
+- **Loud failure when no model resolvable** — if the agent has no model AND `settings.default_model` is empty, the run is marked `FAILED` with a clear error in `TaskRun.error` and an `ERROR`-level server log: *"No model configured. Agent 'X' has no model and no default_model is set. Configure one in Settings → Default Model."*
+- **AgentEditor no longer corrupts saved agents** — `frontend/src/components/agents/AgentEditor.tsx` no longer pre-fills the model field with the current app default on load. Previously, opening any model-less agent and clicking Save would write the live default into the JSON, freezing it against settings changes.
+- **Seeded `morning-tech-brief.json`** — dropped the empty `"model": ""` line that triggered the bug for new installs.
+- **`/help` works in unactivated session panes** — typing `/help [question]` in a brand-new session pane (before the session is created on the server) now renders the loading bubble and answer in-place. When the user then sends their first real message, the help Q&A is migrated seamlessly into the new session's history. Powered by a `NEW_SESSION_KEY` sentinel in `chatStore` and a race-immune `updateMessageEverywhere` helper that finds the bubble by id regardless of which session key currently holds it.
+- **`/help` cache survives app upgrades cleanly** — the previous in-app version-pinning logic in `help_service.py` is replaced by an installer-driven cleanup. `scripts/install.sh` and `scripts/install.ps1` now strip `help_session_id` from `~/.copilot-console/settings.json` on every install/upgrade, so a fresh `/help` session is always created against the current CLI/SDK. Single source of truth, no in-app version checks.
+- **Cold-start "server unreachable" toast clears on reconnect** — `frontend/src/api/events.ts` SSE `open` handler now dismisses the `'server-down'` toast immediately when the channel reconnects, instead of letting it linger for its full 5-second duration. Affects both backend restart and initial cold start.
+
+### ✨ Changes
+
+- **`agent.model` is now optional** — schema (`app/models/agent.py`), TypeScript types (`frontend/src/types/agent.ts`), and storage (`agent_storage_service.save_agent` uses `exclude_none=True`) all treat absence as legitimate. None means "use the app default model from Settings at runtime."
+- **Back-compat for legacy JSON** — pydantic `field_validator` coerces existing `"model": ""` to `None` on load. No on-disk migration needed.
+- **AgentEditor adds "Use app default" toggle** — checkbox above the model selector that maps to `(model=null, reasoning_effort=null)`. Reasoning effort stays atomic with model: agent's effort with agent's model, settings' effort with settings' model, never crossed.
+- **`workflow_engine.py` simplified ~5x** — Patch 2 (`_tool_to_copilot_tool` override) and the `kwargs`-rewrap shim are no longer needed against AF 1.3.0 / GHCP b260507 and have been removed (218 → 41 line diff). `docs/guides/AF_SDK_PATCHES.md` updated to mark Patch 2 as Removed and document the kwargs hotfix history. Workflow engine init also goes through the model resolver; on failure it logs an error but doesn't crash (degraded fallback).
+- **Frontend cold-start retry is snappier** — `frontend/src/utils/retry.ts` now supports a `maxDelayMs` cap (default `Infinity`, backward compatible). `Sidebar.tsx` and `viewedStore.ts` use `{maxAttempts: 8, initialDelayMs: 2000, maxDelayMs: 2000}` → linear 2-second polling with a 14-second budget. Old config (`{maxAttempts: 4, initialDelayMs: 2000}`) had 2s/4s/8s exponential delays, so a server ready at t=7s could leave the UI waiting until t=14s. New config snaps to ready within 2s of backend availability — meaningful for `--expose` cold starts.
+- **Browser auto-open fires exactly when ready** — `cli.py` no longer schedules a daemon `Timer` thread with an 8s readiness probe. Instead, it sets `COPILOT_OPEN_BROWSER_URL` in env, and the FastAPI lifespan in `app/main.py` calls `webbrowser.open()` immediately after the "Copilot Console started successfully" log. Removes both the up-to-8s open delay on slow startups and the "open against not-yet-ready server" race.
+- **AF "experimental feature" warnings suppressed at import** — benign `ExperimentalWarning` from `agent_framework` (HARNESS / SKILLS) suppressed at the package `__init__` so the server console stays clean. Same precedent as the OTEL `Failed to detach context` filter.
+
+### 🧪 Tests
+
+- New `tests/test_model_resolver.py` (6 tests): agent-pair preserved, fallback to settings, empty-string coercion, hard-fail when nothing resolvable.
+- New `TestAgentModelOptional` class in `tests/test_agents.py` (5 tests): None model round-trips, legacy `""` loads as None, `save_agent` omits the key from disk.
+- New `tests/test_session_service_reasoning_effort.py`: reasoning-effort atomicity with model selection.
+- New `updateMessageEverywhere` tests in `frontend/src/stores/chatStore.test.ts` (3 tests): patches across sessions, finds messages after sentinel→real-id migration, no-op on missing id.
+- Frontend retry config update verified by running all 394 frontend tests; backend test suite (656 tests) green after each backend change.
+
+### ⬆️ Dependency upgrades
+
+- `github-copilot-sdk`: `0.3.0` → `1.0.0b2`
+- `agent-framework`: `1.0.0rc2` → `1.3.0`
+- `agent-framework-github-copilot`: `1.0.0b260225` → `1.0.0b260507`
+- `agent-framework-declarative`: `1.0.0b260219` → `1.0.0b260507`
+
+---
+
 ## v0.8.7
 
 ### Release Summary

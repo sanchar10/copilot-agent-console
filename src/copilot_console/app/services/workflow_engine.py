@@ -38,157 +38,14 @@ from agent_framework_declarative._workflows._executors_external_input import (
     ExternalInputResponse,
 )
 
-# --- SDK 0.3.0 compatibility shim for agent_framework_github_copilot ---
-# The installed agent_framework_github_copilot (1.0.0b260225) was built against
-# SDK 0.1.x and imports `from copilot.types import (...)`. SDK 0.3.0 removed
-# `copilot.types` entirely and moved symbols to `copilot.session` and
-# `copilot.tools`. We synthesize a `copilot.types` module that re-exports the
-# symbols AF-GHCP needs, then wrap the changed SDK methods so AF-GHCP's
-# dict-style calls still work against 0.3.0's keyword-arg APIs.
-#
-# The newer AF-GHCP (1.0.0b260424+) uses kwargs natively but hard-pins
-# github-copilot-sdk == 0.2.1, which would force a downgrade of the core SDK
-# this app depends on. Until that pin is lifted upstream, this shim is the
-# bridge that lets us keep SDK 0.3.0.
-import sys
-import types as _pytypes
-
-import copilot
-import copilot.tools as _copilot_tools
-import copilot.session as _copilot_session
-import copilot.client as _copilot_client
-import copilot.generated.session_events as _copilot_events
-
-_SDK_PATCHED = False
-_PATCH_SENTINEL = "_copilot_console_patched"
-
-
-def _build_copilot_types_module() -> _pytypes.ModuleType:
-    """Synthesize a copilot.types module re-exporting symbols AF-GHCP needs.
-
-    AF-GHCP 1.0.0b260225 imports these from copilot.types, but SDK 0.3.0
-    removed that module. We register a synthetic one in sys.modules before
-    AF-GHCP imports.
-    """
-    mod = _pytypes.ModuleType("copilot.types")
-    mod.__package__ = "copilot"
-    # Symbols moved to copilot.session in 0.3.0
-    mod.MCPServerConfig = _copilot_session.MCPServerConfig
-    mod.PermissionRequest = _copilot_session.PermissionRequest
-    mod.PermissionRequestResult = _copilot_session.PermissionRequestResult
-    mod.ResumeSessionConfig = _copilot_session.ResumeSessionConfig
-    mod.SessionConfig = _copilot_session.SessionConfig
-    mod.SystemMessageConfig = _copilot_session.SystemMessageConfig
-    # Tool symbols live in copilot.tools
-    mod.Tool = _copilot_tools.Tool
-    mod.ToolInvocation = _copilot_tools.ToolInvocation
-    mod.ToolResult = _copilot_tools.ToolResult
-    # CopilotClientOptions was a TypedDict that no longer exists. AF-GHCP only
-    # uses it as an annotation for a literal {}, so dict is sufficient.
-    mod.CopilotClientOptions = dict
-    # MessageOptions was also a TypedDict; included defensively for any
-    # AF-GHCP variant that imports it.
-    mod.MessageOptions = dict
-    return mod
-
-
-def _apply_sdk_compat_shim() -> bool:
-    """Bridge AF-GHCP 1.0.0b260225 calls to SDK 0.3.0. Returns True if patched."""
-    global _SDK_PATCHED
-    if _SDK_PATCHED:
-        return True
-
-    # 1. Register synthetic copilot.types if (and only if) SDK didn't ship one.
-    if "copilot.types" not in sys.modules and not hasattr(copilot, "types"):
-        types_mod = _build_copilot_types_module()
-        sys.modules["copilot.types"] = types_mod
-        copilot.types = types_mod  # type: ignore[attr-defined]
-
-    # 2. Wrap CopilotClient.__init__ to accept dict options
-    if not getattr(_copilot_client.CopilotClient.__init__, _PATCH_SENTINEL, False):
-        _orig_init = _copilot_client.CopilotClient.__init__
-
-        def _patched_init(self, config=None, **kwargs):
-            if isinstance(config, dict):
-                from copilot import SubprocessConfig
-                if config:
-                    config = SubprocessConfig(**{
-                        k: v for k, v in config.items()
-                        if k in SubprocessConfig.__dataclass_fields__
-                    })
-                else:
-                    config = None
-            _orig_init(self, config, **kwargs)
-
-        setattr(_patched_init, _PATCH_SENTINEL, True)
-        _copilot_client.CopilotClient.__init__ = _patched_init
-
-    # 3. Wrap create_session to accept dict config
-    if not getattr(_copilot_client.CopilotClient.create_session, _PATCH_SENTINEL, False):
-        _orig_create = _copilot_client.CopilotClient.create_session
-
-        async def _patched_create(self, config=None, **kwargs):
-            if isinstance(config, dict):
-                return await _orig_create(self, **config)
-            if config is not None:
-                kwargs["config"] = config
-            return await _orig_create(self, **kwargs)
-
-        setattr(_patched_create, _PATCH_SENTINEL, True)
-        _copilot_client.CopilotClient.create_session = _patched_create
-
-    # 4. Wrap resume_session to accept dict config
-    if not getattr(_copilot_client.CopilotClient.resume_session, _PATCH_SENTINEL, False):
-        _orig_resume = _copilot_client.CopilotClient.resume_session
-
-        async def _patched_resume(self, session_id, config=None, **kwargs):
-            if isinstance(config, dict):
-                return await _orig_resume(self, session_id, **config)
-            if config is not None:
-                kwargs["config"] = config
-            return await _orig_resume(self, session_id, **kwargs)
-
-        setattr(_patched_resume, _PATCH_SENTINEL, True)
-        _copilot_client.CopilotClient.resume_session = _patched_resume
-
-    # 5. Wrap send_and_wait to accept dict message_options.
-    # Transparent passthrough for non-dict callers (e.g., session_client.py).
-    # For dict callers, copy the dict before popping to avoid mutating the
-    # caller's data, and forward all extra options as kwargs.
-    if not getattr(_copilot_session.CopilotSession.send_and_wait, _PATCH_SENTINEL, False):
-        _orig_send_wait = _copilot_session.CopilotSession.send_and_wait
-
-        async def _patched_send_wait(self, prompt_or_opts, **kwargs):
-            if isinstance(prompt_or_opts, dict):
-                opts = dict(prompt_or_opts)
-                prompt = opts.pop("prompt", "")
-                return await _orig_send_wait(self, prompt, **opts, **kwargs)
-            return await _orig_send_wait(self, prompt_or_opts, **kwargs)
-
-        setattr(_patched_send_wait, _PATCH_SENTINEL, True)
-        _copilot_session.CopilotSession.send_and_wait = _patched_send_wait
-
-    # 6. Wrap send similarly. copilot_service.enqueue_message() relies on dict
-    # forwarding for prompt + mode + attachments.
-    if not getattr(_copilot_session.CopilotSession.send, _PATCH_SENTINEL, False):
-        _orig_send = _copilot_session.CopilotSession.send
-
-        async def _patched_send(self, prompt_or_opts, **kwargs):
-            if isinstance(prompt_or_opts, dict):
-                opts = dict(prompt_or_opts)
-                prompt = opts.pop("prompt", "")
-                return await _orig_send(self, prompt, **opts, **kwargs)
-            return await _orig_send(self, prompt_or_opts, **kwargs)
-
-        setattr(_patched_send, _PATCH_SENTINEL, True)
-        _copilot_session.CopilotSession.send = _patched_send
-
-    _SDK_PATCHED = True
-    return True
+# Note: the SDK 0.3.0 compat shim and 5 monkey-patched CopilotClient/CopilotSession
+# methods were removed when we upgraded to the coordinated stack
+# (github-copilot-sdk==1.0.0b2 + agent-framework-github-copilot==1.0.0b260507).
+# The newer AF-GHCP imports SDK symbols natively and uses kwargs throughout.
+# See docs/guides/AF_SDK_PATCHES.md for the historical context.
 
 
 try:
-    _apply_sdk_compat_shim()
     from agent_framework_github_copilot import GitHubCopilotAgent
     _AF_GHCP_AVAILABLE = True
 except ImportError:
@@ -361,7 +218,7 @@ class WorkflowCopilotAgent(GitHubCopilotAgent):
         # Inject fields AF doesn't pass natively
         self._inject_session_fields(config)
 
-        session = await self._client.create_session(config)
+        session = await self._client.create_session(**config)
         # Capture session ID incrementally for crash recovery
         if hasattr(session, 'session_id') and session.session_id:
             self._session_ids.append(session.session_id)
@@ -392,45 +249,13 @@ class WorkflowCopilotAgent(GitHubCopilotAgent):
         # Inject fields AF doesn't pass natively
         self._inject_session_fields(config)
 
-        return await self._client.resume_session(session_id, config)
+        return await self._client.resume_session(session_id, **config)
 
-    def _tool_to_copilot_tool(self, ai_func):  # type: ignore[override]
-        """Convert FunctionTool to a Copilot SDK tool, bridging the AF-GHCP
-        1.0.0b260225 → SDK 0.3.0 ABI mismatch.
-
-        AF-GHCP's parent implementation calls invocation.get("arguments", {})
-        and constructs ToolResult(textResultForLlm=..., resultType=...). In
-        SDK 0.3.0, ToolInvocation is a dataclass without .get, and ToolResult
-        uses snake_case kwargs (text_result_for_llm, result_type). This
-        override reproduces the parent's logic with 0.3.0-correct calls.
-        """
-        from copilot.tools import Tool as _CopilotTool, ToolResult as _ToolResult
-
-        async def handler(invocation):
-            args = getattr(invocation, "arguments", None) or {}
-            try:
-                if ai_func.input_model:
-                    args_instance = ai_func.input_model(**args)
-                    result = await ai_func.invoke(arguments=args_instance)
-                else:
-                    result = await ai_func.invoke(arguments=args)
-                return _ToolResult(
-                    text_result_for_llm=str(result),
-                    result_type="success",
-                )
-            except Exception as e:
-                return _ToolResult(
-                    text_result_for_llm=f"Error: {e}",
-                    result_type="failure",
-                    error=str(e),
-                )
-
-        return _CopilotTool(
-            name=ai_func.name,
-            description=ai_func.description,
-            handler=handler,
-            parameters=ai_func.parameters(),
-        )
+    # _tool_to_copilot_tool override removed in May 2026 stack upgrade.
+    # AF-GHCP 1.0.0b260507's native implementation uses SDK 1.0.0b2's correct
+    # signatures (invocation.arguments, ToolResult(text_result_for_llm=..., result_type=...))
+    # AND adds approval-mode handling we never had. The hand-rolled override is
+    # not just redundant — it would suppress the new requires_approval flow.
 
 
 # ---------------------------------------------------------------------------
@@ -746,8 +571,21 @@ class WorkflowEngine:
             if "system_message" not in opts:
                 opts["system_message"] = {"mode": "append", "content": fallback_instructions}
 
-            if agent.model:
-                opts["model"] = agent.model
+            # Resolve model + reasoning_effort. Workflow engine registers agents
+            # at startup; an unresolvable model here shouldn't crash the entire
+            # engine. Log it and skip — if the agent is actually invoked later
+            # the user will see no output and check the log.
+            try:
+                from copilot_console.app.services.model_resolver import resolve_agent_model
+                resolved_model, resolved_effort = resolve_agent_model(agent)
+                opts["model"] = resolved_model
+                if resolved_effort:
+                    opts["reasoning_effort"] = resolved_effort
+            except ValueError as e:
+                logger.error(
+                    f"Cannot resolve model for workflow agent '{agent.name}': {e}. "
+                    f"Agent will use SDK/CLI default if invoked."
+                )
 
             # Resolve MCP servers — AF pops mcp_servers from default_options
             if agent.mcp_servers:
@@ -806,7 +644,7 @@ class WorkflowEngine:
                 f"Registered agent '{agent.name}' for workflow use "
                 f"(tools={len(function_tools or [])}, "
                 f"mcp={len(opts.get('mcp_servers', {}))}, "
-                f"model={agent.model}, "
+                f"model={opts.get('model', 'unresolved')}, "
                 f"sys_msg_mode={agent.system_message.mode if agent.system_message else 'append'}, "
                 f"sub_agents={len(custom_agents_sdk or [])})"
             )

@@ -53,7 +53,10 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState('🤖');
-  const [model, setModel] = useState(defaultModel);
+  // model=null means "use the app default at runtime". Don't pre-fill with
+  // defaultModel — that silently corrupts the saved JSON with whatever the
+  // user happened to have configured at edit time.
+  const [model, setModel] = useState<string | null>(null);
   const [reasoningEffort, setReasoningEffort] = useState<string | null>(null);
   const [systemMessage, setSystemMessage] = useState<SystemMessage | null>(null);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
@@ -75,7 +78,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
       setName(existingAgent.name);
       setDescription(existingAgent.description);
       setIcon(existingAgent.icon);
-      setModel(existingAgent.model || defaultModel);
+      setModel(existingAgent.model || null);
       setReasoningEffort(existingAgent.reasoning_effort || null);
       setSystemMessage(existingAgent.system_message?.content ? existingAgent.system_message : null);
       // Load tools from structured fields
@@ -252,17 +255,49 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Model</label>
-              <ModelSelector
-                models={availableModels}
-                selectedModelId={model}
-                reasoningEffort={reasoningEffort}
-                onModelChange={(modelId, effort) => {
-                  setModel(modelId);
-                  setReasoningEffort(effort);
-                }}
-                onReasoningEffortChange={(effort) => setReasoningEffort(effort)}
-                variant="full"
-              />
+              {(() => {
+                const useAppDefault = model === null;
+                return (
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={useAppDefault}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setModel(null);
+                            setReasoningEffort(null);
+                          } else {
+                            // Switch to explicit choice — seed with current app default
+                            // so the ModelSelector has something selected to show.
+                            setModel(defaultModel);
+                            const di = availableModels.find(m => m.id === defaultModel);
+                            const eff = di?.supported_reasoning_efforts?.length
+                              ? (di.default_reasoning_effort || di.supported_reasoning_efforts[0])
+                              : null;
+                            setReasoningEffort(eff);
+                          }
+                        }}
+                        className="rounded"
+                      />
+                      <span>Use app default</span>
+                    </label>
+                    {!useAppDefault && (
+                      <ModelSelector
+                        models={availableModels}
+                        selectedModelId={model || ''}
+                        reasoningEffort={reasoningEffort}
+                        onModelChange={(modelId, effort) => {
+                          setModel(modelId);
+                          setReasoningEffort(effort);
+                        }}
+                        onReasoningEffortChange={(effort) => setReasoningEffort(effort)}
+                        variant="full"
+                      />
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </section>
 

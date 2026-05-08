@@ -41,7 +41,8 @@ class TestAgentCRUD:
         resp = client.post("/api/agents", json={"name": "Minimal Agent"})
         assert resp.status_code == 200
         agent = resp.json()
-        assert agent["model"] == "claude-sonnet-4"
+        # model defaults to None (= "use app default at runtime")
+        assert agent["model"] is None
         assert agent["icon"] == "🤖"
         assert agent["description"] == ""
         assert agent["tools"]["custom"] == []
@@ -170,6 +171,58 @@ class TestAgentEdgeCases:
         resp = client.put(f"/api/agents/{created['id']}", json={"name": "Updated"})
         updated = resp.json()
         assert updated["created_at"] == created["created_at"]
+
+
+class TestAgentModelOptional:
+    """v0.8.8: agent.model is optional. None means 'use app default at runtime'."""
+
+    def test_create_agent_without_model(self, client):
+        resp = client.post("/api/agents", json={"name": "No Model Agent"})
+        assert resp.status_code == 200
+        assert resp.json()["model"] is None
+
+    def test_create_agent_explicit_null_model(self, client):
+        resp = client.post("/api/agents", json={"name": "Null Model", "model": None})
+        assert resp.status_code == 200
+        assert resp.json()["model"] is None
+
+    def test_legacy_empty_string_model_coerced_to_none(self, client):
+        # Back-compat: existing JSON files with "model": "" must load as None.
+        resp = client.post("/api/agents", json={"name": "Empty Model", "model": ""})
+        assert resp.status_code == 200
+        assert resp.json()["model"] is None
+
+    def test_save_omits_none_model_from_json(self, client, tmp_path):
+        # Create an agent without a model and confirm the on-disk JSON omits the key.
+        import json
+        import os
+        from pathlib import Path
+
+        resp = client.post("/api/agents", json={"name": "Disk Test"})
+        assert resp.status_code == 200
+        agent_id = resp.json()["id"]
+
+        home = Path(os.environ["copilot_console_HOME"])
+        agent_file = home / "agents" / f"{agent_id}.json"
+        assert agent_file.exists()
+        data = json.loads(agent_file.read_text())
+        assert "model" not in data, f"None model must be omitted, got: {data.get('model')!r}"
+
+    def test_update_to_remove_model_persists_as_omitted(self, client):
+        import json
+        import os
+        from pathlib import Path
+
+        created = _create_agent(client, model="gpt-4.1")
+        assert created["model"] == "gpt-4.1"
+
+        resp = client.put(f"/api/agents/{created['id']}", json={"model": None})
+        assert resp.status_code == 200
+        assert resp.json()["model"] is None
+
+        home = Path(os.environ["copilot_console_HOME"])
+        data = json.loads((home / "agents" / f"{created['id']}.json").read_text())
+        assert "model" not in data
 
 
 class TestSubAgentEligibility:

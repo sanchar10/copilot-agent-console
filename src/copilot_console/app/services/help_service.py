@@ -26,22 +26,12 @@ from copilot_console.app.services.storage_service import storage_service
 logger = get_logger(__name__)
 
 _HELP_SETTINGS_KEY = "help_session_id"
-_HELP_VERSION_KEY = "help_session_app_version"
 _HELP_SESSION_NAME = "Copilot Console Help"
 _HELP_TRIGGER = "help"
 _HELP_TIMEOUT_SECONDS = 120
 _HELP_CWD = str(APP_HOME / "docs")
 
 _lock = asyncio.Lock()
-
-
-def _get_app_version() -> str:
-    try:
-        from copilot_console import __version__
-        return str(__version__)
-    except Exception as e:
-        logger.warning(f"Could not read app version for /help session pinning: {e}")
-        return "unknown"
 
 
 def _build_system_prompt() -> str:
@@ -110,32 +100,18 @@ def _write_persisted_id(session_id: str) -> None:
 async def _get_or_create_help_session() -> tuple[str, bool, str]:
     """Return (session_id, is_new_session, model).
 
-    The persisted help session is pinned to the app version it was created
-    against. When the app upgrades (which also triggers a docs re-seed and
-    may include a new system prompt), we discard the old session and create
-    a fresh one — otherwise the SDK conversation carries forward stale
-    context (e.g. answers grounded on docs that no longer match) and the
-    agent confidently parrots its prior turns instead of re-reading docs.
+    The /help session is invalidated on app install/upgrade by the installer
+    script (which strips ``help_session_id`` from settings.json). That keeps
+    /help fresh against the newly-installed app + bundled CLI without needing
+    in-process version pinning here.
     """
     settings = storage_service.get_settings()
     model = settings.get("default_model") or "gpt-4.1"
-    current_version = _get_app_version()
 
     persisted_id = _read_persisted_id()
-    persisted_version = settings.get(_HELP_VERSION_KEY)
 
-    if (
-        persisted_id
-        and persisted_version == current_version
-        and storage_service.load_session(persisted_id)
-    ):
+    if persisted_id and storage_service.load_session(persisted_id):
         return persisted_id, False, model
-
-    if persisted_id:
-        logger.info(
-            f"Discarding /help session {persisted_id} "
-            f"(was v{persisted_version}, app is v{current_version}) — recreating"
-        )
 
     session = await session_service.create_session(SessionCreate(
         model=model,
@@ -147,13 +123,10 @@ async def _get_or_create_help_session() -> tuple[str, bool, str]:
         trigger=_HELP_TRIGGER,
     ))
     try:
-        storage_service.update_settings({
-            _HELP_SETTINGS_KEY: session.session_id,
-            _HELP_VERSION_KEY: current_version,
-        })
+        storage_service.update_settings({_HELP_SETTINGS_KEY: session.session_id})
     except Exception as e:
-        logger.warning(f"Failed to persist help session metadata: {e}")
-    logger.info(f"Created /help session {session.session_id} for v{current_version}")
+        logger.warning(f"Failed to persist help session id: {e}")
+    logger.info(f"Created /help session {session.session_id}")
     return session.session_id, True, model
 
 
