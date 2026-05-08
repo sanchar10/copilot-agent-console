@@ -97,13 +97,30 @@ def _write_persisted_id(session_id: str) -> None:
         logger.warning(f"Failed to persist help session id to settings: {e}")
 
 
+def clear_persisted_help_session() -> None:
+    """Drop the persisted /help session id.
+
+    Called from app startup so each server restart begins with a fresh /help
+    session. This guarantees the latest system prompt + bundled docs are in
+    effect after any upgrade, without relying on installer scripts to mutate
+    settings.json (which races with running app processes).
+    """
+    try:
+        settings = storage_service.get_settings()
+        if settings.get(_HELP_SETTINGS_KEY):
+            storage_service.update_settings({_HELP_SETTINGS_KEY: ""})
+            logger.info("Cleared persisted /help session id on startup")
+    except Exception as e:
+        logger.warning(f"Failed to clear persisted /help session id: {e}")
+
+
 async def _get_or_create_help_session() -> tuple[str, bool, str]:
     """Return (session_id, is_new_session, model).
 
-    The /help session is invalidated on app install/upgrade by the installer
-    script (which strips ``help_session_id`` from settings.json). That keeps
-    /help fresh against the newly-installed app + bundled CLI without needing
-    in-process version pinning here.
+    The /help session is invalidated on every server restart (see
+    ``clear_persisted_help_session`` called from app startup). That keeps
+    /help fresh against the newly-installed app + bundled CLI without
+    relying on installer scripts to mutate settings.json.
     """
     settings = storage_service.get_settings()
     model = settings.get("default_model") or "gpt-4.1"

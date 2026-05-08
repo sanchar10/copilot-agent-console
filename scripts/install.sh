@@ -314,26 +314,6 @@ else
     echo -e "${YELLOW}  [NOTE] Restart your terminal, then run 'copilot-console'.${NC}"
 fi
 
-# Clear cached /help session id on install/upgrade so /help recreates fresh
-# against the newly-installed app + bundled CLI. Idempotent; silent no-op if
-# the file or key are absent.
-SETTINGS_FILE="$HOME/.copilot-console/settings.json"
-if [ -f "$SETTINGS_FILE" ] && command -v python3 &> /dev/null; then
-    python3 - "$SETTINGS_FILE" <<'PYEOF' &> /dev/null || true
-import json, sys
-p = sys.argv[1]
-try:
-    with open(p, "r", encoding="utf-8") as f:
-        s = json.load(f)
-    if "help_session_id" in s:
-        s.pop("help_session_id")
-        with open(p, "w", encoding="utf-8") as f:
-            json.dump(s, f, indent=2)
-except Exception:
-    pass
-PYEOF
-fi
-
 # --- Install ripgrep (for cross-session search) ---
 if ! command -v rg &> /dev/null; then
     echo ""

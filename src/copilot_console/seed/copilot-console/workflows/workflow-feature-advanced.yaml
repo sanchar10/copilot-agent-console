@@ -32,7 +32,7 @@ trigger:
     # If/else — renders as a diamond in the YAML overlay
     - kind: If
       id: branch_quick
-      condition: =Local.mode == "quick"
+      condition: =Local.mode = "quick"
       then:
         - kind: SendActivity
           id: quick_path

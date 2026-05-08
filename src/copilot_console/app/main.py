@@ -87,6 +87,10 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting Copilot Console...")
     ensure_directories()
+    # Drop any persisted /help session id so each server restart begins with a
+    # fresh /help session against the latest system prompt + bundled docs.
+    from copilot_console.app.services.help_service import clear_persisted_help_session
+    clear_persisted_help_session()
     # Pre-start main SDK client for reliable operation
     await copilot_service._start_main_client()
     # Start buffer cleanup task
