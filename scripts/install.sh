@@ -109,8 +109,30 @@ echo ""
 
 # Resolve latest wheel URL from GitHub releases
 echo -e "${GRAY}  Fetching latest release...${NC}"
-RELEASE_INFO=$(curl -fsSL -H "User-Agent: copilot-console-installer" \
-    "https://api.github.com/repos/$REPO/releases/latest")
+RELEASE_INFO=""
+LAST_ERR=""
+for attempt in 1 2 3; do
+    if RELEASE_INFO=$(curl -fsSL --max-time 30 -H "User-Agent: copilot-console-installer" \
+        "https://api.github.com/repos/$REPO/releases/latest" 2>&1); then
+        break
+    else
+        LAST_ERR="$RELEASE_INFO"
+        RELEASE_INFO=""
+        if [ "$attempt" -lt 3 ]; then
+            echo -e "${YELLOW}     Attempt $attempt failed; retrying...${NC}"
+            sleep 2
+        fi
+    fi
+done
+if [ -z "$RELEASE_INFO" ]; then
+    echo -e "${RED}  [ERROR] Failed to fetch latest release from GitHub.${NC}"
+    if [ -n "$LAST_ERR" ]; then
+        echo -e "${YELLOW}     Cause: $LAST_ERR${NC}"
+    fi
+    echo -e "${YELLOW}     If this persists, you may be rate-limited by the GitHub API (60 requests/hour per IP).${NC}"
+    echo -e "${YELLOW}     Check https://github.com/$REPO/releases for manual download.${NC}"
+    exit 1
+fi
 WHL_URL=$(echo "$RELEASE_INFO" | grep -o '"browser_download_url":\s*"[^"]*\.whl"' | head -n1 | cut -d'"' -f4)
 if [ -z "$WHL_URL" ]; then
     echo -e "${RED}  [ERROR] No .whl found in latest release.${NC}"
