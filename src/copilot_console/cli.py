@@ -47,8 +47,10 @@ def initialize_app_directory():
 def open_browser_now(url: str) -> None:
     """Open the URL in the default browser.
 
-    Called from the FastAPI lifespan once startup completes, so the server
-    is already accepting requests by the time the page makes its first request.
+    Called from a background task in the FastAPI lifespan that first polls
+    the URL until the server is reachable, so the browser never races the
+    uvicorn socket bind (an issue observed on Linux where xdg-open into an
+    already-running browser fires the request sub-100ms).
     """
     try:
         webbrowser.open(url)

@@ -114,11 +114,29 @@ async def lifespan(app: FastAPI):
     # URL is set by cli.py when --no-browser was not passed.
     _browser_url = os.environ.get("COPILOT_OPEN_BROWSER_URL")
     if _browser_url:
-        try:
-            from copilot_console.cli import open_browser_now
-            open_browser_now(_browser_url)
-        except Exception as e:
-            logger.warning(f"Failed to open browser: {e}")
+        import asyncio as _asyncio
+        async def _open_when_ready(url: str) -> None:
+            # Uvicorn doesn't begin accepting until lifespan startup completes
+            # (yield below). On Linux, xdg-open into an already-running browser
+            # is so fast the GET races the socket. Poll until the server
+            # answers, then open. Capped so we don't spin forever.
+            import httpx
+            deadline_attempts = 40  # ~10s at 250ms
+            for _ in range(deadline_attempts):
+                try:
+                    async with httpx.AsyncClient(timeout=0.5) as client:
+                        r = await client.get(url)
+                        if r.status_code < 500:
+                            break
+                except Exception:
+                    pass
+                await _asyncio.sleep(0.25)
+            try:
+                from copilot_console.cli import open_browser_now
+                open_browser_now(url)
+            except Exception as e:
+                logger.warning(f"Failed to open browser: {e}")
+        _asyncio.create_task(_open_when_ready(_browser_url))
     yield
     # Shutdown
     logger.info("Shutting down Copilot Console...")
