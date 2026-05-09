@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.9.1
+
+### Release Summary
+
+Patch release with four post-v0.9.0 hotfixes — the most consequential being the **silent enqueue regression** introduced by the SDK 1.0.0b2 migration, where rapid-fire queued messages were dropped instead of being processed in order. Also tightens chat UX (transient Intent rows no longer pollute persisted history; ask_user/elicitation cards auto-scroll into view) and brings `uv.lock` back into agreement with `pyproject.toml`'s declared dependency pins (lockfile drift carried over from v0.9.0).
+
+### 🐛 Fixes
+
+- **Silent enqueue regression** — `app/services/copilot_service.py` was still calling `session.send({prompt, mode})` with a positional dict at the `/enqueue` site, missing the v0.9.0 SDK 1.0.0b2 kwargs migration that was applied at the `/messages` site. The SDK treated the dict as the prompt string and defaulted `mode=None` (immediate), causing rapid-fire queued messages to be silently dropped or coalesced server-side. Now passes prompt as positional and mode/attachments as kwargs to match `CopilotSession.send(prompt, *, attachments=None, mode=None)`. Existing test strengthened from `assert_awaited_once()` to exact call-signature assertion, plus a new regression test on the attachments path that would have caught this in v0.9.0.
+- **Bare 'Intent' step rows hidden from chat** — Intent is a transient streaming-only signal that was leaking into the persisted step list and adding visual noise. New generic `hideStepsByTitle` filter in `frontend/src/utils/stepFilter.ts` with `HIDDEN_STEP_TITLES = ['Intent']` chained after the existing `hideStepsByToolName` filter, applied uniformly in `StreamingMessage` (live), `MessageBubble` (persisted), and `mobileStepParser` (mobile parity).
+- **Auto-scroll follows ask_user/elicitation cards** — `frontend/src/components/chat/ChatPane.tsx` auto-scroll effect previously only depended on streaming text and tool steps, so the viewport did not follow when a card appeared below the fold mid-turn. Effect deps now include `pendingAskUserForSession`, `pendingElicitationForSession`, and `resolvedElicitationsForSession` so the chat pane scrolls to keep the active prompt visible.
+
+### 🧹 Chores
+
+- **Stale SDK version reference refreshed** — `app/services/session_client.py` `list_mcp_servers` docstring now reads "SDK 1.0.0b2" instead of "SDK 0.3.0". Behavior unchanged: the `MCPServerList` wrapper still exists in 1.0.0b2 (`rpc.py:4567`), so normalization logic remains correct.
+- **`uv.lock` synced to declared pins** — committed lockfile previously had `agent-framework==1.0.0rc2` while `pyproject.toml` declared `agent-framework==1.3.0` (latent inconsistency carried over from v0.9.0). Lock now matches pyproject; transitive AF/Azure packages updated accordingly. Verified via `uv sync` clean and app import smoke check.
+
 ## v0.9.0
 
 ### Release Summary
