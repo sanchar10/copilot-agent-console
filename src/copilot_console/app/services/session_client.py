@@ -203,7 +203,7 @@ class SessionClient:
     async def list_mcp_servers(self) -> list:
         """Wrapper around ``session.rpc.mcp.list()`` with safety checks.
 
-        Normalizes the SDK 0.3.0 ``MCPServerList`` wrapper into a plain list.
+        Normalizes the SDK 1.0.0b2 ``MCPServerList`` wrapper into a plain list.
         """
         if self.session is None:
             return []
