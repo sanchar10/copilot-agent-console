@@ -5,6 +5,12 @@
       "command": "python",
       "args": ["{{APP_HOME}}/local-mcp-servers/weather_server.py"],
       "tools": ["*"]
+    },
+    "playwright": {
+      "type": "local",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "tools": ["*"]
     }
   }
 }

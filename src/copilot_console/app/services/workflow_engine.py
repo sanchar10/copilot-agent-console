@@ -20,6 +20,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from typing import Any
@@ -99,6 +100,103 @@ def _probe_powerfx() -> bool:
 
 
 POWERFX_AVAILABLE: bool = _probe_powerfx()
+
+
+# ---------------------------------------------------------------------------
+# PowerFx error wrapping
+# ---------------------------------------------------------------------------
+# AF's `WorkflowState.eval(expression)` raises ValueError on PowerFx compile
+# failures with messages like ``Power Fx failed compilation: Error 12-13: ...``
+# — without telling the user which expression actually failed. Without the
+# offending text, debugging a workflow with many `=…` expressions is guesswork.
+# Patch eval at our boundary (not in the SDK) to prepend the original
+# expression to any PowerFx-related ValueError it raises.
+
+def _powerfx_step_hint() -> str:
+    """Walk the call stack to find the executing *Executor and return a short tag.
+
+    Returns something like ``step "Decide route" (kind=If)`` or ``""`` if no
+    executor is found. Best-effort: any failure returns empty string.
+    """
+    try:
+        import sys
+        frame = sys._getframe(2)
+        while frame is not None:
+            inst = frame.f_locals.get("self")
+            cls_name = type(inst).__name__ if inst is not None else ""
+            if inst is not None and cls_name.endswith("Executor"):
+                action_def = getattr(inst, "_action_def", None)
+                display = action_def.get("displayName") if isinstance(action_def, dict) else None
+                kind = action_def.get("kind") if isinstance(action_def, dict) else None
+                exec_id = getattr(inst, "id", None)
+                label = display or exec_id or cls_name
+                detail = f" (kind={kind})" if kind and kind not in str(label) else ""
+                return f' in step "{label}"{detail}'
+            frame = frame.f_back
+    except Exception:
+        pass
+    return ""
+
+
+def _install_powerfx_error_wrap() -> None:
+    try:
+        import agent_framework_declarative._workflows._declarative_base as _db
+    except Exception:
+        return
+    # SDK class name has shifted across versions — try the known names in order
+    # and fall back to "any class in this module that has an `eval` method".
+    cls = None
+    for name in ("DeclarativeWorkflowState", "WorkflowState"):
+        candidate = getattr(_db, name, None)
+        if candidate is not None and callable(getattr(candidate, "eval", None)):
+            cls = candidate
+            break
+    if cls is None:
+        import inspect as _inspect
+        for _, candidate in _inspect.getmembers(_db, _inspect.isclass):
+            if (
+                candidate.__module__ == _db.__name__
+                and callable(getattr(candidate, "eval", None))
+            ):
+                cls = candidate
+                break
+    if cls is None:
+        logger.debug("PowerFx wrap: no eval-bearing class found in %s", _db.__name__)
+        return
+    if getattr(cls, "_copilot_console_pfx_wrap", False):
+        return
+    _orig_eval = cls.eval
+
+    def _eval_with_formula(self: Any, expression: str) -> Any:
+        try:
+            return _orig_eval(self, expression)
+        except ValueError as e:
+            msg = str(e)
+            if (
+                isinstance(expression, str)
+                and "Power Fx" in msg
+                and expression not in msg
+            ):
+                hint = _powerfx_step_hint()
+                # Strip PowerFx generic tutorial boilerplate ("For example, you
+                # can add the operand '2'...") - same text for every failure,
+                # adds no diagnostic value. Cut from " For example," up to the
+                # next "; " (next error boundary) or end of string.
+                msg = re.sub(r"\s*For example,.*?(?=;\s|$)", "", msg, flags=re.DOTALL)
+                # Convert SDK's "; "-separated error list into bullet lines so
+                # toast/red-card render each PowerFx error on its own line.
+                msg = msg.replace("; ", "\n  • ")
+                raise ValueError(
+                    f"PowerFx evaluation failed{hint} for expression `{expression}`: {msg}"
+                ) from e
+            raise
+
+    cls.eval = _eval_with_formula  # type: ignore[method-assign]
+    cls._copilot_console_pfx_wrap = True  # type: ignore[attr-defined]
+    logger.debug("PowerFx error wrap installed on %s.eval", cls.__name__)
+
+
+_install_powerfx_error_wrap()
 
 
 def _yaml_uses_expressions(yaml_content: str) -> bool:

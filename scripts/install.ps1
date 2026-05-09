@@ -355,62 +355,12 @@ if (-not $rg) {
 }
 
 # --- Optional: Agentic Web Browsing (Playwright MCP) ---
-Write-Host ""
-Write-Host "  Optional: Agentic Web Browsing" -ForegroundColor Cyan
-Write-Host "  Adds autonomous web navigation via Playwright MCP server." -ForegroundColor DarkGray
-Write-Host "  Uses your system browser (Edge or Chrome)." -ForegroundColor DarkGray
-Write-Host ""
-$setupPlaywright = Read-Host "  Enable agentic web browsing? (Y/n)"
-if ($setupPlaywright -ne 'n' -and $setupPlaywright -ne 'N') {
-    # Add Playwright MCP server to mcp-config.json (uses system browser, no extra install needed)
-    $mcpConfigPath = "$env:USERPROFILE\.copilot-console\mcp-config.json"
-    $addPlaywright = $true
-    if (Test-Path $mcpConfigPath) {
-        try {
-            $existingConfig = Get-Content $mcpConfigPath -Raw | ConvertFrom-Json
-            if ($existingConfig.mcpServers.PSObject.Properties.Name -contains 'playwright') {
-                Write-Host "  [OK] Playwright MCP server already configured" -ForegroundColor Green
-                $addPlaywright = $false
-            }
-        } catch { }
-    }
-    if ($addPlaywright) {
-        # Ensure directory exists
-        $mcpDir = Split-Path $mcpConfigPath
-        if (-not (Test-Path $mcpDir)) { New-Item -ItemType Directory -Path $mcpDir -Force | Out-Null }
-
-        if (Test-Path $mcpConfigPath) {
-            try {
-                $config = Get-Content $mcpConfigPath -Raw | ConvertFrom-Json
-                $playwrightServer = @{
-                    type = "local"
-                    command = "npx"
-                    tools = @("*")
-                    args = @("@playwright/mcp@latest")
-                }
-                $config.mcpServers | Add-Member -MemberType NoteProperty -Name "playwright" -Value $playwrightServer
-                $config | ConvertTo-Json -Depth 5 | Set-Content $mcpConfigPath -Encoding UTF8
-            } catch {
-                Write-Host "  [WARN] Failed to update mcp-config.json. Add playwright server manually." -ForegroundColor Yellow
-            }
-        } else {
-            $newConfig = @{
-                mcpServers = @{
-                    playwright = @{
-                        type = "local"
-                        command = "npx"
-                        tools = @("*")
-                        args = @("@playwright/mcp@latest")
-                    }
-                }
-            }
-            $newConfig | ConvertTo-Json -Depth 5 | Set-Content $mcpConfigPath -Encoding UTF8
-        }
-        Write-Host "  [OK] Playwright MCP server added to config" -ForegroundColor Green
-    }
-} else {
-    Write-Host "  Skipped. Enable later — see docs/guides/INSTALL.md" -ForegroundColor DarkGray
-}
+# Note: The `playwright` MCP server is now seeded into mcp-config.json
+# automatically by the app on first launch (via mcp-config.json.template).
+# It uses your system browser (Edge/Chrome) and `npx @playwright/mcp@latest`
+# is fetched on first use. Requires Node.js (npx) on PATH.
+# To disable, remove the `playwright` entry from ~/.copilot-console/mcp-config.json
+# or toggle it off in the session's settings.
 
 # --- Optional: Mobile Access & CLI Notifications ---
 $mobileEnabled = $false

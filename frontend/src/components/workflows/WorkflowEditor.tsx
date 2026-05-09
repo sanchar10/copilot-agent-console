@@ -371,6 +371,46 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
             <textarea
               value={yamlContent}
               onChange={(e) => handleYamlChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== 'Tab') return;
+                e.preventDefault();
+                const ta = e.currentTarget;
+                const { selectionStart: s, selectionEnd: end, value } = ta;
+                const indent = '  ';
+                // Multi-line selection: indent/outdent each line
+                if (s !== end && value.slice(s, end).includes('\n')) {
+                  const lineStart = value.lastIndexOf('\n', s - 1) + 1;
+                  const block = value.slice(lineStart, end);
+                  const lines = block.split('\n');
+                  const updated = e.shiftKey
+                    ? lines.map((l) => (l.startsWith(indent) ? l.slice(indent.length) : l.replace(/^\t/, '')))
+                    : lines.map((l) => indent + l);
+                  const newBlock = updated.join('\n');
+                  const newValue = value.slice(0, lineStart) + newBlock + value.slice(end);
+                  handleYamlChange(newValue);
+                  requestAnimationFrame(() => {
+                    ta.selectionStart = lineStart;
+                    ta.selectionEnd = lineStart + newBlock.length;
+                  });
+                  return;
+                }
+                // Caret/single-line: insert or remove one indent at caret
+                if (e.shiftKey) {
+                  const lineStart = value.lastIndexOf('\n', s - 1) + 1;
+                  const line = value.slice(lineStart, s);
+                  if (line.startsWith(indent)) {
+                    const newValue = value.slice(0, lineStart) + line.slice(indent.length) + value.slice(s);
+                    handleYamlChange(newValue);
+                    const newPos = s - indent.length;
+                    requestAnimationFrame(() => { ta.selectionStart = ta.selectionEnd = newPos; });
+                  }
+                  return;
+                }
+                const newValue = value.slice(0, s) + indent + value.slice(end);
+                handleYamlChange(newValue);
+                const newPos = s + indent.length;
+                requestAnimationFrame(() => { ta.selectionStart = ta.selectionEnd = newPos; });
+              }}
               spellCheck={false}
               className="w-full h-full p-4 font-mono text-sm bg-gray-900 text-gray-100 resize-none outline-none border-none"
               style={{ tabSize: 2 }}

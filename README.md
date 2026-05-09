@@ -25,9 +25,9 @@ Copilot CLI is great. But by Wednesday afternoon you have 8 sessions open across
 - 🧰 **Per-session context** — different MCP servers, agents, models, and working directory per task
 - 🔁 **Workflows & automations** — chain agents, schedule runs, repeat the boring stuff
 - 🔍 **Find what you did last week** — search across every past session, pin responses with notes
-- 📱 **Phone view of the whole console** — every session, search, workflows, push notifications
+- 📱 **All your CLI sessions on your phone** — every session auto-discovered, push notifications when any agent finishes (Console-initiated **or** native CLI)
 
-> **A note on mobile:** GitHub's built-in [`/remote`](https://docs.github.com/en/enterprise-cloud@latest/copilot/how-tos/copilot-cli/use-copilot-cli/steer-remotely) command is a great way to steer a single CLI session from your phone via GitHub Mobile. Console's mobile view takes it further — every session, search, workflows, and the agent library, all from one place — and works for sessions outside GitHub.com-hosted repos too. Use whichever fits.
+> **Pairs well with `/remote`:** GitHub's built-in [`/remote`](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/steer-remotely) is great for steering a session from GitHub Mobile when you need to. Copilot Console mobile is for the times you want a list of *every* CLI session — Console-launched and native terminal alike — with push notifications when any one of them finishes or needs you. Different jobs; use whichever fits the moment.
 
 Built on the [Copilot Python SDK](https://github.com/github/copilot-sdk). Open source, MIT-licensed, one-line install, runs locally. **Platform:** Windows, macOS, Linux (Ubuntu 22.04+).
 
@@ -55,9 +55,9 @@ Built on the [Copilot Python SDK](https://github.com/github/copilot-sdk). Open s
 
 ---
 
-## 📱 Mobile Companion
+## 📱 Mobile — every CLI session on your phone
 
-Access Copilot Console sessions from your phone — get push notifications when agents finish, monitor progress, and reply on the go. No more waiting at a terminal for agent responses. Install as a PWA for a native-like experience.
+Every Copilot CLI session — Console-launched **and** native terminal — visible on your phone the moment it starts. Push notifications when any agent finishes or asks a question. Reply from the chat view. Installable as a PWA.
 
 <img src="docs/screenshots/mobile/mobile-session.jpeg" alt="Mobile Companion" height="350">
 

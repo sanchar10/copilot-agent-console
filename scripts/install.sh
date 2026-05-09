@@ -406,65 +406,12 @@ else
 fi
 
 # --- Optional: Agentic Web Browsing (Playwright MCP) ---
-echo ""
-echo -e "${CYAN}  Optional: Agentic Web Browsing${NC}"
-echo -e "${GRAY}  Adds autonomous web navigation via Playwright MCP server.${NC}"
-echo -e "${GRAY}  Uses your system browser (Edge or Chrome).${NC}"
-echo ""
-if [ -t 0 ] || [ -e /dev/tty ]; then
-    read -p "  Enable agentic web browsing? (Y/n) " SETUP_PLAYWRIGHT < /dev/tty
-else
-    SETUP_PLAYWRIGHT="Y"
-fi
-if [[ ! "$SETUP_PLAYWRIGHT" =~ ^[Nn]$ ]]; then
-    MCP_CONFIG_PATH="$HOME/.copilot-console/mcp-config.json"
-    ADD_PLAYWRIGHT=true
-    if [ -f "$MCP_CONFIG_PATH" ]; then
-        if grep -q '"playwright"' "$MCP_CONFIG_PATH" 2>/dev/null; then
-            echo -e "${GREEN}  [OK] Playwright MCP server already configured${NC}"
-            ADD_PLAYWRIGHT=false
-        fi
-    fi
-    if [ "$ADD_PLAYWRIGHT" = true ]; then
-        mkdir -p "$(dirname "$MCP_CONFIG_PATH")"
-        if [ -f "$MCP_CONFIG_PATH" ]; then
-            # Update existing config (basic jq-free approach)
-            TEMP_CONFIG=$(mktemp)
-            python3 -c "
-import json, sys
-with open('$MCP_CONFIG_PATH', 'r') as f:
-    config = json.load(f)
-if 'mcpServers' not in config:
-    config['mcpServers'] = {}
-config['mcpServers']['playwright'] = {
-    'type': 'local',
-    'command': 'npx',
-    'tools': ['*'],
-    'args': ['@playwright/mcp@latest']
-}
-with open('$TEMP_CONFIG', 'w') as f:
-    json.dump(config, f, indent=2)
-" 2>/dev/null && mv "$TEMP_CONFIG" "$MCP_CONFIG_PATH"
-        else
-            # Create new config
-            cat > "$MCP_CONFIG_PATH" << 'EOF'
-{
-  "mcpServers": {
-    "playwright": {
-      "type": "local",
-      "command": "npx",
-      "tools": ["*"],
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
-EOF
-        fi
-        echo -e "${GREEN}  [OK] Playwright MCP server added to config${NC}"
-    fi
-else
-    echo -e "${GRAY}  Skipped. Enable later — see docs/guides/INSTALL.md${NC}"
-fi
+# Note: The `playwright` MCP server is now seeded into mcp-config.json
+# automatically by the app on first launch (via mcp-config.json.template).
+# It uses your system browser (Edge/Chrome) and `npx @playwright/mcp@latest`
+# is fetched on first use. Requires Node.js (npx) on PATH.
+# To disable, remove the `playwright` entry from ~/.copilot-console/mcp-config.json
+# or toggle it off in the session's settings.
 
 # --- Optional: Mobile Access & CLI Notifications ---
 MOBILE_ENABLED=false

@@ -2,6 +2,10 @@
 
 Access Copilot Console securely from your phone — check sessions, read messages, and reply to agents on the go.
 
+## When to use Mobile Companion
+
+GitHub's built-in [`/remote`](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/steer-remotely) lets you steer a session from GitHub Mobile when you need to — a great fit for one-off remote steering. Mobile Companion is built for the case where Copilot CLI is part of your daily flow and you want **all** your sessions visible on your phone, with push notifications when any of them finishes or asks a question — including sessions started in a plain terminal. The two complement each other.
+
 ## Prerequisites
 
 Requires [devtunnel](https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started). If you used the install script or already have it, skip this.

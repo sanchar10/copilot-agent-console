@@ -232,28 +232,16 @@ To disable:
 cli-notify off
 ```
 
-## Optional: Agentic Web Browsing (Playwright MCP)
+## Agentic Web Browsing (Playwright MCP)
 
-Enable autonomous web navigation by adding the [Playwright MCP server](https://github.com/microsoft/playwright-mcp). It uses your system browser (Edge or Chrome) — no extra browser install needed.
+Copilot Console ships with the [Playwright MCP server](https://github.com/microsoft/playwright-mcp) preconfigured in your `~/.copilot-console/mcp-config.json` on first launch. It uses your system browser (Edge or Chrome) — no extra browser install needed.
 
-### Add to MCP config
+**Requirements:**
+- **Node.js** (`npx`) on PATH — Playwright MCP is fetched on first use via `npx @playwright/mcp@latest`.
 
-Add the following to `~/.copilot-console/mcp-config.json` (create it if it doesn't exist). If the file already has content, add `playwright` inside the existing `mcpServers` object:
+**Enable in a session:** open the session's settings and toggle the `playwright` MCP server on.
 
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "type": "local",
-      "command": "npx",
-      "tools": ["*"],
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
-```
-
-Once configured, enable the Playwright MCP server in any session's settings to use web browsing.
+**To remove:** delete the `playwright` entry from `~/.copilot-console/mcp-config.json`. Note that the seed merge re-runs on each app upgrade and will re-add any missing shipped server, so a removed entry may come back after a version bump. To keep it disabled across upgrades, toggle the server off in **Settings → MCP Servers** instead.
 
 ## Using the Installed Copilot CLI (instead of Bundled)
 

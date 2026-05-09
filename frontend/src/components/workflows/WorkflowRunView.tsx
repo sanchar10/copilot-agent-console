@@ -395,7 +395,7 @@ function EventCard({ event, onSubmit, isSubmitted, submittedAnswer }: {
   // Error events
   if (type === 'workflow_failed') {
     return (
-      <div className="px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+      <div className="px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400 whitespace-pre-line">
         ❌ {event.error || 'Workflow failed'}
       </div>
     );
@@ -781,11 +781,12 @@ function FreeTextSubmit({
   setValue: (v: string) => void;
   onSubmit: (value: unknown) => void | Promise<void>;
 }) {
+  const isEmpty = value.trim().length === 0;
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        if (!disabled) onSubmit(value);
+        if (!disabled && !isEmpty) onSubmit(value);
       }}
       className="flex gap-2"
     >
@@ -799,7 +800,7 @@ function FreeTextSubmit({
       />
       <button
         type="submit"
-        disabled={disabled}
+        disabled={disabled || isEmpty}
         className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Send

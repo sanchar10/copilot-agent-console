@@ -204,16 +204,17 @@ def seed_bundled_content(force: bool = False) -> None:
     logger.info(f"Seeding bundled content (version: {seeded_version} → {app_version})")
     total = 0
 
-    # seed/copilot-console/ → ~/.copilot-console/ (copy-if-missing)
+    # seed/copilot-console/ → ~/.copilot-console/
+    # Shipped samples (workflows, agents, tools, automations, docs, etc.) are
+    # treated as app-managed and overwritten on version change so users pick up
+    # bug fixes and new defaults. mcp-config.json is the only exception — it's
+    # merged via _merge_mcp_config (special-cased in _sync_tree) so user-added
+    # MCP servers are preserved. Users who want to customize a shipped sample
+    # should copy it to a new filename (e.g. workflow-feature-advanced.yaml →
+    # workflow-my-feature.yaml); files with new names are never touched.
     app_seed = SEED_DIR / "copilot-console"
     if app_seed.exists():
-        count = _sync_tree(app_seed, APP_HOME, overwrite=False)
-        total += count
-
-    # Docs are always overwritten — they're not user-customizable
-    docs_seed = SEED_DIR / "copilot-console" / "docs"
-    if docs_seed.exists():
-        count = _sync_tree(docs_seed, APP_HOME / "docs", overwrite=True)
+        count = _sync_tree(app_seed, APP_HOME, overwrite=True)
         total += count
 
     # seed/copilot/ → ~/.copilot/ (copy-or-update, we own these)
