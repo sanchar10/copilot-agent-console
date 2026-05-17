@@ -19,10 +19,10 @@ class MobileErrorBoundary extends Component<{ children: ReactNode; onReset: () =
   render() {
     if (this.state.error) {
       return (
-        <div className="h-full flex flex-col items-center justify-center p-6 text-center bg-[#fafafa] dark:bg-[#1e1e2e]">
+        <div className="h-full flex flex-col items-center justify-center p-6 text-center bg-[#fafafa] dark:bg-qd-bg">
           <p className="text-4xl mb-3">💥</p>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Something went wrong</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 max-w-xs break-all">{this.state.error.message}</p>
+          <h2 className="text-lg font-semibold text-qd-text mb-2">Something went wrong</h2>
+          <p className="text-sm text-qd-text-muted mb-1 max-w-xs break-all">{this.state.error.message}</p>
           <button
             onClick={() => { this.setState({ error: null }); this.props.onReset(); }}
             className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg"
@@ -52,18 +52,18 @@ function ConnectionErrorScreen({ authError, onRetry, onReconfigure }: {
   }, [authError, onRetry]);
 
   return (
-    <div className="h-dvh bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col items-center justify-center p-6 text-center safe-top">
+    <div className="h-dvh bg-[#fafafa] dark:bg-qd-bg flex flex-col items-center justify-center p-6 text-center safe-top">
       <div className="text-5xl mb-4">{authError === 'unauthorized' ? '🔑' : '📡'}</div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+      <h2 className="text-xl font-semibold text-qd-text mb-2">
         {authError === 'unauthorized' ? 'Session Expired' : 'Connection Lost'}
       </h2>
-      <p className="text-gray-600 dark:text-gray-400 mb-2 max-w-xs">
+      <p className="text-qd-text-dim mb-2 max-w-xs">
         {authError === 'unauthorized'
           ? 'Your API token has been regenerated. Please scan the QR code again from the desktop Settings.'
           : 'Unable to reach the server. Check your internet connection and retry.'}
       </p>
       {authError === 'network' && getStoredBaseUrl() && (
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-6 max-w-xs break-all">
+        <p className="text-xs text-qd-text-muted mb-6 max-w-xs break-all">
           Server: {getStoredBaseUrl()}
         </p>
       )}
@@ -72,7 +72,7 @@ function ConnectionErrorScreen({ authError, onRetry, onReconfigure }: {
         <button onClick={onRetry} className="bg-blue-600 text-white rounded-lg py-3 px-4 font-medium">
           Retry Connection
         </button>
-        <button onClick={onReconfigure} className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg py-3 px-4 font-medium">
+        <button onClick={onReconfigure} className="bg-gray-200 dark:bg-gray-700 text-qd-text rounded-lg py-3 px-4 font-medium">
           Re-configure Connection
         </button>
       </div>
@@ -176,14 +176,14 @@ export function MobileApp() {
   if (!isLocalhost && !getStoredToken() && !searchParams.get('token')) {
     const savedUrl = getStoredBaseUrl();
     return (
-      <div className="h-dvh bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col safe-top">
+      <div className="h-dvh bg-[#fafafa] dark:bg-qd-bg flex flex-col safe-top">
         {/* Welcome header */}
         <div className="px-6 pt-8 pb-4">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-3xl">🤖</span>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Copilot Console</h1>
+            <h1 className="text-2xl font-bold text-qd-text">Copilot Console</h1>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-qd-text-muted">
             Connect to your Copilot Console server to get started
           </p>
         </div>
@@ -191,8 +191,8 @@ export function MobileApp() {
         {/* Reconnect prompt when we have a saved URL but no token */}
         {savedUrl && (
           <div className="mx-6 mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Last connected to:</p>
-            <p className="text-sm text-gray-700 dark:text-gray-300 font-mono break-all mb-2">{savedUrl}</p>
+            <p className="text-xs text-qd-text-muted mb-1">Last connected to:</p>
+            <p className="text-sm text-qd-text-dim font-mono break-all mb-2">{savedUrl}</p>
             <button
               onClick={() => {
                 setStoredBaseUrl(savedUrl);
@@ -235,7 +235,7 @@ export function MobileApp() {
   const activeTab = getActiveTab();
 
   return (
-    <div className="h-dvh bg-[#fafafa] dark:bg-[#1e1e2e] flex flex-col safe-top">
+    <div className="h-dvh bg-[#fafafa] dark:bg-qd-bg flex flex-col safe-top">
       {/* Connection indicator */}
       {connected === false && (
         <div className="bg-red-500 text-white text-center text-xs py-1">
@@ -269,7 +269,7 @@ export function MobileApp() {
 
       {/* Bottom tab navigation — hidden when in chat view */}
       {!location.pathname.includes('/chat/') && (
-        <nav className="bg-white dark:bg-[#252536] border-t border-gray-200 dark:border-[#3a3a4e] flex safe-bottom">
+        <nav className="bg-qd-bg border-t border-qd-border flex safe-bottom">
           <TabButton
             icon="💬"
             label="Sessions"
@@ -307,7 +307,7 @@ function TabButton({ icon, label, active, onClick, badge }: {
       className={`flex-1 flex flex-col items-center justify-center py-1 gap-0 transition-colors ${
         active
           ? 'text-blue-600 dark:text-blue-400'
-          : 'text-gray-500 dark:text-gray-400'
+          : 'text-qd-text-muted'
       }`}
     >
       <span className="text-xl relative">

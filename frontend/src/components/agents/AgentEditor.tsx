@@ -176,7 +176,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
 
   if (!isNew && !existingAgent) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">
+      <div className="flex-1 flex items-center justify-center text-qd-text-muted">
         Agent not found. It may have been deleted.
       </div>
     );
@@ -187,7 +187,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-2xl font-bold text-qd-text">
             {icon} {isNew ? 'New Agent' : name}
           </h1>
           <div className="flex items-center gap-2">
@@ -215,7 +215,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             </button>
             <button
               onClick={() => closeTab(tabId.agentDetail(agentId))}
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 border border-gray-300/60 dark:border-gray-600/60 hover:bg-gray-50/60 dark:hover:bg-gray-800/30 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-qd-text-dim border border-gray-300/60 dark:border-gray-600/60 hover:bg-gray-50/60 dark:hover:bg-gray-800/30 rounded-lg transition-colors"
             >
               Close
             </button>
@@ -225,41 +225,41 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
         {/* Form */}
         <div className="space-y-6">
           {/* Basic Info */}
-          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4 relative z-40">
-            <h2 className="font-semibold text-gray-700 dark:text-gray-300">Basic Info</h2>
+          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4 relative z-40">
+            <h2 className="font-semibold text-qd-text-dim">Basic Info</h2>
             <div className="grid grid-cols-[1fr_80px] gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Name</label>
+                <label className="block text-sm font-medium text-qd-text-dim mb-1">Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="My Agent"
-                  className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+                  className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Icon</label>
+                <label className="block text-sm font-medium text-qd-text-dim mb-1">Icon</label>
                 <EmojiPicker value={icon} onChange={setIcon} />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Description</label>
+              <label className="block text-sm font-medium text-qd-text-dim mb-1">Description</label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What does this agent do?"
-                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Model</label>
+              <label className="block text-sm font-medium text-qd-text-dim mb-1">Model</label>
               {(() => {
                 const useAppDefault = model === null;
                 return (
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                    <label className="flex items-center gap-2 text-sm text-qd-text-dim cursor-pointer">
                       <input
                         type="checkbox"
                         checked={useAppDefault}
@@ -309,10 +309,10 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           />
 
           {/* Tools */}
-          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4 relative z-30">
+          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4 relative z-30">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-700 dark:text-gray-300">Tools</h2>
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <h2 className="font-semibold text-qd-text-dim">Tools</h2>
+              <span className="text-xs text-qd-text-muted">
                 {excludedBuiltinTools.length === 0 && builtinTools.length === 0
                   ? [
                       'All built-in tools enabled',
@@ -326,7 +326,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 }
               </span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-qd-text-muted">
               Select which tools this agent can use.
             </p>
             <ToolsSelector
@@ -352,7 +352,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             )}
             {builtinTools.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-1">
-                <span className="text-[10px] text-gray-400 dark:text-gray-500 self-center mr-1">include:</span>
+                <span className="text-[10px] text-qd-text-muted self-center mr-1">include:</span>
                 {builtinTools.map((t) => (
                   <span key={t} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200/60 dark:border-green-700/40">
                     {t}
@@ -362,7 +362,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             )}
             {excludedBuiltinTools.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-1">
-                <span className="text-[10px] text-gray-400 dark:text-gray-500 self-center mr-1">exclude:</span>
+                <span className="text-[10px] text-qd-text-muted self-center mr-1">exclude:</span>
                 {excludedBuiltinTools.map((t) => (
                   <span key={t} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200/60 dark:border-red-700/40">
                     {t}
@@ -373,16 +373,16 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           </section>
 
           {/* MCP Servers */}
-          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4 relative z-20">
+          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4 relative z-20">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-700 dark:text-gray-300">MCP Servers</h2>
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <h2 className="font-semibold text-qd-text-dim">MCP Servers</h2>
+              <span className="text-xs text-qd-text-muted">
                 {selectedMcpServers.length === 0
                   ? 'None selected'
                   : `${selectedMcpServers.length} selected`}
               </span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-qd-text-muted">
               Select which MCP servers this agent should use.
             </p>
             {availableMcpServers.length > 0 ? (
@@ -403,7 +403,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 )}
               </>
             ) : (
-              <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+              <p className="text-sm text-qd-text-muted italic">
                 No MCP servers configured. Add global servers in ~/.copilot/mcp-config.json
                 or agent-only servers in ~/.copilot-console/mcp-config.json
               </p>
@@ -411,16 +411,16 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           </section>
 
           {/* Sub-Agents (Agent Teams) */}
-          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4 relative z-10">
+          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4 relative z-10">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-700 dark:text-gray-300">👥 Sub-Agents</h2>
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <h2 className="font-semibold text-qd-text-dim">👥 Sub-Agents</h2>
+              <span className="text-xs text-qd-text-muted">
                 {selectedSubAgents.length === 0
                   ? 'None selected'
                   : `${selectedSubAgents.length} selected`}
               </span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-qd-text-muted">
               Select agents to compose into a team. The main agent can delegate tasks to sub-agents automatically.
             </p>
             {eligibleSubAgents.length > 0 ? (
@@ -456,21 +456,21 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 )}
               </>
             ) : (
-              <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+              <p className="text-sm text-qd-text-muted italic">
                 No eligible agents available. Agents need a prompt and description, and cannot have custom tools or sub-agents of their own.
               </p>
             )}
           </section>
 
           {/* Starter Prompts */}
-          <section className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur rounded-xl border border-white/40 dark:border-[#3a3a4e] p-5 space-y-4">
+          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-700 dark:text-gray-300">💡 Starter Prompts</h2>
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <h2 className="font-semibold text-qd-text-dim">💡 Starter Prompts</h2>
+              <span className="text-xs text-qd-text-muted">
                 {starterPrompts.length}/4
               </span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-qd-text-muted">
               Clickable prompt suggestions shown when a session is created from this agent.
             </p>
             {starterPrompts.map((sp, idx) => (
@@ -485,7 +485,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                       setStarterPrompts(updated);
                     }}
                     placeholder="Title (e.g. Task Tracker)"
-                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/60 dark:bg-[#1e1e2e]/60 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-white/40 dark:border-qd-border bg-white/60 dark:bg-qd-bg/60 text-qd-text"
                   />
                   <textarea
                     value={sp.prompt}
@@ -496,7 +496,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                     }}
                     placeholder="Full prompt text..."
                     rows={2}
-                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-white/40 dark:border-[#3a3a4e] bg-white/60 dark:bg-[#1e1e2e]/60 text-gray-900 dark:text-white resize-none"
+                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-white/40 dark:border-qd-border bg-white/60 dark:bg-qd-bg/60 text-qd-text resize-none"
                   />
                 </div>
                 <button

@@ -85,7 +85,7 @@ export function ConfirmModal({
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white/80 dark:bg-[#2a2a3c]/80 backdrop-blur-xl border border-white/30 dark:border-[#3a3a4e] rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+        <div className="relative bg-white/80 dark:bg-qd-bg-elev/80 backdrop-blur-xl border border-white/30 dark:border-qd-border rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
           <div className="flex items-start gap-4">
             {/* Icon */}
             <div className={`flex-shrink-0 w-10 h-10 rounded-full ${styles.iconBg} flex items-center justify-center`}>
@@ -94,10 +94,10 @@ export function ConfirmModal({
 
             {/* Content */}
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-lg font-semibold text-qd-text">
                 {title}
               </h3>
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              <p className="mt-2 text-sm text-qd-text-dim">
                 {message}
               </p>
             </div>
@@ -107,7 +107,7 @@ export function ConfirmModal({
           <div className="mt-6 flex justify-end gap-3">
             <button
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-[#32324a] backdrop-blur border border-white/40 dark:border-gray-600 rounded-lg hover:bg-white/70 dark:hover:bg-[#3a3a4e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-qd-text-dim bg-white/50 dark:bg-qd-panel backdrop-blur border border-white/40 dark:border-gray-600 rounded-lg hover:bg-white/70 dark:hover:bg-qd-panel-deep focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
               aria-label={cancelLabel}
             >
               {cancelLabel}

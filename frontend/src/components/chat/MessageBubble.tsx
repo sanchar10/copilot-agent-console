@@ -47,7 +47,7 @@ function AttachmentChips({ attachments }: { attachments: MessageAttachment[] }) 
             key={idx}
             onClick={hasPath ? () => handleClick(att.path!) : undefined}
             disabled={!hasPath}
-            className={`inline-flex items-center gap-1 bg-white/70 dark:bg-[#2a2a3c]/70 border border-gray-200 dark:border-gray-700 rounded px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400 ${hasPath ? 'hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-400 cursor-pointer' : 'cursor-default'}`}
+            className={`inline-flex items-center gap-1 bg-qd-bg-elev border border-qd-border rounded-qd-sm px-2 py-0.5 text-xs text-qd-text-dim ${hasPath ? 'hover:bg-qd-accent-soft hover:border-qd-accent-border hover:text-qd-accent-text cursor-pointer' : 'cursor-default'}`}
             title={hasPath ? `Open ${name}` : name}
           >
             {fileIcon(name)}
@@ -183,9 +183,9 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
   if (isSystem) {
     return (
       <div className="flex items-center justify-center gap-2 py-1.5">
-        <div className="h-px flex-1 min-w-[2rem] bg-gray-200 dark:bg-gray-700" />
-        <span className="text-xs text-gray-500 dark:text-gray-400 px-2 max-w-[85%] text-center break-words">{message.content}</span>
-        <div className="h-px flex-1 min-w-[2rem] bg-gray-200 dark:bg-gray-700" />
+        <div className="h-px flex-1 min-w-[2rem] bg-qd-border-soft" />
+        <span className="text-xs text-qd-text-muted px-2 max-w-[85%] text-center break-words">{message.content}</span>
+        <div className="h-px flex-1 min-w-[2rem] bg-qd-border-soft" />
       </div>
     );
   }
@@ -201,17 +201,19 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
   return (
     <div className="flex gap-3" data-sdk-message-id={message.sdk_message_id}>
       {/* Avatar */}
-      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+      <div className={`flex-shrink-0 w-[26px] h-[26px] rounded-qd-sm flex items-center justify-center text-sm font-medium ${
         isHelp && !isUser
           ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-          : `text-white ${isUser ? 'bg-blue-600' : 'bg-emerald-600'}`
+          : isUser
+            ? 'bg-qd-accent text-white'
+            : 'bg-qd-bg-elev border border-qd-border text-qd-agent-mark'
       }`}>
         {isUser ? (
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
           </svg>
         ) : (
-          <span className="text-sm leading-none">{isHelp ? '❓' : '🤖'}</span>
+          <span className="text-sm leading-none">{isHelp ? '❓' : '◆'}</span>
         )}
       </div>
 
@@ -219,19 +221,19 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
       <div className="flex-1 min-w-0 group/pin">
         {/* Label */}
         <div className="flex items-center justify-between gap-2 mb-1">
-          <div className={`text-sm font-medium ${
+          <div className={`text-[12px] font-medium tracking-[-0.005em] ${
             isHelp && !isUser
               ? 'text-amber-700 dark:text-amber-400'
-              : isUser ? 'text-blue-600' : 'text-emerald-600'
+              : isUser ? 'text-qd-accent-text' : 'text-qd-text'
           }`}>
             {isUser ? 'You' : (isHelp ? 'Help Agent' : 'Copilot')}
             {isHelp && isUser && (
-              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium align-middle bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-600">
+              <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-qd-sm text-xs font-medium align-middle bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-600">
                 <span>❓</span><span>/help</span>
               </span>
             )}
             {isEnqueued && (
-              <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-600">
+              <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-qd-sm text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-600">
                 <svg className="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -240,21 +242,21 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
             )}
           </div>
           {message.timestamp && (
-            <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">
+            <span className="text-[11px] font-mono text-qd-text-muted shrink-0">
               {formatTimestamp(message.timestamp)}
             </span>
           )}
         </div>
         
         {/* Message body */}
-        <div ref={bodyRef} onClick={handleCitationClick} className={`relative rounded-lg px-4 py-3 ${
+        <div ref={bodyRef} onClick={handleCitationClick} className={`relative rounded-qd-lg px-4 py-3 ${
           isHelp && !isUser
             ? 'bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/40'
             : isEnqueued
               ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700'
               : isUser
-                ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800'
-                : 'bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700'
+                ? 'bg-qd-accent-soft border border-qd-accent-border text-qd-text'
+                : 'bg-qd-bg-elev border border-qd-border-soft'
         }`}>
           {/* Pin icon — top-right of message body */}
           {canPin && (
@@ -346,15 +348,15 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
 
             return (
               <details className="mb-2 text-sm">
-                <summary className="cursor-pointer text-gray-600 dark:text-gray-400 select-none">
+                <summary className="cursor-pointer text-qd-text-dim hover:text-qd-text select-none">
                   Steps ({displayCount}){userInputCount > 0 && <span className="text-amber-600 dark:text-amber-400"> · {userInputCount} user input{userInputCount > 1 ? 's' : ''}</span>}
                 </summary>
-                <div className="mt-2 text-gray-700 dark:text-gray-300 max-h-[300px] overflow-y-auto pr-1">
+                <div className="mt-2 text-qd-text-dim max-h-[300px] overflow-y-auto pr-1">
                   {parsed.map((p, idx) => {
                     if (p.type === 'ask_user') {
                       return (
                         <div key={idx}>
-                          {idx > 0 && <hr className="border-gray-200 dark:border-gray-700/50 mx-3 my-1.5" />}
+                          {idx > 0 && <hr className="border-qd-border-soft mx-3 my-1.5" />}
                           <div className="border-l-2 border-amber-400 dark:border-amber-600 pl-3 py-1">
                             <div className="text-xs font-medium text-amber-700 dark:text-amber-400">💬 Asked user</div>
                             <div className="text-sm mt-0.5">{p.question}</div>
@@ -366,7 +368,7 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
                     if (p.type === 'elicitation') {
                       return (
                         <div key={idx}>
-                          {idx > 0 && <hr className="border-gray-200 dark:border-gray-700/50 mx-3 my-1.5" />}
+                          {idx > 0 && <hr className="border-qd-border-soft mx-3 my-1.5" />}
                           <div className="border-l-2 border-blue-400 dark:border-blue-600 pl-3 py-1">
                             <div className="text-xs font-medium text-blue-700 dark:text-blue-400">📋 Agent asked</div>
                             <div className="text-sm mt-0.5">{p.message}</div>
@@ -377,8 +379,8 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
                     }
                     return (
                       <div key={idx}>
-                        {idx > 0 && <hr className="border-gray-200 dark:border-gray-700/50 mx-3 my-1.5" />}
-                        <div className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1">
+                        {idx > 0 && <hr className="border-qd-border-soft mx-3 my-1.5" />}
+                        <div className="border-l-2 border-qd-border pl-3 py-1">
                           <div className="font-medium">{p.step.title}</div>
                           {p.step.detail && <pre className="mt-1 whitespace-pre-wrap break-words text-xs">{p.step.detail}</pre>}
                         </div>
@@ -391,7 +393,7 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
           })()}
           {isUser ? (
             <>
-              <div className="whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100">
+              <div className="whitespace-pre-wrap break-words text-qd-text">
                 {message.content || (message.attachments?.length ? '' : message.content)}
               </div>
               {message.attachments && message.attachments.length > 0 && <AttachmentChips attachments={message.attachments} />}
@@ -416,3 +418,4 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
     </div>
   );
 });
+

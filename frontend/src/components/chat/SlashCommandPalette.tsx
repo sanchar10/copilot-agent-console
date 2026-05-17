@@ -118,7 +118,7 @@ export function SlashCommandPalette({ query, onSelect, onDismiss, agentItems, on
           {/* Submenu header */}
           <button
             onClick={() => setSubmenuCommand(null)}
-            className="w-full flex items-center gap-2 px-3 py-1.5 text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide hover:text-gray-600 dark:hover:text-gray-300"
+            className="w-full flex items-center gap-2 px-3 py-1.5 text-[10px] font-medium text-qd-text-muted uppercase tracking-wide hover:text-gray-600 dark:hover:text-gray-300"
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -126,7 +126,7 @@ export function SlashCommandPalette({ query, onSelect, onDismiss, agentItems, on
             Select Agent
           </button>
           {submenuItems.length === 0 ? (
-            <div className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500 italic">
+            <div className="px-3 py-2 text-xs text-qd-text-muted italic">
               No agents available — add sub-agents first
             </div>
           ) : (
@@ -142,14 +142,14 @@ export function SlashCommandPalette({ query, onSelect, onDismiss, agentItems, on
                 className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
                   idx === selectedIndex
                     ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-800 dark:text-blue-100'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#33334a]'
+                    : 'text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel-deep'
                 }`}
               >
                 <span className="text-base flex-shrink-0">{item.isDefault ? '✨' : '🤖'}</span>
                 <div className="flex flex-col items-start min-w-0">
                   <span className={`font-medium ${item.isDefault ? 'italic' : ''}`}>{item.displayName}</span>
                   {item.description && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[180px]">{item.description}</span>
+                    <span className="text-xs text-qd-text-muted truncate max-w-[180px]">{item.description}</span>
                   )}
                 </div>
               </button>
@@ -158,7 +158,7 @@ export function SlashCommandPalette({ query, onSelect, onDismiss, agentItems, on
         </>
       ) : (
         <>
-          <div className="px-2 py-1 text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+          <div className="px-2 py-1 text-[10px] font-medium text-qd-text-muted uppercase tracking-wide">
             Commands
           </div>
           {commands.map((cmd, idx) => (
@@ -175,16 +175,16 @@ export function SlashCommandPalette({ query, onSelect, onDismiss, agentItems, on
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
                 idx === selectedIndex
                   ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-800 dark:text-blue-100'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#33334a]'
+                  : 'text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel-deep'
               }`}
             >
               <span className="text-base flex-shrink-0">{cmd.icon}</span>
               <div className="flex flex-col items-start min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">/{cmd.name}</span>
-                  {cmd.usage && <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">{cmd.usage}</span>}
+                  {cmd.usage && <span className="text-[10px] text-qd-text-muted font-mono">{cmd.usage}</span>}
                 </div>
-                <span className="text-xs text-gray-400 dark:text-gray-500 truncate">{cmd.description}</span>
+                <span className="text-xs text-qd-text-muted truncate">{cmd.description}</span>
               </div>
               {cmd.interaction === 'submenu' && (
                 <svg className="w-3 h-3 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

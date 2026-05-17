@@ -48,7 +48,7 @@ export function ModeSelector({ mode, onModeChange, disabled }: ModeSelectorProps
         className={`flex items-center gap-1 w-[120px] px-2 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
           open
             ? 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/25 dark:text-blue-100 dark:border-blue-400/30'
-            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#33334a]'
+            : 'border-qd-border-soft text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel-deep'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         title={`Mode: ${current.label}`}
       >
@@ -59,7 +59,7 @@ export function ModeSelector({ mode, onModeChange, disabled }: ModeSelectorProps
         </svg>
       </button>
       {open && (
-        <div className="absolute bottom-full left-0 mb-1 w-[120px] bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+        <div className="absolute bottom-full left-0 mb-1 w-[120px] bg-qd-bg-elev border border-qd-border-soft rounded-lg shadow-lg z-50 py-1">
           {MODES.map((m) => {
             const isActive = m.value === mode;
             return (
@@ -69,7 +69,7 @@ export function ModeSelector({ mode, onModeChange, disabled }: ModeSelectorProps
                 className={`w-full flex items-center gap-1.5 px-2 py-1.5 text-xs transition-colors ${
                   isActive
                     ? 'bg-blue-50 text-blue-800 dark:bg-blue-500/20 dark:text-blue-100'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#33334a]'
+                    : 'text-qd-text-dim hover:bg-gray-50 dark:hover:bg-qd-panel-deep'
                 }`}
               >
                 <span>{m.icon}</span>

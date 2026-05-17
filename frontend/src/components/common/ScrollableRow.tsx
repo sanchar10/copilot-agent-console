@@ -56,7 +56,7 @@ export function ScrollableRow({
         <div className={`absolute left-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-r ${fadeFromLight} ${fadeFromDark} to-transparent flex items-center justify-start`}>
           <button
             onClick={() => scroll('left')}
-            className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
+            className="w-full h-full flex items-center justify-center text-qd-text-muted hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
             aria-label="Scroll left"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@ export function ScrollableRow({
         <div className={`absolute right-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-l ${fadeFromLight} ${fadeFromDark} to-transparent flex items-center justify-end`}>
           <button
             onClick={() => scroll('right')}
-            className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
+            className="w-full h-full flex items-center justify-center text-qd-text-muted hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
             aria-label="Scroll right"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

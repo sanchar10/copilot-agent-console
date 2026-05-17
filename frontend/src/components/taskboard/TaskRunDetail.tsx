@@ -28,8 +28,8 @@ function MetaRow({ label, value }: { label: string; value: string | null | undef
   if (!value) return null;
   return (
     <div className="flex gap-2">
-      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 w-32 shrink-0">{label}</span>
-      <span className="text-sm text-gray-900 dark:text-gray-100 break-all">{value}</span>
+      <span className="text-sm font-medium text-qd-text-muted w-32 shrink-0">{label}</span>
+      <span className="text-sm text-qd-text break-all">{value}</span>
     </div>
   );
 }
@@ -78,7 +78,7 @@ export function TaskRunDetail({ runId }: { runId: string }) {
   };
 
   if (loading) {
-    return <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">Loading...</div>;
+    return <div className="flex-1 flex items-center justify-center text-qd-text-muted">Loading...</div>;
   }
   if (error || !run) {
     return <div className="flex-1 flex items-center justify-center text-red-500 dark:text-red-400">{error || 'Not found'}</div>;
@@ -92,8 +92,8 @@ export function TaskRunDetail({ runId }: { runId: string }) {
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{run.agent_name}</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Task Run · {run.id}</p>
+            <h1 className="text-2xl font-bold text-qd-text">{run.agent_name}</h1>
+            <p className="text-sm text-qd-text-muted mt-1">Task Run · {run.id}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusConfig.bg} ${statusConfig.color} ${statusConfig.darkBg} ${statusConfig.darkColor}`}>
@@ -112,7 +112,7 @@ export function TaskRunDetail({ runId }: { runId: string }) {
         </div>
 
         {/* Metadata */}
-        <div className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-5 mb-6 space-y-2">
+        <div className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5 mb-6 space-y-2">
           <MetaRow label="Prompt" value={run.prompt} />
           <MetaRow label="Working Dir" value={run.cwd} />
           <MetaRow label="Started" value={run.started_at ? formatDateTime(run.started_at) : null} />
@@ -135,16 +135,16 @@ export function TaskRunDetail({ runId }: { runId: string }) {
         )}
 
         {/* Output */}
-        <div className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Output</h3>
+        <div className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-qd-text-dim mb-3">Output</h3>
           {run.output ? (
             <div className="prose prose-sm max-w-none dark:prose-invert">
-              <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 bg-white/40 dark:bg-[#1e1e2e]/40 p-4 rounded-lg overflow-x-auto">
+              <pre className="whitespace-pre-wrap text-sm text-qd-text bg-white/40 dark:bg-qd-bg/40 p-4 rounded-lg overflow-x-auto">
                 {run.output}
               </pre>
             </div>
           ) : (
-            <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+            <p className="text-sm text-qd-text-muted italic">
               {run.status === 'running' ? 'Collecting output...' : 'No output'}
             </p>
           )}

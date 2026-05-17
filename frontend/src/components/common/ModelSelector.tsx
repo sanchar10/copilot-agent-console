@@ -87,12 +87,12 @@ export function ModelSelector({
           ? `w-[120px] h-[30px] px-2.5 py-0.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 ${
               !disabled
                 ? 'bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer border border-blue-200/60 dark:border-blue-500/35'
-                : 'bg-gray-100 dark:bg-[#2a2a3c] text-gray-600 dark:text-gray-400 cursor-default border border-gray-200/60 dark:border-gray-700/60'
+                : 'bg-gray-100 dark:bg-qd-bg-elev text-qd-text-dim cursor-default border border-gray-200/60 dark:border-gray-700/60'
             }`
           : `w-full px-3 py-2 border rounded-lg text-sm flex items-center justify-between transition-colors ${
               !disabled
-                ? 'border-white/40 bg-white/50 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100 hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer'
-                : 'border-white/40 bg-gray-50 dark:bg-[#1e1e2e] dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-default'
+                ? 'border-white/40 bg-white/50 dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100 hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer'
+                : 'border-white/40 bg-gray-50 dark:bg-qd-bg dark:border-gray-600 text-qd-text-muted cursor-default'
             }`
         }
         title={disabled ? 'Model cannot be changed' : 'Click to change model'}
@@ -112,7 +112,7 @@ export function ModelSelector({
 
       {/* Dropdown */}
       {open && (
-        <div className={`absolute top-full mt-1 bg-white dark:bg-[#2a2a3c] border dark:border-[#3a3a4e] rounded-md shadow-lg dark:shadow-black/20 z-50 max-h-60 overflow-y-auto ${
+        <div className={`absolute top-full mt-1 bg-qd-bg-elev border dark:border-qd-border rounded-md shadow-lg dark:shadow-black/20 z-50 max-h-60 overflow-y-auto ${
           isCompact ? 'left-0 min-w-[200px]' : 'left-0 right-0 min-w-full'
         }`}>
           {models.map((m) => {
@@ -133,9 +133,9 @@ export function ModelSelector({
                   className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between ${
                     readOnly
                       ? 'opacity-50 cursor-default'
-                      : 'hover:bg-gray-100 dark:hover:bg-[#32324a]'
+                      : 'hover:bg-gray-100 dark:hover:bg-qd-panel'
                   } ${
-                    isSelected ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'
+                    isSelected ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-qd-text-dim'
                   }`}
                 >
                   <span>{m.name}</span>
@@ -146,7 +146,7 @@ export function ModelSelector({
                   )}
                 </button>
                 {supportsReasoning && isExpanded && (
-                  <div className="px-3 py-1.5 bg-gray-50 dark:bg-[#1e1e2e] flex gap-1 flex-wrap">
+                  <div className="px-3 py-1.5 bg-gray-50 dark:bg-qd-bg flex gap-1 flex-wrap">
                     {m.supported_reasoning_efforts!.map((level) => {
                       const isExplicitlySelected = isSelected && reasoningEffort === level;
                       const isDefault = m.default_reasoning_effort === level;
@@ -158,7 +158,7 @@ export function ModelSelector({
                           className={`px-2 py-0.5 text-[11px] rounded-full border transition-colors ${
                             isExplicitlySelected
                               ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300'
-                              : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+                              : 'border-gray-200 dark:border-gray-600 text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel'
                           }`}
                         >
                           {level}{isDefault && !isExplicitlySelected ? ' ●' : ''}

@@ -188,17 +188,19 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-72 bg-white dark:bg-[#252536] text-gray-900 dark:text-gray-100 flex flex-col overflow-y-auto border-r border-gray-200 dark:border-[#3a3a4e] shadow-sm dark:shadow-black/20">
+    <aside className="w-[264px] flex-shrink-0 bg-qd-bg-elev text-qd-text flex flex-col overflow-y-auto border-r border-qd-border">
       {/* Header - sticky at top */}
-      <div className="sticky top-0 bg-white dark:bg-[#252536] px-4 pt-3 pb-3 border-b border-gray-200 dark:border-[#3a3a4e] z-10">
+      <div className="sticky top-0 bg-qd-bg-elev px-4 pt-3 pb-3 border-b border-qd-border-soft z-10">
         <div className="flex items-center gap-2 mb-3">
-          <svg className="w-6 h-6 text-emerald-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-          </svg>
-          <h1 className="text-base font-semibold text-gray-900 dark:text-gray-100 flex-1">Copilot Console</h1>
+          <div className="w-[22px] h-[22px] rounded-qd-md bg-qd-accent text-qd-text-inv grid place-items-center flex-shrink-0">
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+            </svg>
+          </div>
+          <h1 className="text-[13px] font-semibold tracking-[-0.01em] text-qd-text flex-1">Copilot Console</h1>
           <button
             onClick={() => setSearchOpen(true)}
-            className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#32324a] transition-colors"
+            className="p-1 rounded-qd-sm text-qd-text-muted hover:text-qd-text hover:bg-qd-panel transition-colors"
             title={`Search sessions (${isMac ? '⌘K' : 'Ctrl+K'})`}
             aria-label="Search sessions"
           >
@@ -221,7 +223,7 @@ export function Sidebar() {
         {/* Agent Monitor Button */}
         <button
           onClick={() => setAgentMonitorOpen(true)}
-          className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm bg-gray-50 dark:bg-[#2a2a3c] hover:bg-gray-100 dark:hover:bg-[#32324a] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-[#3a3a4e]"
+          className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-1.5 rounded-qd-md transition-colors text-sm bg-qd-panel hover:bg-qd-panel-deep text-qd-text-dim border border-qd-border-soft"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -230,8 +232,8 @@ export function Sidebar() {
           Active Agents
           {activeCount > 0 && (
             <span className="relative flex h-5 min-w-5 items-center justify-center">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex items-center justify-center rounded-full h-5 min-w-5 px-1 bg-emerald-500 text-white text-xs">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: 'var(--status-running)' }}></span>
+              <span className="relative inline-flex items-center justify-center rounded-full h-5 min-w-5 px-1 text-white text-xs" style={{ background: 'var(--status-running)' }}>
                 {activeCount}
               </span>
             </span>
@@ -240,22 +242,22 @@ export function Sidebar() {
       </div>
 
       {/* Navigation — flat entries */}
-      <div className="px-3 pt-2 pb-1 border-b border-gray-200 dark:border-[#3a3a4e]">
+      <div className="px-3 pt-2 pb-1 border-b border-qd-border-soft">
         <button
           onClick={() => {
             fetchAgents();
             openTab({ id: tabId.agentLibrary(), type: 'agent-library', label: 'Agent Library' });
           }}
-          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm ${
+          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-qd-sm transition-colors text-sm ${
             activeTabId === tabId.agentLibrary()
-              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+              ? 'bg-qd-panel-deep text-qd-text'
+              : 'text-qd-text-dim hover:bg-qd-panel hover:text-qd-text'
           }`}
         >
           <span>🤖</span>
           Agents
           {agents.length > 0 && (
-            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{agents.length}</span>
+            <span className="ml-auto text-[11px] font-mono text-qd-text-muted">{agents.length}</span>
           )}
         </button>
         <button
@@ -263,26 +265,26 @@ export function Sidebar() {
             fetchAutomations();
             openTab({ id: tabId.automationManager(), type: 'automation-manager', label: 'Automations' });
           }}
-          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm ${
+          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-qd-sm transition-colors text-sm ${
             activeTabId?.startsWith('automation-manager')
-              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+              ? 'bg-qd-panel-deep text-qd-text'
+              : 'text-qd-text-dim hover:bg-qd-panel hover:text-qd-text'
           }`}
         >
           <span>⏰</span>
           Automations
           {automations.length > 0 && (
-            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{automations.length}</span>
+            <span className="ml-auto text-[11px] font-mono text-qd-text-muted">{automations.length}</span>
           )}
         </button>
         <button
           onClick={() => {
             openTab({ id: tabId.taskBoard(), type: 'task-board', label: 'Runs' });
           }}
-          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm ${
+          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-qd-sm transition-colors text-sm ${
             activeTabId === tabId.taskBoard()
-              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+              ? 'bg-qd-panel-deep text-qd-text'
+              : 'text-qd-text-dim hover:bg-qd-panel hover:text-qd-text'
           }`}
         >
           <span>📋</span>
@@ -302,16 +304,16 @@ export function Sidebar() {
             fetchWorkflows();
             openTab({ id: tabId.workflowLibrary(), type: 'workflow-library', label: 'Workflow Library' });
           }}
-          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm ${
+          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-qd-sm transition-colors text-sm ${
             activeTabId === tabId.workflowLibrary()
-              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+              ? 'bg-qd-panel-deep text-qd-text'
+              : 'text-qd-text-dim hover:bg-qd-panel hover:text-qd-text'
           }`}
         >
           <span>🔀</span>
           Workflows
           {workflows.length > 0 && (
-            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">{workflows.length}</span>
+            <span className="ml-auto text-[11px] font-mono text-qd-text-muted">{workflows.length}</span>
           )}
         </button>
       </div>
@@ -375,16 +377,16 @@ export function Sidebar() {
       </div>
 
       {/* User Settings Footer - sticky at bottom */}
-      <div className="sticky bottom-0 p-2 border-t border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#252536]">
+      <div className="sticky bottom-0 p-2 border-t border-qd-border-soft bg-qd-bg-elev">
         <button
           onClick={() => openSettingsModal()}
           title={`Settings${appVersion ? ` · v${appVersion}` : ''}${authStatus.authenticated === null ? ' · Checking auth...' : authStatus.authenticated ? ` · Authenticated via ${authStatus.provider || 'unknown'}` : ' · No auth configured'}`}
-          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-[#32324a] transition-colors"
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-qd-sm hover:bg-qd-panel transition-colors"
         >
           <span className="text-base">⚙️</span>
-          <span className="flex-1 text-left text-sm font-medium text-gray-900 dark:text-gray-100">Settings</span>
+          <span className="flex-1 text-left text-sm font-medium text-qd-text">Settings</span>
           <span className="text-xs leading-none">{authStatus.authenticated === null ? '⏳' : authStatus.authenticated ? '🔒' : '🔐'}</span>
-          {appVersion && <span className="text-[10px] leading-none text-gray-500 dark:text-gray-400">v{appVersion}</span>}
+          {appVersion && <span className="text-[10px] leading-none font-mono text-qd-text-muted">v{appVersion}</span>}
         </button>
       </div>
 
@@ -400,13 +402,13 @@ export function Sidebar() {
         }
       >
         <div className="space-y-3">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-qd-text-dim">
             Workflows require the <strong>Agent Framework</strong> package. Install it by running:
           </p>
-          <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-3 text-sm font-mono text-gray-800 dark:text-gray-200 overflow-x-auto select-all">
+          <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-3 text-sm font-mono text-qd-text overflow-x-auto select-all">
             {workflowInstallModal?.command}
           </pre>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-qd-text-muted">
             After installing, restart Copilot Console for the changes to take effect.
           </p>
         </div>

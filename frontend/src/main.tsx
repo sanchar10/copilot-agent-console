@@ -29,8 +29,8 @@ createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
     <BrowserRouter>
       <Suspense fallback={
-        <div className="h-screen flex items-center justify-center bg-[#fafafa] dark:bg-[#1e1e2e]">
-          <div className="text-gray-400 dark:text-gray-500 text-sm">Loading...</div>
+        <div className="h-screen flex items-center justify-center bg-[#fafafa] dark:bg-qd-bg">
+          <div className="text-qd-text-muted text-sm">Loading...</div>
         </div>
       }>
         <Routes>

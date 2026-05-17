@@ -69,14 +69,14 @@ export function PinsDrawer({ sessionId, pins, onClose, onAsk, focusPinId, onFocu
   };
 
   return (
-    <aside data-pins-drawer className="w-96 border-l border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-[#1f1f2e]/90 backdrop-blur p-3 overflow-y-auto">
+    <aside data-pins-drawer className="w-96 border-l border-qd-border-soft bg-white/90 dark:bg-[#1f1f2e]/90 backdrop-blur p-3 overflow-y-auto">
       <div className="flex items-center justify-between gap-2">
-        <div className="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-1.5"><PinnedIcon size={16} /> Pins ({pins.length})</div>
-        <button type="button" className="text-xs px-2 py-1 rounded border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500" onClick={onClose} title="Close">Close</button>
+        <div className="font-semibold text-sm text-qd-text flex items-center gap-1.5"><PinnedIcon size={16} /> Pins ({pins.length})</div>
+        <button type="button" className="text-xs px-2 py-1 rounded border border-qd-border-soft text-qd-text-dim hover:border-gray-300 dark:hover:border-gray-500" onClick={onClose} title="Close">Close</button>
       </div>
 
       {sortedPins.length === 0 ? (
-        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">No pins yet.</div>
+        <div className="mt-3 text-sm text-qd-text-muted">No pins yet.</div>
       ) : (
         <div className="mt-3 space-y-3">
           {sortedPins.map((p) => {
@@ -86,7 +86,7 @@ export function PinsDrawer({ sessionId, pins, onClose, onAsk, focusPinId, onFocu
             const title = p.title || p.excerpt || p.sdk_message_id;
 
             return (
-              <div key={p.id} className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-[#2a2a3c]/70 p-3">
+              <div key={p.id} className="rounded-lg border border-qd-border-soft bg-white/70 dark:bg-qd-bg-elev/70 p-3">
                 <div className="flex items-start justify-between gap-2">
                   <button
                     type="button" className="flex-1 text-left"
@@ -96,7 +96,7 @@ export function PinsDrawer({ sessionId, pins, onClose, onAsk, focusPinId, onFocu
                     }}
                     title={title}
                   >
-                    <div className="text-xs text-gray-500 dark:text-gray-400">{formatPinTimestamp(p.created_at)}</div>
+                    <div className="text-xs text-qd-text-muted">{formatPinTimestamp(p.created_at)}</div>
                     <div className="text-sm font-medium text-blue-700 dark:text-blue-300 hover:underline line-clamp-2">{title}</div>
                     {scrollFailedPin === p.id && (
                       <div className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Message not available</div>
@@ -104,20 +104,20 @@ export function PinsDrawer({ sessionId, pins, onClose, onAsk, focusPinId, onFocu
                   </button>
                   {confirmingDelete === p.id ? (
                     <span className="text-xs flex items-center gap-1 whitespace-nowrap">
-                      <span className="text-gray-500 dark:text-gray-400">Delete?</span>
+                      <span className="text-qd-text-muted">Delete?</span>
                       <button type="button" className="text-red-600 dark:text-red-400 hover:underline" onClick={() => { usePinStore.getState().deletePin(sessionId, p.id).catch((e) => console.error('Failed to unpin:', e)); setConfirmingDelete(null); }}>Yes</button>
-                      <span className="text-gray-400 dark:text-gray-500">·</span>
-                      <button type="button" className="text-gray-500 dark:text-gray-400 hover:underline" onClick={() => setConfirmingDelete(null)}>Cancel</button>
+                      <span className="text-qd-text-muted">·</span>
+                      <button type="button" className="text-qd-text-muted hover:underline" onClick={() => setConfirmingDelete(null)}>Cancel</button>
                     </span>
                   ) : (
-                    <button type="button" className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 px-1" title="Delete pin" onClick={() => setConfirmingDelete(p.id)}>✕</button>
+                    <button type="button" className="text-xs text-qd-text-muted hover:text-red-600 dark:hover:text-red-400 px-1" title="Delete pin" onClick={() => setConfirmingDelete(p.id)}>✕</button>
                   )}
                 </div>
 
                 <div className="mt-2">
                   <textarea
                     ref={(el) => { textareaRefs.current[p.id] = el; }}
-                    className="w-full text-sm rounded-md border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-[#1f1f2e]/60 px-2 py-1.5 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 resize-y overflow-y-auto"
+                    className="w-full text-sm rounded-md border border-qd-border-soft bg-white/60 dark:bg-[#1f1f2e]/60 px-2 py-1.5 text-qd-text-dim placeholder-gray-400 dark:placeholder-gray-500 resize-y overflow-y-auto"
                     rows={1} style={{ minHeight: '1.75rem', maxHeight: '18.75rem' }}
                     placeholder="Add a note (optional)" value={note}
                     onChange={(e) => { setDraftNotes((prev) => ({ ...prev, [p.id]: e.target.value })); autoResizeTextarea(e.target); }}
@@ -128,7 +128,7 @@ export function PinsDrawer({ sessionId, pins, onClose, onAsk, focusPinId, onFocu
                       onClick={() => handleAsk(p)} title="Pre-fill input with this pin's context"
                     >Ask</button>
                     <button type="button" disabled={!isDirty}
-                      className={`text-xs px-2 py-1 rounded border transition-colors ${isDirty ? 'border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:border-blue-300 dark:hover:border-blue-500' : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'}`}
+                      className={`text-xs px-2 py-1 rounded border transition-colors ${isDirty ? 'border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:border-blue-300 dark:hover:border-blue-500' : 'border-qd-border-soft text-qd-text-muted cursor-not-allowed'}`}
                       onClick={() => { usePinStore.getState().updatePin(sessionId, p.id, { note }).catch((e) => console.error('Failed to update pin:', e)); }}
                       title="Save note"
                     >Save</button>

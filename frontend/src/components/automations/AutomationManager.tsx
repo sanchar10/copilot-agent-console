@@ -111,7 +111,7 @@ function AutomationDialog({
   return (
     <>
       <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-        <form onSubmit={handleSubmit} className="bg-white/80 dark:bg-[#252536]/95 backdrop-blur-xl border border-white/30 dark:border-[#3a3a4e] rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="bg-white/80 dark:bg-qd-bg/95 backdrop-blur-xl border border-white/30 dark:border-qd-border rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
           <h2 className="text-lg font-semibold dark:text-gray-100">{isEdit ? 'Edit Automation' : 'New Automation'}</h2>
 
           {!isEdit && (
@@ -126,19 +126,19 @@ function AutomationDialog({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Automation Name</label>
+            <label className="block text-sm font-medium text-qd-text-dim mb-1">Automation Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Morning news check"
-              className="w-full border rounded-lg px-3 py-2 text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+              className="w-full border rounded-lg px-3 py-2 text-sm dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Frequency</label>
+            <label className="block text-sm font-medium text-qd-text-dim mb-1">Frequency</label>
             <Dropdown
               options={CRON_PRESETS.map(p => ({ value: p.value, label: p.label }))}
               value={cronPreset}
@@ -150,37 +150,37 @@ function AutomationDialog({
               value={cron}
               onChange={(e) => { setCron(e.target.value); setCronPreset(''); }}
               placeholder="Cron expression (e.g. 0 8 * * *)"
-              className="w-full border rounded-lg px-3 py-2 text-sm font-mono dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+              className="w-full border rounded-lg px-3 py-2 text-sm font-mono dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prompt</label>
+            <label className="block text-sm font-medium text-qd-text-dim mb-1">Prompt</label>
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="What should the agent do each run?"
               rows={3}
-              className="w-full border rounded-lg px-3 py-2 text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+              className="w-full border rounded-lg px-3 py-2 text-sm dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Working Directory</label>
+            <label className="block text-sm font-medium text-qd-text-dim mb-1">Working Directory</label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={cwd}
                 onChange={(e) => setCwd(e.target.value)}
                 placeholder="Optional — uses default CWD if empty"
-                className="flex-1 border rounded-lg px-3 py-2 text-sm font-mono dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+                className="flex-1 border rounded-lg px-3 py-2 text-sm font-mono dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
               />
               <button
                 type="button"
                 onClick={() => setShowFolderPicker(true)}
-                className="px-3 py-2 border border-white/40 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-white/40 dark:hover:bg-[#32324a] transition-colors shrink-0"
+                className="px-3 py-2 border border-white/40 dark:border-gray-600 rounded-lg text-sm text-qd-text-dim hover:bg-white/40 dark:hover:bg-qd-panel transition-colors shrink-0"
                 title="Browse folders"
               >
                 📁
@@ -189,19 +189,19 @@ function AutomationDialog({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Runtime (minutes)</label>
+            <label className="block text-sm font-medium text-qd-text-dim mb-1">Max Runtime (minutes)</label>
             <input
               type="number"
               value={maxRuntime}
               onChange={(e) => setMaxRuntime(Number(e.target.value))}
               min={1}
               max={120}
-              className="w-24 border rounded-lg px-3 py-2 text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+              className="w-24 border rounded-lg px-3 py-2 text-sm dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
             />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+            <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-qd-text-dim hover:text-gray-800 dark:hover:text-gray-200">
               Cancel
             </button>
             <button
@@ -245,22 +245,22 @@ function AutomationCard({
   return (
     <div
       onClick={onEdit}
-      className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-5 hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all cursor-pointer"
+      className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5 hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{automation.name}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <h3 className="font-semibold text-qd-text">{automation.name}</h3>
+          <p className="text-sm text-qd-text-muted mt-0.5">
             {automation.agent_name} · {humanizeCron(automation.cron)}
           </p>
         </div>
         <StatusBadge enabled={automation.enabled} />
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">{automation.prompt}</p>
+      <p className="text-sm text-qd-text-dim line-clamp-2 mb-3">{automation.prompt}</p>
 
       {automation.cwd && (
-        <p className="text-xs text-gray-400 dark:text-gray-500 font-mono mb-3 truncate" title={automation.cwd}>
+        <p className="text-xs text-qd-text-muted font-mono mb-3 truncate" title={automation.cwd}>
           📁 {automation.cwd}
         </p>
       )}
@@ -271,7 +271,7 @@ function AutomationCard({
         </p>
       )}
 
-      <div className="flex items-center gap-2 pt-2 border-t border-white/40 dark:border-[#3a3a4e]" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-2 pt-2 border-t border-white/40 dark:border-qd-border" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onToggle}
           className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
@@ -290,7 +290,7 @@ function AutomationCard({
         </button>
         <button
           onClick={onViewRuns}
-          className="text-xs px-3 py-1.5 rounded-lg bg-white/40 text-gray-600 hover:bg-white/60 dark:bg-[#1e1e2e]/40 dark:text-gray-400 dark:hover:bg-[#32324a] transition-colors"
+          className="text-xs px-3 py-1.5 rounded-lg bg-white/40 text-gray-600 hover:bg-white/60 dark:bg-qd-bg/40 dark:text-gray-400 dark:hover:bg-qd-panel transition-colors"
         >
           📋 Runs
         </button>
@@ -300,7 +300,7 @@ function AutomationCard({
             <button onClick={onDelete} className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
               Confirm
             </button>
-            <button onClick={() => setConfirming(false)} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
+            <button onClick={() => setConfirming(false)} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-qd-text-dim hover:bg-gray-300 dark:hover:bg-gray-600">
               Cancel
             </button>
           </div>
@@ -412,8 +412,8 @@ export function AutomationManager({ agentId: initialAgentId }: AutomationManager
       <div className="max-w-4xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Automations</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <h1 className="text-2xl font-bold text-qd-text">Automations</h1>
+            <p className="text-sm text-qd-text-muted mt-1">
               Automated agent runs on cron expressions
             </p>
           </div>
@@ -429,7 +429,7 @@ export function AutomationManager({ agentId: initialAgentId }: AutomationManager
         {/* Agent filter */}
         {agents.length > 0 && (
           <div className="flex items-center gap-3 mb-4">
-            <label className="text-sm text-gray-500 dark:text-gray-400">Filter by agent:</label>
+            <label className="text-sm text-qd-text-muted">Filter by agent:</label>
             <Dropdown
               options={[
                 { value: '', label: 'All Agents' },
@@ -440,7 +440,7 @@ export function AutomationManager({ agentId: initialAgentId }: AutomationManager
               variant="compact"
             />
             {filterAgentId && (
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <span className="text-xs text-qd-text-muted">
                 {filteredAutomations.length} automation{filteredAutomations.length !== 1 ? 's' : ''}
               </span>
             )}
@@ -448,14 +448,14 @@ export function AutomationManager({ agentId: initialAgentId }: AutomationManager
         )}
 
         {loading ? (
-          <div className="text-center py-12 text-gray-400 dark:text-gray-500">Loading...</div>
+          <div className="text-center py-12 text-qd-text-muted">Loading...</div>
         ) : filteredAutomations.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-4xl mb-3">⏰</div>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-qd-text-muted">
               {filterAgentId ? 'No automations for this agent' : 'No automations yet'}
             </p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-sm text-qd-text-muted mt-1">
               Create an automation to run agents automatically
             </p>
           </div>

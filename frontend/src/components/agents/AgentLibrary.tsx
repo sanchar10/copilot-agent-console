@@ -101,7 +101,7 @@ function AgentCard({ agent, membership }: { agent: Agent; membership: TeamMember
   return (
     <button
       onClick={() => handleClick(agent)}
-      className="bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-5 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all group relative"
+      className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all group relative"
     >
       <div className="flex items-start justify-between">
         <div className="text-3xl mb-3">{agent.icon}</div>
@@ -122,13 +122,13 @@ function AgentCard({ agent, membership }: { agent: Agent; membership: TeamMember
           </span>
         </div>
       </div>
-      <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+      <h3 className="font-semibold text-qd-text group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
         {agent.name}
       </h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+      <p className="text-sm text-qd-text-muted mt-1 line-clamp-2">
         {agent.description || 'No description'}
       </p>
-      <div className="flex items-center gap-2 mt-3 text-xs text-gray-400 dark:text-gray-500 flex-wrap">
+      <div className="flex items-center gap-2 mt-3 text-xs text-qd-text-muted flex-wrap">
         <span>{agent.model || 'app default'}</span>
         {isTeam(agent) && (
           <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-1.5 py-0.5 rounded font-medium" title="Has sub-agents">
@@ -156,12 +156,12 @@ function AgentRow({ agent, membership }: { agent: Agent; membership: TeamMembers
   return (
     <button
       onClick={() => handleClick(agent)}
-      className="w-full flex items-center gap-3 px-4 py-2.5 bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-lg text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-sm transition-all group"
+      className="w-full flex items-center gap-3 px-4 py-2.5 bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-lg text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-sm transition-all group"
     >
       <span className="text-xl flex-shrink-0 w-8 text-center">{agent.icon}</span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+          <span className="font-medium text-sm text-qd-text truncate group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
             {agent.name}
           </span>
           {isTeam(agent) && (
@@ -178,9 +178,9 @@ function AgentRow({ agent, membership }: { agent: Agent; membership: TeamMembers
             <span className="text-gray-300 dark:text-gray-600 flex-shrink-0" title="Composable — can be used as a sub-agent">🧩</span>
           )}
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{agent.description || 'No description'}</p>
+        <p className="text-xs text-qd-text-muted truncate">{agent.description || 'No description'}</p>
       </div>
-      <span className="text-[11px] text-gray-400 dark:text-gray-500 flex-shrink-0 hidden sm:block">{agent.model || 'app default'}</span>
+      <span className="text-[11px] text-qd-text-muted flex-shrink-0 hidden sm:block">{agent.model || 'app default'}</span>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
         <span
           onClick={(e) => handleAutomations(agent, e)}
@@ -284,8 +284,8 @@ export function AgentLibrary() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">🤖 Agent Library</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <h1 className="text-2xl font-bold text-qd-text">🤖 Agent Library</h1>
+            <p className="text-sm text-qd-text-muted mt-1">
               Create and manage agents
             </p>
           </div>
@@ -313,7 +313,7 @@ export function AgentLibrary() {
                 placeholder="Search agents..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#2a2a3c] text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-qd-border bg-qd-bg-elev text-qd-text placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
               />
             </div>
 
@@ -328,11 +328,11 @@ export function AgentLibrary() {
                     className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                       filter === f.key
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 dark:bg-[#2a2a3c] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#3a3a4e]'
+                        : 'bg-gray-100 dark:bg-qd-bg-elev text-qd-text-dim hover:bg-gray-200 dark:hover:bg-qd-panel-deep'
                     }`}
                   >
                     {f.icon ? `${f.icon} ` : ''}{f.label}
-                    <span className={`ml-1 ${filter === f.key ? 'text-blue-200' : 'text-gray-400 dark:text-gray-500'}`}>
+                    <span className={`ml-1 ${filter === f.key ? 'text-blue-200' : 'text-qd-text-muted'}`}>
                       {counts[f.key]}
                     </span>
                   </button>
@@ -349,11 +349,11 @@ export function AgentLibrary() {
                 />
 
                 {/* View toggle */}
-                <div className="flex items-center border border-gray-200 dark:border-[#3a3a4e] rounded overflow-hidden">
+                <div className="flex items-center border border-qd-border rounded overflow-hidden">
                   <button
                     onClick={() => setView('grid')}
                     title="Grid view"
-                    className={`p-1.5 ${view === 'grid' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-[#2a2a3c] text-gray-500 hover:bg-gray-100 dark:hover:bg-[#3a3a4e]'}`}
+                    className={`p-1.5 ${view === 'grid' ? 'bg-blue-600 text-white' : 'bg-qd-bg-elev text-gray-500 hover:bg-gray-100 dark:hover:bg-qd-panel-deep'}`}
                   >
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
                       <rect x="1" y="1" width="6" height="6" rx="1" /><rect x="9" y="1" width="6" height="6" rx="1" />
@@ -363,7 +363,7 @@ export function AgentLibrary() {
                   <button
                     onClick={() => setView('list')}
                     title="List view"
-                    className={`p-1.5 ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-[#2a2a3c] text-gray-500 hover:bg-gray-100 dark:hover:bg-[#3a3a4e]'}`}
+                    className={`p-1.5 ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-qd-bg-elev text-gray-500 hover:bg-gray-100 dark:hover:bg-qd-panel-deep'}`}
                   >
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
                       <rect x="1" y="1.5" width="14" height="3" rx="0.5" /><rect x="1" y="6.5" width="14" height="3" rx="0.5" />
@@ -378,12 +378,12 @@ export function AgentLibrary() {
 
         {/* Content */}
         {loading ? (
-          <div className="text-center py-12 text-gray-400 dark:text-gray-500">Loading agents...</div>
+          <div className="text-center py-12 text-qd-text-muted">Loading agents...</div>
         ) : filtered.length === 0 && !search && filter === 'all' ? (
           <div className="text-center py-12">
             <div className="text-4xl mb-3">🤖</div>
-            <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">No agents yet</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <h3 className="text-lg font-medium text-qd-text-dim">No agents yet</h3>
+            <p className="text-sm text-qd-text-muted mt-1">
               Create your first agent to get started
             </p>
             <button
@@ -394,7 +394,7 @@ export function AgentLibrary() {
             </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+          <div className="text-center py-12 text-qd-text-muted">
             No agents match the current filters
           </div>
         ) : view === 'grid' ? (

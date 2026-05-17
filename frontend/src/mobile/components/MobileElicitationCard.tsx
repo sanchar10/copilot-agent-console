@@ -86,14 +86,14 @@ export function MobileElicitationCard({
             if (enumValues) {
               return (
                 <div key={key}>
-                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <label className="text-xs font-medium text-qd-text-dim">
                     {title}{isRequired && ' *'}
                   </label>
                   <select
                     value={(values[key] as string) || ''}
                     onChange={(e) => handleChange(key, e.target.value)}
                     disabled={submitting}
-                    className="w-full mt-0.5 text-base rounded-lg border border-blue-200 dark:border-blue-700/40 bg-white dark:bg-[#2a2a3c] px-2 py-1.5 text-gray-800 dark:text-gray-200"
+                    className="w-full mt-0.5 text-base rounded-lg border border-blue-200 dark:border-blue-700/40 bg-qd-bg-elev px-2 py-1.5 text-qd-text"
                   >
                     <option value="">Select...</option>
                     {enumValues.map((v) => (
@@ -114,7 +114,7 @@ export function MobileElicitationCard({
                     disabled={submitting}
                     className="text-blue-600"
                   />
-                  <span className="text-gray-800 dark:text-gray-200">{title}</span>
+                  <span className="text-qd-text">{title}</span>
                 </label>
               );
             }
@@ -122,7 +122,7 @@ export function MobileElicitationCard({
             if (type === 'number' || type === 'integer') {
               return (
                 <div key={key}>
-                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <label className="text-xs font-medium text-qd-text-dim">
                     {title}{isRequired && ' *'}
                   </label>
                   <input
@@ -130,7 +130,7 @@ export function MobileElicitationCard({
                     value={(values[key] as number) ?? ''}
                     onChange={(e) => handleChange(key, e.target.value ? Number(e.target.value) : '')}
                     disabled={submitting}
-                    className="w-full mt-0.5 text-base rounded-lg border border-blue-200 dark:border-blue-700/40 bg-white dark:bg-[#2a2a3c] px-2 py-1.5 text-gray-800 dark:text-gray-200"
+                    className="w-full mt-0.5 text-base rounded-lg border border-blue-200 dark:border-blue-700/40 bg-qd-bg-elev px-2 py-1.5 text-qd-text"
                   />
                 </div>
               );
@@ -139,7 +139,7 @@ export function MobileElicitationCard({
             // Default: string input
             return (
               <div key={key}>
-                <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                <label className="text-xs font-medium text-qd-text-dim">
                   {title}{isRequired && ' *'}
                 </label>
                 <input
@@ -147,7 +147,7 @@ export function MobileElicitationCard({
                   value={(values[key] as string) || ''}
                   onChange={(e) => handleChange(key, e.target.value)}
                   disabled={submitting}
-                  className="w-full mt-0.5 text-base rounded-lg border border-blue-200 dark:border-blue-700/40 bg-white dark:bg-[#2a2a3c] px-2 py-1.5 text-gray-800 dark:text-gray-200"
+                  className="w-full mt-0.5 text-base rounded-lg border border-blue-200 dark:border-blue-700/40 bg-qd-bg-elev px-2 py-1.5 text-qd-text"
                 />
               </div>
             );
@@ -165,7 +165,7 @@ export function MobileElicitationCard({
           <button
             onClick={handleCancel}
             disabled={submitting}
-            className="px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600 rounded-lg"
+            className="px-3 py-1.5 text-xs font-medium text-qd-text-muted border border-gray-200 dark:border-gray-600 rounded-lg"
           >
             Cancel
           </button>

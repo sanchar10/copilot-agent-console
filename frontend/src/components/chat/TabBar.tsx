@@ -1,12 +1,14 @@
 import { useSessionStore } from '../../stores/sessionStore';
 import { useChatStore } from '../../stores/chatStore';
 import { useTabStore } from '../../stores/tabStore';
+import { useViewedStore } from '../../stores/viewedStore';
 import { getSession, disconnectSession } from '../../api/sessions';
 import { clearReadySession } from './InputBox';
 
 export function TabBar() {
   const { sessions, isNewSession, clearNewSession } = useSessionStore();
   const { tabs, activeTabId, switchTab, closeTab } = useTabStore();
+  const activeAgentIds = useViewedStore((s) => (s as unknown as { activeAgentIds?: Set<string> }).activeAgentIds);
 
   const handleTabClick = async (tab: { id: string; type: string; sessionId?: string }) => {
     if (tab.id === activeTabId) return;
@@ -54,33 +56,51 @@ export function TabBar() {
   }
 
   return (
-    <div className="flex items-center bg-gray-50 dark:bg-[#252536] border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+    <div className="flex items-stretch h-[38px] bg-qd-bg border-b border-qd-border-soft pl-1 overflow-x-auto">
       {/* All open tabs */}
       {tabs.map((tab) => {
-        const label = tab.type === 'session'
-          ? sessions.find((s) => s.session_id === tab.sessionId)?.session_name || tab.label
-          : tab.label;
+        const session = tab.type === 'session' ? sessions.find((s) => s.session_id === tab.sessionId) : null;
+        const label = session?.session_name || tab.label;
+        const isActive = activeTabId === tab.id;
+        const isRunning = tab.type === 'session' && tab.sessionId && activeAgentIds?.has(tab.sessionId);
+        const status: string = isRunning
+          ? 'running'
+          : isActive
+            ? 'active'
+            : 'idle';
 
         return (
           <div
             key={tab.id}
             onClick={() => handleTabClick(tab)}
-            className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 dark:border-gray-700 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
-              ${activeTabId === tab.id
-                ? 'bg-white dark:bg-[#32324a] border-b-2 border-b-blue-500 dark:border-b-blue-400' 
-                : 'hover:bg-gray-50 dark:hover:bg-[#2a2a3c]'}`}
+            role="tab"
+            aria-selected={isActive}
+            className={`group relative flex items-center gap-[7px] pl-3 pr-2 cursor-pointer whitespace-nowrap min-w-0 max-w-[220px] text-[12.5px] border-r border-qd-border-soft transition-colors
+              ${isActive
+                ? 'bg-qd-bg-elev text-qd-text font-medium'
+                : 'text-qd-text-dim hover:bg-qd-panel hover:text-qd-text'}`}
+            style={isActive ? { boxShadow: 'inset 0 -2px 0 var(--accent)' } : undefined}
           >
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate flex-1">
-              {label}
-            </span>
+            {tab.type === 'session' && (
+              <span
+                className="qd-status-dot"
+                data-status={status}
+                style={{
+                  background: status === 'idle' ? 'transparent' : `var(--status-${status})`,
+                  border: status === 'idle' ? '1px solid var(--border)' : undefined,
+                }}
+                aria-hidden
+              />
+            )}
+            <span className="truncate flex-1 min-w-0">{label}</span>
             <button
               onClick={(e) => handleTabClose(e, tab)}
-              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-opacity flex-shrink-0"
+              className="grid place-items-center w-[18px] h-[18px] rounded text-qd-text-muted opacity-0 group-hover:opacity-70 hover:!opacity-100 hover:bg-qd-panel-deep hover:text-qd-text transition-opacity flex-shrink-0"
               title="Close tab"
               aria-label={`Close tab ${label}`}
             >
-              <svg className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg className="w-[11px] h-[11px]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
@@ -94,26 +114,31 @@ export function TabBar() {
             // Deactivate all tabs to show new-session view
             useTabStore.setState({ activeTabId: null });
           }}
-          className={`group flex items-center gap-2 px-4 py-2 border-r border-gray-200 dark:border-gray-700 cursor-pointer whitespace-nowrap min-w-[120px] max-w-[200px]
-            ${activeTabId === null ? 'bg-white dark:bg-[#32324a] border-b-2 border-b-blue-500 dark:border-b-blue-400' : 'hover:bg-gray-50 dark:hover:bg-[#2a2a3c]'}`}
+          role="tab"
+          aria-selected={activeTabId === null}
+          className={`group flex items-center gap-[7px] pl-3 pr-2 cursor-pointer whitespace-nowrap min-w-0 max-w-[220px] text-[12.5px] border-r border-qd-border-soft transition-colors
+            ${activeTabId === null
+              ? 'bg-qd-bg-elev text-qd-text font-medium'
+              : 'text-qd-text-dim hover:bg-qd-panel hover:text-qd-text'}`}
+          style={activeTabId === null ? { boxShadow: 'inset 0 -2px 0 var(--accent)' } : undefined}
         >
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-100">New Session</span>
+          <span className="qd-status-dot" data-status="new" style={{ background: 'var(--status-new)' }} aria-hidden />
+          <span className="truncate flex-1">New Session</span>
           <button
             onClick={(e) => {
               e.stopPropagation();
               clearNewSession();
-              // Restore last tab if activeTabId was cleared
               const { tabs: currentTabs, activeTabId: currentActive } = useTabStore.getState();
               if (!currentActive && currentTabs.length > 0) {
                 useTabStore.setState({ activeTabId: currentTabs[currentTabs.length - 1].id });
               }
             }}
-            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-opacity flex-shrink-0"
-            title="Cancel new session"
+            className="grid place-items-center w-[18px] h-[18px] rounded text-qd-text-muted opacity-0 group-hover:opacity-70 hover:!opacity-100 hover:bg-qd-panel-deep hover:text-qd-text transition-opacity flex-shrink-0"
+            title="Close tab"
             aria-label="Cancel new session"
           >
-            <svg className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-[11px] h-[11px]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>

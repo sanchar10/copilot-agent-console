@@ -15,20 +15,20 @@ describe('StreamingMessage', () => {
       />,
     );
 
-    // The bordered shell uses `rounded-lg` + `border` classes — neither should appear.
-    const borderedShell = container.querySelector('.rounded-lg.border');
+    // The bordered shell uses `rounded-qd-lg` + `border` classes — neither should appear.
+    const borderedShell = container.querySelector('.rounded-qd-lg.border');
     expect(borderedShell).toBeNull();
   });
 
   it('hides the bordered bubble when content is empty and steps is undefined', () => {
     const { container } = render(<StreamingMessage content="" />);
-    const borderedShell = container.querySelector('.rounded-lg.border');
+    const borderedShell = container.querySelector('.rounded-qd-lg.border');
     expect(borderedShell).toBeNull();
   });
 
   it('renders the bordered bubble when content is non-empty', () => {
     const { container } = render(<StreamingMessage content="Hello" />);
-    const borderedShell = container.querySelector('.rounded-lg.border');
+    const borderedShell = container.querySelector('.rounded-qd-lg.border');
     expect(borderedShell).not.toBeNull();
   });
 
@@ -39,7 +39,7 @@ describe('StreamingMessage', () => {
         steps={[{ title: 'Tool: edit', detail: 'editing file' }]}
       />,
     );
-    const borderedShell = container.querySelector('.rounded-lg.border');
+    const borderedShell = container.querySelector('.rounded-qd-lg.border');
     expect(borderedShell).not.toBeNull();
   });
 
@@ -48,3 +48,4 @@ describe('StreamingMessage', () => {
     expect(getByText('Copilot')).toBeInTheDocument();
   });
 });
+

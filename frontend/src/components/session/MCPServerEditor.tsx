@@ -185,11 +185,11 @@ export function MCPServerEditor({
 
         {/* Scope */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-qd-text-dim mb-1">
             Scope
           </label>
           {mode === 'edit' ? (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-qd-text-dim">
               {scope === 'global'
                 ? 'Global (~/.copilot/mcp-config.json)'
                 : 'Agent-only (~/.copilot-console/mcp-config.json)'}{' '}
@@ -223,7 +223,7 @@ export function MCPServerEditor({
 
         {/* Name */}
         <div>
-          <label htmlFor="mcp-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label htmlFor="mcp-name" className="block text-sm font-medium text-qd-text-dim mb-1">
             Name
           </label>
           <input
@@ -233,7 +233,7 @@ export function MCPServerEditor({
             onChange={e => setName(e.target.value)}
             disabled={mode === 'edit' || saving}
             placeholder="my-server"
-            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1e1e2e] text-gray-900 dark:text-gray-100 disabled:opacity-60"
+            className="w-full px-3 py-2 text-sm border border-qd-border rounded-md bg-qd-bg text-qd-text disabled:opacity-60"
           />
           {nameError && (
             <p className="text-xs text-red-600 dark:text-red-400 mt-1">{nameError}</p>
@@ -242,7 +242,7 @@ export function MCPServerEditor({
 
         {/* Config JSON */}
         <div>
-          <label htmlFor="mcp-config" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label htmlFor="mcp-config" className="block text-sm font-medium text-qd-text-dim mb-1">
             Config (JSON)
           </label>
           <textarea
@@ -253,12 +253,12 @@ export function MCPServerEditor({
             rows={8}
             spellCheck={false}
             style={{ minHeight: '12rem', maxHeight: '30rem' }}
-            className="w-full px-3 py-2 text-xs font-mono border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-[#1e1e2e] text-gray-900 dark:text-gray-100 disabled:opacity-60 resize-y"
+            className="w-full px-3 py-2 text-xs font-mono border border-qd-border rounded-md bg-qd-bg text-qd-text disabled:opacity-60 resize-y"
           />
           {!parsedConfig.ok && configText.trim() !== '' && (
             <p className="text-xs text-red-600 dark:text-red-400 mt-1">{parsedConfig.err}</p>
           )}
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-qd-text-muted mt-1">
             Inner MCP server config. Use <code>{'{ "command", "args", ... }'}</code> for stdio
             servers or <code>{'{ "type": "http", "url", "headers" }'}</code> for remote servers.
           </p>
@@ -273,12 +273,12 @@ export function MCPServerEditor({
             disabled={saving}
             className="h-4 w-4 accent-blue-600"
           />
-          <span className="text-sm text-gray-700 dark:text-gray-300">
+          <span className="text-sm text-qd-text-dim">
             Auto-enable on new sessions
           </span>
         </label>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+        <p className="text-xs text-qd-text-muted italic">
           Open chats keep their current MCP setup — start a new chat to use changes.
         </p>
       </div>

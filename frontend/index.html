@@ -11,13 +11,19 @@
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Copilot Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" />
     <script>
-      // Apply theme before render to prevent flash
+      // Apply theme before render to prevent flash. We set BOTH:
+      //  - class="dark" on <html> (back-compat with existing Tailwind `dark:` utilities)
+      //  - data-theme="light|dark" (activates Quiet Doc design tokens)
       (function() {
         var t = localStorage.getItem('copilot-console-theme');
-        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark');
-        }
+        var isDark = (t === 'dark') || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var theme = isDark ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (isDark) document.documentElement.classList.add('dark');
       })();
     </script>
   </head>

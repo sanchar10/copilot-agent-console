@@ -120,7 +120,7 @@ export function SubAgentSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-80 bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-1 w-80 bg-white/95 dark:bg-qd-bg-elev/95 backdrop-blur-xl border border-qd-border-soft rounded-lg shadow-lg z-50">
           <div className="max-h-80 overflow-y-auto">
             {discoverableAgents ? (
               // Sectioned mode
@@ -137,17 +137,17 @@ export function SubAgentSelector({
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs">{SECTION_ICONS[sourceType]}</span>
-                          <span className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+                          <span className="text-[11px] font-semibold text-qd-text-dim uppercase tracking-wide">
                             {section.label}
                           </span>
                           {agents.length > 0 && (
-                            <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                            <span className="text-[10px] text-qd-text-muted">
                               ({sectionSelectedCount}/{agents.length})
                             </span>
                           )}
                         </div>
                         {section.path && (
-                          <span className="text-[9px] text-gray-400 dark:text-gray-500 truncate max-w-[220px] pl-5" title={section.path}>
+                          <span className="text-[9px] text-qd-text-muted truncate max-w-[220px] pl-5" title={section.path}>
                             {section.path}
                           </span>
                         )}
@@ -173,7 +173,7 @@ export function SubAgentSelector({
 
                     {/* Agent list or empty hint */}
                     {agents.length === 0 ? (
-                      <div className="px-3 py-2 text-[11px] text-gray-400 dark:text-gray-500 italic">
+                      <div className="px-3 py-2 text-[11px] text-qd-text-muted italic">
                         No agents found
                       </div>
                     ) : (
@@ -192,11 +192,11 @@ export function SubAgentSelector({
                               disabled={readOnly}
                             />
                             <div className="flex-1 min-w-0">
-                              <span className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate block">
+                              <span className="text-xs font-medium text-qd-text truncate block">
                                 {agent.display_name}
                               </span>
                               {agent.description && (
-                                <div className="text-[10px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                                <div className="text-[10px] text-qd-text-muted truncate mt-0.5">
                                   {agent.description.length > 80 ? agent.description.slice(0, 80) + '…' : agent.description}
                                 </div>
                               )}
@@ -213,7 +213,7 @@ export function SubAgentSelector({
               <>
                 <div className="p-2 border-b border-white/40 dark:border-gray-700">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Sub-Agents</span>
+                    <span className="text-xs font-medium text-qd-text-muted">Sub-Agents</span>
                     {!readOnly && (
                       <div className="flex gap-1">
                         <button onClick={handleLegacyAll} className="text-[10px] text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 px-1.5 py-0.5">All</button>
@@ -241,10 +241,10 @@ export function SubAgentSelector({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm">{agent.icon}</span>
-                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{agent.name}</span>
+                            <span className="text-sm font-medium text-qd-text truncate">{agent.name}</span>
                           </div>
                           {agent.description && (
-                            <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">{agent.description}</div>
+                            <div className="text-[11px] text-qd-text-muted truncate mt-0.5">{agent.description}</div>
                           )}
                         </div>
                       </label>

@@ -113,7 +113,7 @@ export function Dropdown({
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-sm font-medium text-qd-text-dim mb-1">
           {label}
         </label>
       )}
@@ -125,13 +125,13 @@ export function Dropdown({
         className={isCompact
           ? `px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors ${
               !disabled
-                ? 'bg-gray-50 dark:bg-[#2a2a3c] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#32324a] cursor-pointer border border-gray-200 dark:border-[#3a3a4e]'
-                : 'bg-gray-100 dark:bg-[#2a2a3c] text-gray-400 dark:text-gray-500 cursor-default border border-gray-200/60 dark:border-gray-700/60'
+                ? 'bg-qd-panel text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel cursor-pointer border border-qd-border'
+                : 'bg-gray-100 dark:bg-qd-bg-elev text-qd-text-muted cursor-default border border-gray-200/60 dark:border-gray-700/60'
             }`
           : `w-full px-3 py-2 border rounded-lg text-sm flex items-center justify-between transition-colors ${
               !disabled
-                ? 'border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#1e1e2e] text-gray-900 dark:text-gray-100 hover:border-gray-300 dark:hover:border-gray-500 cursor-pointer'
-                : 'border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-[#1e1e2e] text-gray-400 dark:text-gray-500 cursor-default'
+                ? 'border-qd-border bg-qd-bg text-qd-text hover:border-gray-300 dark:hover:border-gray-500 cursor-pointer'
+                : 'border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-qd-bg text-qd-text-muted cursor-default'
             }`
         }
       >
@@ -149,7 +149,7 @@ export function Dropdown({
       {open && (
         <div
           ref={listRef}
-          className={`absolute top-full mt-1 bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-[#3a3a4e] rounded-md shadow-lg dark:shadow-black/20 z-50 overflow-y-auto ${
+          className={`absolute top-full mt-1 bg-qd-bg-elev border border-qd-border rounded-md shadow-lg dark:shadow-black/20 z-50 overflow-y-auto ${
             dropdownClassName || (isCompact ? 'left-0 min-w-[180px] max-h-60' : 'left-0 right-0 min-w-full max-h-60')
           }`}
           role="listbox"
@@ -171,8 +171,8 @@ export function Dropdown({
                   isSelected
                     ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                     : isHighlighted
-                    ? 'bg-gray-100 dark:bg-[#32324a] text-gray-900 dark:text-gray-100'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+                    ? 'bg-qd-panel-deep text-qd-text'
+                    : 'text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel'
                 }`}
               >
                 {option.label}
@@ -180,7 +180,7 @@ export function Dropdown({
             );
           })}
           {options.length === 0 && (
-            <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 italic">
+            <div className="px-3 py-2 text-sm text-qd-text-muted italic">
               No options
             </div>
           )}

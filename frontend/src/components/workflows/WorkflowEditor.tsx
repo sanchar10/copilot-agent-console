@@ -263,7 +263,7 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">
+      <div className="flex-1 flex items-center justify-center text-qd-text-muted">
         Loading workflow...
       </div>
     );
@@ -273,8 +273,8 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
     <>
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Toolbar */}
-      <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#252536]">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex-1 min-w-0 truncate">
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-qd-border bg-qd-bg">
+        <h2 className="text-lg font-semibold text-qd-text flex-1 min-w-0 truncate">
           {name || (isNew ? 'New Workflow' : 'Untitled')}
         </h2>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -298,8 +298,8 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
                   ▶ Run
                 </button>
                 {showRunInput && (
-                  <div className="absolute right-0 top-full mt-1 z-50 bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-[#3a3a4e] rounded-lg shadow-lg p-3 w-80">
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  <div className="absolute right-0 top-full mt-1 z-50 bg-qd-bg-elev border border-qd-border rounded-lg shadow-lg p-3 w-80">
+                    <label className="block text-xs font-medium text-qd-text-muted mb-1">
                       Input message (optional)
                     </label>
                     <textarea
@@ -308,10 +308,10 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
                       onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleRun(runMessage); } }}
                       placeholder="e.g. Research AI agents"
                       rows={3}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-[#3a3a4e] rounded bg-white dark:bg-[#1e1e2e] text-gray-900 dark:text-gray-100 mb-2 resize-y overflow-auto"
+                      className="w-full px-2 py-1.5 text-sm border border-qd-border rounded bg-qd-bg text-qd-text mb-2 resize-y overflow-auto"
                       autoFocus
                     />
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    <label className="block text-xs font-medium text-qd-text-muted mb-1">
                       Working directory (optional)
                     </label>
                     <div className="flex gap-1 mb-2">
@@ -320,11 +320,11 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
                         value={runCwd}
                         onChange={(e) => setRunCwd(e.target.value)}
                         placeholder="Default: workflow-runs/{run_id}/"
-                        className="flex-1 px-2 py-1.5 text-sm border border-gray-200 dark:border-[#3a3a4e] rounded bg-white dark:bg-[#1e1e2e] text-gray-900 dark:text-gray-100"
+                        className="flex-1 px-2 py-1.5 text-sm border border-qd-border rounded bg-qd-bg text-qd-text"
                       />
                       <button
                         onClick={() => setShowFolderBrowser(true)}
-                        className="px-2 py-1.5 text-sm border border-gray-200 dark:border-[#3a3a4e] rounded hover:bg-gray-100 dark:hover:bg-[#3a3a4e] transition-colors"
+                        className="px-2 py-1.5 text-sm border border-qd-border rounded hover:bg-gray-100 dark:hover:bg-qd-panel-deep transition-colors"
                         title="Browse folders"
                       >
                         📁
@@ -353,8 +353,8 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
 
       {/* Description */}
       {description && (
-        <div className="px-4 py-1 border-b border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#252536]">
-          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+        <div className="px-4 py-1 border-b border-qd-border bg-qd-bg">
+          <p className="text-sm text-qd-text-dim truncate">
             {description}
           </p>
         </div>
@@ -363,8 +363,8 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
       {/* Main content: YAML Editor (left) + Mermaid (right) */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left pane: YAML editor */}
-        <div className="w-3/5 border-r border-gray-200 dark:border-[#3a3a4e] flex flex-col overflow-hidden">
-          <div className="px-3 py-2 bg-gray-50 dark:bg-[#2a2a3c] border-b border-gray-200 dark:border-[#3a3a4e] text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <div className="w-3/5 border-r border-qd-border flex flex-col overflow-hidden">
+          <div className="px-3 py-2 bg-qd-panel border-b border-qd-border text-xs font-medium text-qd-text-muted uppercase tracking-wider">
             YAML Definition
           </div>
           <div className="flex-1 overflow-hidden">
@@ -428,7 +428,7 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
                 {mermaidError}
               </div>
             ) : (
-              <div className="text-sm text-gray-400 dark:text-gray-500 p-4 text-center">
+              <div className="text-sm text-qd-text-muted p-4 text-center">
                 {isNew ? 'Save the workflow to see a preview' : 'Loading preview...'}
               </div>
             )}
@@ -438,10 +438,10 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
 
       {/* Bottom panel: Run History (collapsible) */}
       {!isNew && (
-        <div className={`border-t border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#252536] ${showRuns ? 'h-48' : 'h-8'} transition-all`}>
+        <div className={`border-t border-qd-border bg-qd-bg ${showRuns ? 'h-48' : 'h-8'} transition-all`}>
           <button
             onClick={() => setShowRuns(!showRuns)}
-            className="w-full flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a3c] transition-colors"
+            className="w-full flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-qd-text-muted hover:bg-gray-50 dark:hover:bg-qd-bg-elev transition-colors"
           >
             <svg className={`w-3 h-3 transition-transform ${showRuns ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -451,11 +451,11 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
           {showRuns && (
             <div className="overflow-y-auto px-4 pb-2" style={{ height: 'calc(100% - 28px)' }}>
               {runs.length === 0 ? (
-                <div className="text-xs text-gray-400 dark:text-gray-500 py-2">No runs yet</div>
+                <div className="text-xs text-qd-text-muted py-2">No runs yet</div>
               ) : (
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-[#3a3a4e]">
+                    <tr className="text-qd-text-muted border-b border-gray-100 dark:border-qd-border">
                       <th className="text-left py-1 font-medium">Run ID</th>
                       <th className="text-left py-1 font-medium">Status</th>
                       <th className="text-left py-1 font-medium">Started</th>
@@ -511,12 +511,12 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    pending: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400',
+    pending: 'bg-gray-100 dark:bg-gray-800 text-qd-text-dim',
     running: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
     paused: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
     completed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
     failed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
-    aborted: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400',
+    aborted: 'bg-gray-100 dark:bg-gray-800 text-qd-text-dim',
   };
   return (
     <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${styles[status] || styles.pending}`}>
@@ -564,18 +564,18 @@ function RunRow({ run, onClick, onDeleted }: {
   return (
     <tr
       onClick={onClick}
-      className="hover:bg-gray-50 dark:hover:bg-[#2a2a3c] cursor-pointer border-b border-gray-50 dark:border-[#3a3a4e]"
+      className="hover:bg-gray-50 dark:hover:bg-qd-bg-elev cursor-pointer border-b border-gray-50 dark:border-qd-border"
     >
-      <td className="py-1.5 text-gray-400 dark:text-gray-500 font-mono">
+      <td className="py-1.5 text-qd-text-muted font-mono">
         {run.id.slice(0, 8)}
       </td>
       <td className="py-1.5">
         <StatusBadge status={run.status} />
       </td>
-      <td className="py-1.5 text-gray-500 dark:text-gray-400">
+      <td className="py-1.5 text-qd-text-muted">
         {run.started_at ? formatDateTime(run.started_at) : '—'}
       </td>
-      <td className="py-1.5 text-gray-500 dark:text-gray-400">
+      <td className="py-1.5 text-qd-text-muted">
         {run.duration_seconds != null ? `${run.duration_seconds.toFixed(1)}s` : '—'}
       </td>
       <td className="py-1.5 text-red-500 truncate max-w-[200px]" title={run.error || ''}>
@@ -592,7 +592,7 @@ function RunRow({ run, onClick, onDeleted }: {
             </button>
             <button
               onClick={handleCancel}
-              className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-[10px] font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-qd-text-dim rounded text-[10px] font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Cancel
             </button>

@@ -222,10 +222,10 @@ export function MCPServersTab({ isOpen }: MCPServersTabProps) {
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <h3 className="text-sm font-semibold text-qd-text-dim">
             MCP Servers
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-qd-text-muted mt-1">
             Toggle which servers are enabled by default when you start a new session.
             Changes persist immediately.
           </p>
@@ -240,7 +240,7 @@ export function MCPServersTab({ isOpen }: MCPServersTabProps) {
       </div>
 
       {loading && availableMcpServers.length === 0 && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">Loading servers…</p>
+        <p className="text-sm text-qd-text-muted">Loading servers…</p>
       )}
 
       {error && (
@@ -253,28 +253,28 @@ export function MCPServersTab({ isOpen }: MCPServersTabProps) {
       )}
 
       {!loading && availableMcpServers.length === 0 && !error && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-qd-text-muted">
           No MCP servers configured yet.
         </p>
       )}
 
       {groups.map(group => (
-        <section key={group.key} className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4">
+        <section key={group.key} className="border-t border-qd-border pt-4">
           <div className="flex items-baseline justify-between gap-3 mb-2">
             <div className="flex items-baseline gap-2 min-w-0">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex-shrink-0">
+              <h4 className="text-sm font-semibold text-qd-text-dim flex-shrink-0">
                 {group.label}
               </h4>
               <button
                 type="button"
                 onClick={() => handleOpenConfigFile(group.path)}
-                className="text-[11px] font-mono text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline truncate text-left cursor-pointer"
+                className="text-[11px] font-mono text-qd-text-muted hover:text-blue-600 dark:hover:text-blue-400 hover:underline truncate text-left cursor-pointer"
                 title={`Open ${group.path} with the OS default application`}
               >
                 {group.path}
               </button>
             </div>
-            <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+            <span className="text-xs text-qd-text-muted flex-shrink-0">
               {group.description}
             </span>
           </div>
@@ -290,14 +290,14 @@ export function MCPServersTab({ isOpen }: MCPServersTabProps) {
               return (
                 <li
                   key={server.name}
-                  className="flex items-center justify-between gap-3 px-3 py-2 rounded-md bg-white/40 dark:bg-[#1e1e2e]/60 border border-white/30 dark:border-gray-700"
+                  className="flex items-center justify-between gap-3 px-3 py-2 rounded-md bg-white/40 dark:bg-qd-bg/60 border border-white/30 dark:border-gray-700"
                 >
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">
+                    <span className="text-sm font-medium text-qd-text truncate">
                       {server.name}
                     </span>
                     <span
-                      className="text-xs text-gray-500 dark:text-gray-400 truncate"
+                      className="text-xs text-qd-text-muted truncate"
                       title={detail}
                     >
                       {detail || '—'}
@@ -323,7 +323,7 @@ export function MCPServersTab({ isOpen }: MCPServersTabProps) {
                           : 'Auto-enable on new sessions (plugin config itself is managed by the plugin)'
                       }
                     >
-                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                      <span className="text-xs text-qd-text-dim">
                         Auto-enable
                       </span>
                       <input

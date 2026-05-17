@@ -87,7 +87,7 @@ export function MobileAskUserCard({
                   disabled={submitting}
                   className="text-emerald-600"
                 />
-                <span className="text-gray-800 dark:text-gray-200">{choice}</span>
+                <span className="text-qd-text">{choice}</span>
               </label>
             ))}
             {allowFreeform && (
@@ -100,7 +100,7 @@ export function MobileAskUserCard({
                   disabled={submitting}
                   className="text-emerald-600"
                 />
-                <span className="text-gray-500 dark:text-gray-400 italic">Other...</span>
+                <span className="text-qd-text-muted italic">Other...</span>
               </label>
             )}
           </div>
@@ -113,7 +113,7 @@ export function MobileAskUserCard({
             placeholder="Type your answer..."
             disabled={submitting}
             rows={2}
-            className="w-full text-base rounded-lg border border-emerald-200 dark:border-emerald-700/40 bg-white dark:bg-[#2a2a3c] px-3 py-2 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none mb-2"
+            className="w-full text-base rounded-lg border border-emerald-200 dark:border-emerald-700/40 bg-qd-bg-elev px-3 py-2 text-qd-text placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none mb-2"
           />
         )}
 
@@ -128,7 +128,7 @@ export function MobileAskUserCard({
           <button
             onClick={handleSkip}
             disabled={submitting}
-            className="px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600 rounded-lg"
+            className="px-3 py-1.5 text-xs font-medium text-qd-text-muted border border-gray-200 dark:border-gray-600 rounded-lg"
           >
             Skip
           </button>

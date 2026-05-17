@@ -77,17 +77,17 @@ function TaskRunCard({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white/50 dark:bg-[#2a2a3c]/50 backdrop-blur border border-white/40 dark:border-[#3a3a4e] rounded-xl p-4 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all"
+      className="w-full bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-4 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">{run.agent_name}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">{run.prompt}</p>
+          <h3 className="font-medium text-qd-text truncate">{run.agent_name}</h3>
+          <p className="text-sm text-qd-text-muted truncate mt-0.5">{run.prompt}</p>
         </div>
         <StatusBadge status={run.status} />
       </div>
 
-      <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-gray-500 mt-2">
+      <div className="flex items-center gap-4 text-xs text-qd-text-muted mt-2">
         {run.started_at && <span>{formatDateTime(run.started_at)}</span>}
         {run.duration_seconds !== null && <span>{formatDuration(run.duration_seconds)}</span>}
         {tokenStr && <span>🎟 {tokenStr}</span>}
@@ -97,7 +97,7 @@ function TaskRunCard({
         <p className="text-xs text-red-600 dark:text-red-400 mt-2 line-clamp-2">{run.error}</p>
       )}
 
-      <div className="mt-3 pt-2 border-t border-white/40 dark:border-[#3a3a4e] flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="mt-3 pt-2 border-t border-white/40 dark:border-qd-border flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
         {run.status === 'running' && (
           <button
             onClick={onAbort}
@@ -115,7 +115,7 @@ function TaskRunCard({
             <button onClick={onDelete} className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
               Confirm
             </button>
-            <button onClick={() => setConfirmDelete(false)} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
+            <button onClick={() => setConfirmDelete(false)} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-qd-text-dim hover:bg-gray-300 dark:hover:bg-gray-600">
               Cancel
             </button>
           </div>
@@ -241,10 +241,10 @@ export function TaskBoard({ automationId, automationName }: { automationId?: str
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold text-qd-text">
               {automationName ? `Runs: ${automationName}` : '📋 Runs'}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm text-qd-text-muted mt-1">
               {runningCount > 0 && <span className="text-blue-600 dark:text-blue-400">{runningCount} running</span>}
               {runningCount > 0 && pendingCount > 0 && ' · '}
               {pendingCount > 0 && <span className="text-amber-600 dark:text-amber-400">{pendingCount} pending</span>}
@@ -262,7 +262,7 @@ export function TaskBoard({ automationId, automationName }: { automationId?: str
             )}
             <button
               onClick={refresh}
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+              className="text-sm text-qd-text-muted hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
               🔄 Refresh
             </button>
@@ -272,7 +272,7 @@ export function TaskBoard({ automationId, automationName }: { automationId?: str
         {/* Agent filter */}
         {!automationId && agents.length > 0 && (
           <div className="flex items-center gap-3 mb-4">
-            <label className="text-sm text-gray-500 dark:text-gray-400">Filter by agent:</label>
+            <label className="text-sm text-qd-text-muted">Filter by agent:</label>
             <Dropdown
               options={[
                 { value: '', label: 'All Agents' },
@@ -286,15 +286,15 @@ export function TaskBoard({ automationId, automationName }: { automationId?: str
         )}
 
         {/* Filter Tabs */}
-        <div className="flex gap-1 mb-6 bg-white/40 dark:bg-[#2a2a3c]/40 backdrop-blur p-1 rounded-lg w-fit">
+        <div className="flex gap-1 mb-6 bg-white/40 dark:bg-qd-bg-elev/40 backdrop-blur p-1 rounded-lg w-fit">
           {['all', 'running', 'completed', 'failed'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 filter === f
-                  ? 'bg-white/70 dark:bg-[#32324a] text-gray-900 dark:text-gray-100 shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  ? 'bg-white/70 dark:bg-qd-panel text-qd-text shadow-sm'
+                  : 'text-qd-text-muted hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -305,11 +305,11 @@ export function TaskBoard({ automationId, automationName }: { automationId?: str
 
         {/* Content */}
         {loading ? (
-          <div className="text-center py-12 text-gray-400 dark:text-gray-500">Loading...</div>
+          <div className="text-center py-12 text-qd-text-muted">Loading...</div>
         ) : filteredRuns.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-4xl mb-3">📋</div>
-            <p className="text-gray-500 dark:text-gray-400">No runs {filter !== 'all' ? `with status "${filter}"` : 'yet'}</p>
+            <p className="text-qd-text-muted">No runs {filter !== 'all' ? `with status "${filter}"` : 'yet'}</p>
           </div>
         ) : (
           <div className="space-y-3">
