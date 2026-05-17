@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Copilot Console — directions</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: Geist, ui-sans-serif, system-ui, sans-serif; background: #f0eee9; }
+  #app { width: 100vw; height: 100vh; }
+  *, *::before, *::after { box-sizing: border-box; }
+</style>
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#16161c"/>
+    <rect x="22" y="32" width="56" height="36" rx="4" fill="none" stroke="oklch(0.74 0.13 268)" stroke-width="2"/>
+    <line x1="22" y1="42" x2="78" y2="42" stroke="oklch(0.74 0.13 268)" stroke-width="2"/>
+    <circle cx="28" cy="37" r="1.5" fill="oklch(0.74 0.13 268)"/>
+    <circle cx="33" cy="37" r="1.5" fill="oklch(0.74 0.13 268)"/>
+    <circle cx="38" cy="37" r="1.5" fill="oklch(0.74 0.13 268)"/>
+  </svg>
+</template>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="variations/quiet-doc.jsx"></script>
+<script type="text/babel" src="variations/quiet-doc-dark.jsx"></script>
+<script type="text/babel" src="variations/studio.jsx"></script>
+<script type="text/babel" src="variations/terminal.jsx"></script>
+<script type="text/babel" src="variations/ambient.jsx"></script>
+<script type="text/babel" src="variations/composer.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const ABW = 1440;
+const ABH = 900;
+
+const App = () => (
+  <DesignCanvas initialZoom={0.42}>
+    <DCSection
+      id="intro"
+      title="Copilot Console — six directions"
+      subtitle="Same session content across all artboards (your LinkedIn-feedback thread). Each direction commits to one idea — mix what you like and I'll combine."
+    />
+
+    <DCSection
+      id="quiet-doc"
+      title="Quiet Doc"
+      subtitle="Linear-ish. Sidebar-only nav, no top tabs. Document-style thread. Indigo used sparingly. Pair of light + warm-dark to compare theme treatment."
+    >
+      <DCArtboard id="qd-light" label="A · Quiet Doc — light" width={ABW} height={ABH}>
+        <QuietDocVariation />
+      </DCArtboard>
+      <DCArtboard id="qd-dark" label="A · Quiet Doc — dark twin" width={ABW} height={ABH}>
+        <QuietDocDarkVariation />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection
+      id="studio"
+      title="Studio"
+      subtitle="Tabs only — no permanent session list. Slim icon rail at left, per-session accent dots, live-steps drawer on the right. Warm dark."
+    >
+      <DCArtboard id="st" label="B · Studio" width={ABW} height={ABH}>
+        <StudioVariation />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection
+      id="terminal"
+      title="Terminal"
+      subtitle="Power-user dense. Monochrome with mono typography for chrome. Inline streaming steps. ⌘K-centric, both sidebar + tabs kept and compressed."
+    >
+      <DCArtboard id="tr" label="C · Terminal" width={ABW} height={ABH}>
+        <TerminalVariation />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection
+      id="ambient"
+      title="Ambient"
+      subtitle="Status-driven color. Each session has a Live/Active/New/Issue badge color, sparklines on the sidebar, pulsing tab dots. Adaptive density."
+    >
+      <DCArtboard id="am" label="D · Ambient" width={ABW} height={ABH}>
+        <AmbientVariation />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection
+      id="composer"
+      title="Composer"
+      subtitle="Cursor-style: the entire action bar collapses into the message composer. Document thread, restrained sage accent, minimal sidebar."
+    >
+      <DCArtboard id="co" label="E · Composer" width={ABW} height={ABH}>
+        <ComposerVariation />
+      </DCArtboard>
+    </DCSection>
+  </DesignCanvas>
+);
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App />);
+</script>
+</body>
+</html>

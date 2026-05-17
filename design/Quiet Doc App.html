@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <title>Quiet Doc — Copilot Console</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!--
+    QUIET DOC — interactive prototype for the Copilot Console redesign.
+
+    File layout (for handoff to Claude Code):
+      quiet-doc-app/styles.css      — design tokens (CSS vars, light + dark) + all styles
+      quiet-doc-app/data.jsx        — Icon set + initial mock data
+      quiet-doc-app/components.jsx  — Sidebar, TabStrip, Header
+      quiet-doc-app/app.jsx         — Thread, Composer, App (state + actions + shortcuts)
+
+    Interactions implemented:
+      - Click sidebar session   → opens as tab if not open, activates.
+      - Click tab               → switch active session.
+      - Close tab (X)           → removes from tabs; falls back to neighbour.
+      - New session             → adds + opens + activates. Button or ⌘N.
+      - ⌘K                     → focus sidebar search; type to filter sessions.
+      - Esc in search           → clears.
+      - Click "N steps" pill    → expand inline activity log for that message.
+      - Click model chip        → popover with model list; Esc / click-outside closes.
+      - Title in header         → contentEditable; Enter commits, Esc cancels.
+      - Composer Enter          → send. Shift+Enter → newline. Autosizes 22-200px.
+      - Send                    → optimistic user msg, then mock assistant reply
+                                  with steps (replace with real agent stream).
+      - Theme toggle (footer)   → toggles [data-theme] on <html>; persisted to localStorage.
+      - ⌘W                     → close active tab.
+
+    Theming:
+      All colors live in CSS custom properties in styles.css. Light is :root
+      defaults; dark is [data-theme="dark"]. To add a new theme, fork the
+      [data-theme=…] block.
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="quiet-doc-app/styles.css" />
+</head>
+<body>
+  <div id="app"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="quiet-doc-app/data.jsx"></script>
+  <script type="text/babel" src="quiet-doc-app/components.jsx"></script>
+  <script type="text/babel" src="quiet-doc-app/app.jsx"></script>
+</body>
+</html>

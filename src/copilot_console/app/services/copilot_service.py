@@ -44,6 +44,40 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
+def _pid_is_alive(pid: int) -> bool:
+    """Cross-platform check for whether a PID corresponds to a running process.
+
+    On Windows uses ``OpenProcess``; on POSIX uses ``os.kill(pid, 0)``.
+    Returns False on any error (treat unknown as not-alive so stale locks
+    don't permanently block sanitization).
+    """
+    if pid <= 0:
+        return False
+    import os
+    import sys
+    try:
+        if sys.platform == "win32":
+            import ctypes
+            PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+            kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+            handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+            if not handle:
+                return False
+            try:
+                exit_code = ctypes.c_ulong()
+                if kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)) == 0:
+                    return False
+                STILL_ACTIVE = 259
+                return exit_code.value == STILL_ACTIVE
+            finally:
+                kernel32.CloseHandle(handle)
+        else:
+            os.kill(pid, 0)
+            return True
+    except Exception:
+        return False
+
+
 class SessionResumeError(Exception):
     """Raised when a session cannot be resumed via the SDK due to a CLI/SDK bug.
 
@@ -353,34 +387,128 @@ class CopilotService:
                 return []
 
     async def _sanitize_events_jsonl(self, session_id: str, error_msg: str) -> bool:
-        """Strip unsupported event types from events.jsonl so session.resume can succeed.
+        """Strip unsupported events from events.jsonl so session.resume can succeed.
 
-        The CLI writes event types (e.g. system.notification) that its own
-        JSON-RPC session.resume handler rejects. This extracts the offending
-        type from the error message, removes those events, and re-links the
-        parentId chain so remaining events stay connected.
+        The CLI emits events (or inner discriminator values) that its own
+        JSON-RPC session.resume validator rejects. Two error formats are
+        handled:
+
+        - Old format ``Unknown event type: "<type>"`` (CLI < ~1.0.45):
+          the entire event type is unknown. Strip every event of that type.
+
+        - New format ``Session file is corrupted (line N: Unknown event type)``
+          (CLI ~1.0.45+): the cited line might still have a known outer type
+          but an unknown inner discriminator (e.g. ``permission.requested``
+          with ``permissionRequest.kind = extension-permission-access``).
+          Read line N, derive a signature (outer type + relevant inner
+          discriminator), and strip only events matching that signature so
+          legitimate events of the same outer type are preserved.
 
         Returns True if events were removed, False otherwise.
         """
         import json as _json
         from copilot_console.app.config import COPILOT_SESSION_STATE
 
-        # Extract the event type from error like: Unknown event type: "system.notification"
-        match = re.search(r'Unknown event type:\s*"([^"]+)"', error_msg)
-        if not match:
-            logger.warning(f"Session {session_id} has unsupported event type but could not parse type from: {error_msg}")
-            return False
-
-        bad_type = match.group(1)
-        logger.warning(f"Session {session_id} has unsupported event type '{bad_type}' — sanitizing events.jsonl")
-
         events_file = COPILOT_SESSION_STATE / session_id / "events.jsonl"
         if not events_file.exists():
             return False
 
+        # Skip if the session is currently held open by a live process.
+        # Mutating events.jsonl while in use risks confusing the live consumer.
+        # Stale locks (process died without cleanup) are ignored.
+        session_dir = events_file.parent
+        for lock in session_dir.glob("inuse.*.lock"):
+            try:
+                pid_str = lock.stem.split(".", 1)[1]  # "inuse.<pid>" -> "<pid>"
+                pid = int(pid_str)
+            except (ValueError, IndexError):
+                continue
+            if _pid_is_alive(pid):
+                logger.warning(
+                    f"Session {session_id} is in use by live PID {pid} — skipping sanitization to avoid concurrent-write risk"
+                )
+                return False
+
+        # Determine signature of the bad event(s) to strip.
+        # signature is a callable: (event_dict) -> bool that returns True
+        # for events that should be removed.
+        signature = None
+        signature_desc = ""
+
+        # Old format first — entire event type is unknown.
+        m_type = re.search(r'Unknown event type:\s*"([^"]+)"', error_msg)
+        if m_type:
+            bad_type = m_type.group(1)
+            signature = lambda evt: evt.get("type") == bad_type  # noqa: E731
+            signature_desc = f"type={bad_type!r}"
+        else:
+            # New format — only a line number is given.
+            m_line = re.search(r"line\s+(\d+)\s*:\s*Unknown event type", error_msg)
+            if not m_line:
+                logger.warning(
+                    f"Session {session_id} has unsupported event type but could not parse type from: {error_msg}"
+                )
+                return False
+
+            line_no = int(m_line.group(1))  # 1-indexed
+            try:
+                raw_lines = events_file.read_text(encoding="utf-8").splitlines()
+            except Exception as e:
+                logger.warning(f"Failed to read events.jsonl for session {session_id}: {e}")
+                return False
+
+            if line_no < 1 or line_no > len(raw_lines):
+                logger.warning(
+                    f"Session {session_id}: error cites line {line_no} but file has {len(raw_lines)} lines — bailing"
+                )
+                return False
+
+            try:
+                bad_evt = _json.loads(raw_lines[line_no - 1])
+            except Exception as e:
+                logger.warning(
+                    f"Session {session_id}: could not parse line {line_no} as JSON ({e}) — bailing"
+                )
+                return False
+
+            if not isinstance(bad_evt, dict) or "type" not in bad_evt:
+                logger.warning(
+                    f"Session {session_id}: line {line_no} has no 'type' field — bailing"
+                )
+                return False
+
+            outer_type = bad_evt["type"]
+            data = bad_evt.get("data") if isinstance(bad_evt.get("data"), dict) else {}
+
+            # Try to derive a more surgical signature by looking for an inner
+            # discriminator. Currently the only known case is
+            # permission.requested with permissionRequest.kind. If we find
+            # such a discriminator, match on (type, kind); otherwise fall
+            # back to type-only stripping.
+            inner_kind = None
+            pr = data.get("permissionRequest") if isinstance(data, dict) else None
+            if isinstance(pr, dict) and isinstance(pr.get("kind"), str):
+                inner_kind = pr["kind"]
+
+            if inner_kind:
+                def signature(evt: dict, _t=outer_type, _k=inner_kind) -> bool:
+                    if evt.get("type") != _t:
+                        return False
+                    d = evt.get("data") if isinstance(evt.get("data"), dict) else {}
+                    p = d.get("permissionRequest") if isinstance(d, dict) else None
+                    return isinstance(p, dict) and p.get("kind") == _k
+                signature_desc = f"type={outer_type!r} permissionRequest.kind={inner_kind!r}"
+            else:
+                signature = lambda evt, _t=outer_type: evt.get("type") == _t  # noqa: E731
+                signature_desc = f"type={outer_type!r} (line {line_no})"
+
+        logger.warning(
+            f"Session {session_id} sanitizing events.jsonl — stripping events matching {signature_desc}"
+        )
+
         try:
             raw_lines = events_file.read_text(encoding="utf-8").splitlines()
-            events = []
+            events: list = []
             for ln in raw_lines:
                 ln = ln.strip()
                 if ln:
@@ -392,12 +520,15 @@ class CopilotService:
             removed_redirect: dict[str, str | None] = {}
             kept = []
             for evt in events:
-                if isinstance(evt, dict) and evt.get("type") == bad_type:
-                    removed_redirect[evt["id"]] = evt.get("parentId")
+                if isinstance(evt, dict) and signature(evt):
+                    removed_redirect[evt.get("id", "")] = evt.get("parentId")
                 else:
                     kept.append(evt)
 
             if not removed_redirect:
+                logger.warning(
+                    f"Session {session_id}: no events matched signature ({signature_desc}) — nothing to sanitize"
+                )
                 return False
 
             for evt in kept:
@@ -420,7 +551,9 @@ class CopilotService:
             tmp.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
             tmp.replace(events_file)
             removed_count = len(removed_redirect)
-            logger.debug(f"Sanitized events.jsonl for session {session_id}: removed {removed_count} '{bad_type}' event(s), retrying resume")
+            logger.info(
+                f"Sanitized events.jsonl for session {session_id}: removed {removed_count} event(s) matching {signature_desc}, retrying resume"
+            )
             return True
         except Exception as e:
             logger.warning(f"Failed to sanitize events.jsonl for session {session_id}: {e}")
