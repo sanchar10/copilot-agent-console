@@ -19,7 +19,7 @@
 
 ### Why you might want this
 
-Copilot CLI is great. But by Wednesday afternoon you have 8 sessions open across 6 repos, you're not sure which terminal asked which question, and switching between them is terminal-tab gymnastics. Console gives you:
+Originally built as a personal toolkit on top of the Copilot SDK, kept open as a reference for what's buildable. Copilot CLI is great — but by Wednesday afternoon you have 10 sessions open across 5 repos, you're not sure which terminal asked which question, and switching between them is terminal-tab gymnastics. If any of these match how you actually work, you're welcome to it:
 
 - 🪟 **Every session in one window** — click to switch, see what each one is doing at a glance
 - 🧰 **Per-session context** — different MCP servers, agents, models, and working directory per task
@@ -29,7 +29,9 @@ Copilot CLI is great. But by Wednesday afternoon you have 8 sessions open across
 
 > **Pairs well with `/remote`:** GitHub's built-in [`/remote`](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/steer-remotely) is great for steering a session from GitHub Mobile when you need to. Copilot Console mobile is for the times you want a list of *every* CLI session — Console-launched and native terminal alike — with push notifications when any one of them finishes or needs you. Different jobs; use whichever fits the moment.
 
-Built on the [Copilot Python SDK](https://github.com/github/copilot-sdk). Open source, MIT-licensed, one-line install, runs locally. **Platform:** Windows, macOS, Linux (Ubuntu 22.04+).
+> **Looking for the official desktop app?** GitHub now ships an [official Copilot desktop app](https://github.com/github/app) — a polished, visual, agentic development experience with native GitHub and PR-lifecycle integration. If that fits what you need, grab it. This project is a personal toolkit kept open-source as a reference for what's buildable on the Copilot SDK.
+
+Built on the [Copilot SDK](https://github.com/github/copilot-sdk). Open source, MIT-licensed, one-line install, runs locally. **Platform:** Windows, macOS, Linux (Ubuntu 22.04+).
 
 ---
 
