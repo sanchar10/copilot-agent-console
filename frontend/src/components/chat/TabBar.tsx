@@ -63,11 +63,6 @@ export function TabBar() {
         const label = session?.session_name || tab.label;
         const isActive = activeTabId === tab.id;
         const isRunning = tab.type === 'session' && tab.sessionId && activeAgentIds?.has(tab.sessionId);
-        const status: string = isRunning
-          ? 'running'
-          : isActive
-            ? 'active'
-            : 'idle';
 
         return (
           <div
@@ -81,15 +76,16 @@ export function TabBar() {
                 : 'text-qd-text-dim hover:bg-qd-panel hover:text-qd-text'}`}
             style={isActive ? { boxShadow: 'inset 0 -2px 0 var(--accent)' } : undefined}
           >
-            {tab.type === 'session' && (
+            {/* Only show a dot when it conveys real status (agent running).
+                Active/idle are already implied by the tab styling itself, and
+                adding a dot there would collide with unread indicators. */}
+            {isRunning && (
               <span
                 className="qd-status-dot"
-                data-status={status}
-                style={{
-                  background: status === 'idle' ? 'transparent' : `var(--status-${status})`,
-                  border: status === 'idle' ? '1px solid var(--border)' : undefined,
-                }}
+                data-status="running"
+                style={{ background: 'var(--status-running)' }}
                 aria-hidden
+                title="Agent is processing"
               />
             )}
             <span className="truncate flex-1 min-w-0">{label}</span>
