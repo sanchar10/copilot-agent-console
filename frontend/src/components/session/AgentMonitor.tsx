@@ -33,7 +33,7 @@ function AgentCard({ session, onNavigate }: { session: ActiveAgentSession; onNav
   }, [session.started_at]);
   
   return (
-    <div className="bg-white/70 dark:bg-qd-bg-elev/70 backdrop-blur rounded-lg p-4 border border-white/40 dark:border-qd-border">
+    <div className="bg-qd-bg-elev backdrop-blur rounded-lg p-4 border border-qd-border-soft dark:border-qd-border">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -55,7 +55,7 @@ function AgentCard({ session, onNavigate }: { session: ActiveAgentSession; onNav
       
       {/* Current step */}
       {session.current_step && (
-        <div className="mb-3 px-2 py-1 bg-white/40 dark:bg-qd-bg/40 rounded text-xs">
+        <div className="mb-3 px-2 py-1 bg-qd-bg rounded text-xs">
           <span className="text-emerald-500">▶</span>{' '}
           <span className="text-qd-text-dim">{session.current_step.title}</span>
         </div>
@@ -69,7 +69,7 @@ function AgentCard({ session, onNavigate }: { session: ActiveAgentSession; onNav
       </div>
       
       {/* Footer */}
-      <div className="flex justify-between items-center mt-3 pt-2 border-t border-white/40 dark:border-qd-border">
+      <div className="flex justify-between items-center mt-3 pt-2 border-t border-qd-border-soft dark:border-qd-border">
         <span className="text-xs text-qd-text-muted">
           {session.content_length ? `${session.content_length.toLocaleString()} chars` : ''}
         </span>
@@ -123,9 +123,9 @@ export function AgentMonitor({ onClose }: AgentMonitorProps) {
   
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white/80 dark:bg-qd-bg/95 backdrop-blur-xl border border-white/30 dark:border-qd-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[80vh] flex flex-col">
+      <div className="bg-qd-bg backdrop-blur-xl border border-qd-border-soft dark:border-qd-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/30 dark:border-qd-border">
+        <div className="flex items-center justify-between p-4 border-b border-qd-border-soft dark:border-qd-border">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-semibold text-qd-text">Active Agents Monitor</h2>
             <span className="px-2 py-0.5 bg-emerald-500 text-white text-sm rounded-full">
@@ -134,7 +134,7 @@ export function AgentMonitor({ onClose }: AgentMonitorProps) {
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            className="text-qd-text-muted hover:text-qd-text-dim dark:hover:text-gray-200 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -185,7 +185,7 @@ export function AgentMonitor({ onClose }: AgentMonitorProps) {
         </div>
         
         {/* Footer */}
-        <div className="p-3 border-t border-white/30 dark:border-qd-border text-center text-xs text-qd-text-muted">
+        <div className="p-3 border-t border-qd-border-soft dark:border-qd-border text-center text-xs text-qd-text-muted">
           Live updates every second • Content shows last 500 characters
         </div>
       </div>

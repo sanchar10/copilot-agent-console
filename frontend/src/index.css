@@ -32,11 +32,11 @@
 :root,
 [data-theme="light"] {
   --bg:          oklch(0.985 0.003 250);
-  --bg-elev:     oklch(0.978 0.005 250);
-  --panel:       oklch(0.965 0.005 250);
-  --panel-deep:  oklch(0.94  0.006 250);
-  --border:      oklch(0.92  0.005 250);
-  --border-soft: oklch(0.95  0.004 250);
+  --bg-elev:     oklch(1.000 0.000 0);
+  --panel:       oklch(0.962 0.005 250);
+  --panel-deep:  oklch(0.935 0.006 250);
+  --border:      oklch(0.86  0.006 250);
+  --border-soft: oklch(0.90  0.005 250);
 
   --text:       oklch(0.22 0.01  250);
   --text-dim:   oklch(0.48 0.008 250);
@@ -64,15 +64,15 @@
 /* ---- Dark theme --------------------------------------------- */
 [data-theme="dark"] {
   --bg:          oklch(0.165 0.005 270);
-  --bg-elev:     oklch(0.205 0.006 270);
-  --panel:       oklch(0.205 0.006 270);
-  --panel-deep:  oklch(0.245 0.007 270);
-  --border:      oklch(0.28  0.007 270);
-  --border-soft: oklch(0.235 0.006 270);
+  --bg-elev:     oklch(0.215 0.006 270);
+  --panel:       oklch(0.235 0.006 270);
+  --panel-deep:  oklch(0.275 0.007 270);
+  --border:      oklch(0.34  0.008 270);
+  --border-soft: oklch(0.285 0.007 270);
 
   --text:       oklch(0.95 0.005 270);
-  --text-dim:   oklch(0.72 0.008 270);
-  --text-muted: oklch(0.52 0.008 270);
+  --text-dim:   oklch(0.78 0.008 270);
+  --text-muted: oklch(0.60 0.008 270);
   --text-inv:   var(--bg);
 
   --accent:        oklch(0.74 0.13 268);

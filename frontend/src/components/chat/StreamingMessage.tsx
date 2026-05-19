@@ -166,7 +166,7 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
             ask_user pause where the only step is filtered out). Avatar+label
             above stay visible so the streaming indicator still conveys activity. */}
         {(visibleSteps.length > 0 || content.length > 0) && (
-        <div onClick={handleCitationClick} className="rounded-qd-lg px-4 py-3 bg-qd-bg-elev border border-qd-border-soft">
+        <div onClick={handleCitationClick} className="rounded-qd-lg px-4 py-3 bg-qd-bg-elev border border-qd-border">
           {visibleSteps.length > 0 && (
             <div className="mb-2 text-sm">
               <div className="text-qd-text-dim font-medium mb-2">

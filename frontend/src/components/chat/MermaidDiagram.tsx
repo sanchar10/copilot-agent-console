@@ -170,7 +170,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
   if (isLoading) {
     return (
       <div className={`overflow-hidden not-prose rounded-md ${className}`}>
-        <div className="flex items-center gap-2 px-3 py-2 bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur text-qd-text-dim text-sm">
+        <div className="flex items-center gap-2 px-3 py-2 bg-qd-bg-elev backdrop-blur text-qd-text-dim text-sm">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
           </svg>
@@ -215,7 +215,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
           onClick={e => e.stopPropagation()}
         >
           {/* Modal header */}
-          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-gray-50/95 dark:bg-gray-800/95 border-b border-qd-border-soft z-10">
+          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-qd-panel border-b border-qd-border-soft z-10">
             <div className="flex items-center gap-2 text-qd-text-dim text-sm">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -298,7 +298,7 @@ function MermaidDiagramInner({ code, className = '' }: MermaidDiagramProps) {
       <FullscreenModal />
       <div className={`overflow-hidden not-prose flex flex-col ${className}`}>
         {/* Header with toggle and zoom controls */}
-        <div className="flex items-center justify-between px-2 py-1.5 bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-t-md text-xs shrink-0">
+        <div className="flex items-center justify-between px-2 py-1.5 bg-qd-bg-elev backdrop-blur rounded-t-md text-xs shrink-0">
           <div className="flex items-center gap-2 text-qd-text-dim text-sm">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -413,7 +413,7 @@ export function MermaidDiagram({ code, className = '' }: MermaidDiagramProps) {
   // Guard against undefined/null code
   if (!code) {
     return (
-      <div className={`rounded-lg border border-white/40 dark:border-gray-700 p-4 bg-white/30 dark:bg-gray-800/30 text-gray-500 text-sm ${className}`}>
+      <div className={`rounded-lg border border-qd-border-soft p-4 bg-qd-bg-elev dark:bg-qd-bg-elev text-gray-500 text-sm ${className}`}>
         No diagram code provided
       </div>
     );

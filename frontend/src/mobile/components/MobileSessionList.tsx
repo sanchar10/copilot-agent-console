@@ -275,7 +275,7 @@ export function MobileSessionList({ onNotification }: Props) {
                 <button
                   key={session.session_id}
                   onClick={() => handleSessionClick(session.session_id)}
-                  className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-qd-bg-elev active:bg-gray-100 dark:active:bg-qd-panel transition-colors"
+                  className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-qd-panel dark:hover:bg-qd-bg-elev active:bg-qd-panel-deep dark:active:bg-qd-panel transition-colors"
                 >
                   {/* Status indicator — mutually exclusive: spinner > blue dot > empty (same as desktop) */}
                   <div className="w-3 flex-shrink-0 flex items-center justify-center">

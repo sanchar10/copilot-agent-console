@@ -371,7 +371,7 @@ export function createCitationMarkdownComponents(opts: FactoryOptions = {}): Com
           return <FileCitationCode path={text}>{children}</FileCitationCode>;
         }
         return (
-          <code className="bg-gray-100 dark:bg-qd-bg text-pink-600 dark:text-pink-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
+          <code className="bg-qd-panel-deep dark:bg-qd-bg text-pink-600 dark:text-pink-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
             {children}
           </code>
         );
@@ -396,7 +396,7 @@ export function createCitationMarkdownComponents(opts: FactoryOptions = {}): Com
       );
     },
     thead({ children }) {
-      return <thead className="bg-gray-100 dark:bg-qd-bg-elev">{children}</thead>;
+      return <thead className="bg-qd-panel-deep dark:bg-qd-bg-elev">{children}</thead>;
     },
     th({ children }) {
       return (

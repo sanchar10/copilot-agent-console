@@ -38,7 +38,7 @@ function WorkflowCard({ workflow }: { workflow: WorkflowMetadata }) {
   return (
     <button
       onClick={handleClick}
-      className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all group relative"
+      className="bg-qd-bg-elev backdrop-blur border border-qd-border-soft dark:border-qd-border rounded-xl p-5 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all group relative"
     >
       <div className="flex items-start justify-between">
         <div className="text-3xl mb-3">🔀</div>

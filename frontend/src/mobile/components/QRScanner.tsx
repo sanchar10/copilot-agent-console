@@ -91,7 +91,7 @@ export function QRScanner({ onScan, onClose }: Props) {
           <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
           {/* Scan overlay */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-64 h-64 border-2 border-white/50 rounded-2xl" />
+            <div className="w-64 h-64 border-2 border-qd-border-soft rounded-2xl" />
           </div>
         </div>
       )}

@@ -324,7 +324,7 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
                       />
                       <button
                         onClick={() => setShowFolderBrowser(true)}
-                        className="px-2 py-1.5 text-sm border border-qd-border rounded hover:bg-gray-100 dark:hover:bg-qd-panel-deep transition-colors"
+                        className="px-2 py-1.5 text-sm border border-qd-border rounded hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep transition-colors"
                         title="Browse folders"
                       >
                         📁
@@ -441,7 +441,7 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
         <div className={`border-t border-qd-border bg-qd-bg ${showRuns ? 'h-48' : 'h-8'} transition-all`}>
           <button
             onClick={() => setShowRuns(!showRuns)}
-            className="w-full flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-qd-text-muted hover:bg-gray-50 dark:hover:bg-qd-bg-elev transition-colors"
+            className="w-full flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-qd-text-muted hover:bg-qd-panel dark:hover:bg-qd-bg-elev transition-colors"
           >
             <svg className={`w-3 h-3 transition-transform ${showRuns ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -511,12 +511,12 @@ export function WorkflowEditor({ workflowId }: WorkflowEditorProps) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    pending: 'bg-gray-100 dark:bg-gray-800 text-qd-text-dim',
+    pending: 'bg-qd-panel-deep dark:bg-gray-800 text-qd-text-dim',
     running: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
     paused: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
     completed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
     failed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
-    aborted: 'bg-gray-100 dark:bg-gray-800 text-qd-text-dim',
+    aborted: 'bg-qd-panel-deep dark:bg-gray-800 text-qd-text-dim',
   };
   return (
     <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${styles[status] || styles.pending}`}>
@@ -564,7 +564,7 @@ function RunRow({ run, onClick, onDeleted }: {
   return (
     <tr
       onClick={onClick}
-      className="hover:bg-gray-50 dark:hover:bg-qd-bg-elev cursor-pointer border-b border-gray-50 dark:border-qd-border"
+      className="hover:bg-qd-panel dark:hover:bg-qd-bg-elev cursor-pointer border-b border-gray-50 dark:border-qd-border"
     >
       <td className="py-1.5 text-qd-text-muted font-mono">
         {run.id.slice(0, 8)}

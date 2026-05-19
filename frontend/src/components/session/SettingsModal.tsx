@@ -221,7 +221,7 @@ function GeneralTab({
             className={`flex-1 px-3 py-2 rounded-md text-sm font-medium border transition-colors ${
               theme === 'light'
                 ? 'bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-400'
-                : 'bg-white/50 border-white/40 text-gray-600 hover:bg-gray-50 dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
+                : 'bg-qd-bg-elev border-qd-border-soft text-gray-600 hover:bg-qd-panel dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
             }`}
           >
             ☀️ Light
@@ -232,7 +232,7 @@ function GeneralTab({
             className={`flex-1 px-3 py-2 rounded-md text-sm font-medium border transition-colors ${
               theme === 'dark'
                 ? 'bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-400'
-                : 'bg-white/50 border-white/40 text-gray-600 hover:bg-gray-50 dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
+                : 'bg-qd-bg-elev border-qd-border-soft text-gray-600 hover:bg-qd-panel dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
             }`}
           >
             🌙 Dark
@@ -268,13 +268,13 @@ function GeneralTab({
             type="text"
             value={selectedCwd}
             onChange={(e) => onCwdChange(e.target.value)}
-            className="flex-1 px-3 py-2 border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
+            className="flex-1 px-3 py-2 border border-qd-border-soft bg-qd-bg-elev rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
             placeholder="e.g., C:\Users\you\projects"
           />
           <button
             type="button"
             onClick={onBrowseFolders}
-            className="px-3 py-2 border border-white/40 bg-white/50 rounded-md text-sm text-gray-600 hover:bg-gray-100 dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel transition-colors"
+            className="px-3 py-2 border border-qd-border-soft bg-qd-bg-elev rounded-md text-sm text-gray-600 hover:bg-qd-panel-deep dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel transition-colors"
             title="Browse folders"
             aria-label="Browse folders"
           >
@@ -398,7 +398,7 @@ function MobileTab({ isOpen }: { isOpen: boolean }) {
           </p>
         </div>
       ) : (
-        <div className="bg-gray-50 dark:bg-qd-bg rounded-lg p-4 text-center">
+        <div className="bg-qd-panel dark:bg-qd-bg rounded-lg p-4 text-center">
           <p className="text-sm text-qd-text-muted">
             {devtunnelInstalled === false ? (
               <>
@@ -429,7 +429,7 @@ function MobileTab({ isOpen }: { isOpen: boolean }) {
           value={tunnelUrl}
           onChange={(e) => setTunnelUrl(e.target.value)}
           placeholder="https://your-id.devtunnels.ms"
-          className="w-full px-3 py-1.5 text-sm border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
+          className="w-full px-3 py-1.5 text-sm border border-qd-border-soft bg-qd-bg-elev rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
         />
         {exposeMode && tunnelUrl && (
           <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">
@@ -444,7 +444,7 @@ function MobileTab({ isOpen }: { isOpen: boolean }) {
           API Token
         </label>
         <div className="flex items-center gap-2">
-          <code className="flex-1 text-xs bg-gray-100 dark:bg-qd-bg px-2 py-1.5 rounded font-mono overflow-hidden text-ellipsis whitespace-nowrap min-h-[28px] leading-[20px]">
+          <code className="flex-1 text-xs bg-qd-panel-deep dark:bg-qd-bg px-2 py-1.5 rounded font-mono overflow-hidden text-ellipsis whitespace-nowrap min-h-[28px] leading-[20px]">
             {apiToken
               ? (showToken ? apiToken : '••••••••••••••••')
               : 'Loading...'}
@@ -563,7 +563,7 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
             className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
               desktopNotifications === opt
                 ? 'bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-400'
-                : 'bg-white/50 border-white/40 text-gray-600 hover:bg-gray-50 dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
+                : 'bg-qd-bg-elev border-qd-border-soft text-gray-600 hover:bg-qd-panel dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
             }`}
           >
             {opt === 'all' ? 'All responses' : opt === 'input_only' ? 'Input needed only' : 'Off'}
@@ -583,7 +583,7 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
           <p className="text-xs text-qd-text-muted mt-0.5">
             Receive mobile notifications when Copilot completes a response in CLI session.
             <span className="block mt-1">
-              Toggle within CLI: <code className="bg-gray-100 dark:bg-qd-bg px-1 rounded text-xs">!cli-notify on|off</code>
+              Toggle within CLI: <code className="bg-qd-panel-deep dark:bg-qd-bg px-1 rounded text-xs">!cli-notify on|off</code>
             </span>
           </p>
         </div>
@@ -633,7 +633,7 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
         {desktopToggle}
         {cliToggle}
         <div className="border-t border-qd-border pt-4">
-          <div className="bg-gray-50 dark:bg-qd-bg rounded-lg p-6 text-center">
+          <div className="bg-qd-panel dark:bg-qd-bg rounded-lg p-6 text-center">
             <p className="text-sm text-qd-text-muted">
               No devices registered.
             </p>
@@ -659,7 +659,7 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
           return (
             <div
               key={sub.endpoint}
-              className="flex items-center gap-2 px-3 py-2 rounded-md bg-gray-50 dark:bg-qd-bg border border-qd-border"
+              className="flex items-center gap-2 px-3 py-2 rounded-md bg-qd-panel dark:bg-qd-bg border border-qd-border"
             >
               <span className="text-xs text-qd-text-dim flex-1 font-mono truncate" title={sub.endpoint}>
                 {truncated}
@@ -831,7 +831,7 @@ function AuthenticationTab() {
       <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${
         authStatus.authenticated
           ? 'bg-emerald-50 dark:bg-emerald-900/15 border-emerald-200 dark:border-emerald-800'
-          : 'bg-gray-50 dark:bg-qd-bg border-qd-border'
+          : 'bg-qd-panel dark:bg-qd-bg border-qd-border'
       }`}>
         {authStatus.authenticated ? (
           <span className="text-lg">🔒</span>

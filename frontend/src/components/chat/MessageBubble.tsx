@@ -256,7 +256,7 @@ export const MessageBubble = memo(function MessageBubble({ message, sessionId, o
               ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700'
               : isUser
                 ? 'bg-qd-accent-soft border border-qd-accent-border text-qd-text'
-                : 'bg-qd-bg-elev border border-qd-border-soft'
+                : 'bg-qd-bg-elev border border-qd-border'
         }`}>
           {/* Pin icon — top-right of message body */}
           {canPin && (

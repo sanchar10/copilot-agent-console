@@ -99,7 +99,7 @@ export function MobileAgentMonitor() {
               <button
                 key={agent.session_id}
                 onClick={() => navigate(`/mobile/chat/${agent.session_id}`)}
-                className="w-full text-left bg-qd-bg-elev rounded-xl p-4 shadow-sm border border-gray-100 dark:border-qd-border active:bg-gray-50 dark:active:bg-qd-panel transition-colors"
+                className="w-full text-left bg-qd-bg-elev rounded-xl p-4 shadow-sm border border-gray-100 dark:border-qd-border active:bg-qd-panel dark:active:bg-qd-panel transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">

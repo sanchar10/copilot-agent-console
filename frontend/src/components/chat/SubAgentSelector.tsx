@@ -98,7 +98,7 @@ export function SubAgentSelector({
           flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md h-[30px]
           transition-colors duration-150
           ${disabled
-            ? 'bg-gray-100/80 dark:bg-gray-800/80 text-gray-400 border border-gray-200/60 dark:border-gray-700/60 cursor-not-allowed'
+            ? 'bg-qd-panel text-gray-400 border border-gray-200/60 dark:border-gray-700/60 cursor-not-allowed'
             : 'bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/35 hover:bg-blue-100 dark:hover:bg-blue-800/40 cursor-pointer'
           }
         `}
@@ -120,7 +120,7 @@ export function SubAgentSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-80 bg-white/95 dark:bg-qd-bg-elev/95 backdrop-blur-xl border border-qd-border-soft rounded-lg shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-1 w-80 bg-qd-bg-elev backdrop-blur-xl border border-qd-border-soft rounded-lg shadow-lg z-50">
           <div className="max-h-80 overflow-y-auto">
             {discoverableAgents ? (
               // Sectioned mode
@@ -133,7 +133,7 @@ export function SubAgentSelector({
                 return (
                   <div key={sourceType}>
                     {/* Section header */}
-                    <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50/80 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700/50 sticky top-0">
+                    <div className="flex items-center justify-between px-3 py-1.5 bg-qd-panel border-b border-gray-100 dark:border-gray-700/50 sticky top-0">
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs">{SECTION_ICONS[sourceType]}</span>
@@ -182,7 +182,7 @@ export function SubAgentSelector({
                         return (
                           <label
                             key={agent.id}
-                            className={`flex items-start gap-2 px-3 py-1.5 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-white/40 dark:hover:bg-gray-700/40 cursor-pointer'}`}
+                            className={`flex items-start gap-2 px-3 py-1.5 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-qd-panel cursor-pointer'}`}
                           >
                             <input
                               type="checkbox"
@@ -211,7 +211,7 @@ export function SubAgentSelector({
             ) : availableAgents ? (
               // Legacy flat mode (AgentEditor)
               <>
-                <div className="p-2 border-b border-white/40 dark:border-gray-700">
+                <div className="p-2 border-b border-qd-border-soft">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-qd-text-muted">Sub-Agents</span>
                     {!readOnly && (
@@ -229,7 +229,7 @@ export function SubAgentSelector({
                     return (
                       <label
                         key={agent.id}
-                        className={`flex items-start gap-2 px-3 py-2 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-white/40 dark:hover:bg-gray-700/40 cursor-pointer'}`}
+                        className={`flex items-start gap-2 px-3 py-2 ${readOnly ? 'opacity-60 cursor-default' : 'hover:bg-qd-panel cursor-pointer'}`}
                       >
                         <input
                           type="checkbox"

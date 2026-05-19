@@ -48,7 +48,7 @@ export function ModeSelector({ mode, onModeChange, disabled }: ModeSelectorProps
         className={`flex items-center gap-1 w-[120px] px-2 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
           open
             ? 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/25 dark:text-blue-100 dark:border-blue-400/30'
-            : 'border-qd-border-soft text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel-deep'
+            : 'border-qd-border-soft text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         title={`Mode: ${current.label}`}
       >
@@ -69,7 +69,7 @@ export function ModeSelector({ mode, onModeChange, disabled }: ModeSelectorProps
                 className={`w-full flex items-center gap-1.5 px-2 py-1.5 text-xs transition-colors ${
                   isActive
                     ? 'bg-blue-50 text-blue-800 dark:bg-blue-500/20 dark:text-blue-100'
-                    : 'text-qd-text-dim hover:bg-gray-50 dark:hover:bg-qd-panel-deep'
+                    : 'text-qd-text-dim hover:bg-qd-panel dark:hover:bg-qd-panel-deep'
                 }`}
               >
                 <span>{m.icon}</span>

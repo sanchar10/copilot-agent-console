@@ -549,7 +549,7 @@ export function MobileChatView() {
         </div>
         <button
           onClick={scrollToBottom}
-          className={`sticky bottom-2 left-1/2 -translate-x-1/2 bg-black/20 dark:bg-white/20 backdrop-blur-sm text-qd-text w-10 h-10 rounded-full shadow-lg flex items-center justify-center z-10 transition-opacity duration-200 ${showScrollButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          className={`sticky bottom-2 left-1/2 -translate-x-1/2 bg-black/20 dark:bg-qd-bg-elev backdrop-blur-sm text-qd-text w-10 h-10 rounded-full shadow-lg flex items-center justify-center z-10 transition-opacity duration-200 ${showScrollButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           aria-label="Scroll to bottom"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
@@ -562,11 +562,11 @@ export function MobileChatView() {
         const isActivating = sending && !sessionActivatedRef.current;
         const isThinking = streamingState.isStreaming && !hasPendingInput && !isActivating;
         const inputBg = isActivating
-          ? 'bg-gray-100 dark:bg-gray-800 border-qd-border'
+          ? 'bg-qd-panel-deep dark:bg-gray-800 border-qd-border'
           : isThinking
             ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/40'
             : hasPendingInput
-              ? 'bg-gray-100 dark:bg-gray-800 border-qd-border'
+              ? 'bg-qd-panel-deep dark:bg-gray-800 border-qd-border'
               : 'bg-qd-bg border-qd-border';
         const placeholder = isActivating
           ? 'Activating session…'
@@ -603,7 +603,7 @@ export function MobileChatView() {
                     }}
                     placeholder={input ? placeholder : ''}
                     rows={1}
-                    className="flex-1 resize-none rounded-xl border border-amber-200 dark:border-amber-700/40 bg-white/60 dark:bg-qd-bg-elev/60 px-3 py-2.5 text-base text-qd-text placeholder-amber-400 dark:placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    className="flex-1 resize-none rounded-xl border border-amber-200 dark:border-amber-700/40 bg-qd-bg-elev px-3 py-2.5 text-base text-qd-text placeholder-amber-400 dark:placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-amber-400"
                     style={{ maxHeight: '120px' }}
                   />
                   {!input && (
@@ -631,7 +631,7 @@ export function MobileChatView() {
                   disabled={hasPendingInput}
                   placeholder={placeholder}
                   rows={1}
-                  className={`flex-1 resize-none rounded-xl border px-3 py-2.5 text-base focus:outline-none focus:ring-2 ${hasPendingInput ? 'border-qd-border bg-gray-100 dark:bg-gray-800 text-qd-text-muted placeholder-gray-400 cursor-not-allowed' : 'border-qd-border bg-qd-panel text-qd-text placeholder-gray-400 focus:ring-blue-500'}`}
+                  className={`flex-1 resize-none rounded-xl border px-3 py-2.5 text-base focus:outline-none focus:ring-2 ${hasPendingInput ? 'border-qd-border bg-qd-panel-deep dark:bg-gray-800 text-qd-text-muted placeholder-gray-400 cursor-not-allowed' : 'border-qd-border bg-qd-panel text-qd-text placeholder-gray-400 focus:ring-blue-500'}`}
                   style={{ maxHeight: '120px' }}
                 />
               )}

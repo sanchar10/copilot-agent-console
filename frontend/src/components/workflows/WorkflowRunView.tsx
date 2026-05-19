@@ -481,7 +481,7 @@ function EventCard({ event, onSubmit, isSubmitted, submittedAnswer }: {
   const sessionId = event.session_id;
 
   return (
-    <div className="px-3 py-2 bg-white/50 dark:bg-qd-bg-elev/50 border border-white/40 dark:border-qd-border rounded-lg text-sm">
+    <div className="px-3 py-2 bg-qd-bg-elev border border-qd-border-soft dark:border-qd-border rounded-lg text-sm">
       <div className="flex items-center gap-2">
         <span>{icon}</span>
         <span className="font-medium text-qd-text-dim">{label}</span>
@@ -503,7 +503,7 @@ function EventCard({ event, onSubmit, isSubmitted, submittedAnswer }: {
         </div>
       )}
       {event.data != null && (
-        <div className="mt-1 text-qd-text-dim text-xs whitespace-pre-wrap font-mono bg-gray-50 dark:bg-qd-bg rounded p-2 max-h-32 overflow-y-auto">
+        <div className="mt-1 text-qd-text-dim text-xs whitespace-pre-wrap font-mono bg-qd-panel dark:bg-qd-bg rounded p-2 max-h-32 overflow-y-auto">
           {typeof event.data === 'string' ? event.data : JSON.stringify(event.data, null, 2)}
         </div>
       )}

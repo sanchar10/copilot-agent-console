@@ -50,7 +50,7 @@ function FullVariant({
   };
 
   return (
-    <section className="bg-white/50 dark:bg-qd-bg/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4">
+    <section className="bg-qd-bg backdrop-blur rounded-xl border border-qd-border-soft dark:border-qd-border p-5 space-y-4">
       <h2 className="font-semibold text-qd-text-dim">System Prompt</h2>
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2 text-sm">
@@ -75,7 +75,7 @@ function FullVariant({
         onChange={(e) => handleContentChange(e.target.value)}
         placeholder="Enter the system prompt..."
         rows={6}
-        className="w-full px-3 py-2 border border-white/40 dark:border-gray-600 bg-white/50 dark:bg-qd-bg backdrop-blur rounded-lg text-sm font-mono dark:text-gray-100 focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+        className="w-full px-3 py-2 border border-qd-border bg-qd-bg-elev dark:bg-qd-bg backdrop-blur rounded-lg text-sm font-mono dark:text-gray-100 focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
       />
     </section>
   );
@@ -152,7 +152,7 @@ function CompactVariant({
         }}
         className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 cursor-pointer ${
           disabled
-            ? 'bg-gray-100/80 dark:bg-qd-panel text-qd-text-dim border border-gray-200/60 dark:border-gray-600 cursor-default'
+            ? 'bg-qd-panel text-qd-text-dim border border-qd-border cursor-default'
             : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/50'
         }`}
         title={hasContent ? `System prompt (${value?.mode || 'replace'})` : 'No custom system prompt — using SDK default'}
@@ -172,9 +172,9 @@ function CompactVariant({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1 w-96 bg-white/95 dark:bg-qd-bg-elev/95 backdrop-blur-xl border border-qd-border rounded-lg shadow-lg z-50">
+        <div className="absolute left-0 top-full mt-1 w-96 bg-qd-bg-elev backdrop-blur-xl border border-qd-border rounded-lg shadow-lg z-50">
           {/* Mode toggle */}
-          <div className="flex items-center gap-4 px-3 py-2 border-b border-white/40 dark:border-qd-border">
+          <div className="flex items-center gap-4 px-3 py-2 border-b border-qd-border-soft dark:border-qd-border">
             <span className="text-xs font-medium text-qd-text-dim">Mode:{disabled && <span className="text-qd-text-muted ml-1">(locked)</span>}</span>
             <label className={`flex items-center gap-1.5 text-xs ${disabled ? 'opacity-50' : ''}`}>
               <input
@@ -205,7 +205,7 @@ function CompactVariant({
               onChange={(e) => setDraftContent(e.target.value)}
               placeholder="Enter system prompt... (empty = SDK default)"
               rows={5}
-              className={`w-full px-2 py-1.5 border border-white/40 dark:border-gray-600 rounded text-xs font-mono resize-y ${disabled ? 'bg-white/30 dark:bg-qd-bg/30 text-gray-500 dark:text-gray-500 cursor-default' : 'bg-white/50 dark:bg-qd-bg dark:text-gray-100 focus:ring-2 focus:ring-blue-500/50 focus:border-transparent'}`}
+              className={`w-full px-2 py-1.5 border border-qd-border rounded text-xs font-mono resize-y ${disabled ? 'bg-qd-bg text-gray-500 dark:text-gray-500 cursor-default' : 'bg-qd-bg-elev dark:bg-qd-bg dark:text-gray-100 focus:ring-2 focus:ring-blue-500/50 focus:border-transparent'}`}
               autoFocus={!disabled}
               readOnly={disabled}
               disabled={disabled}
@@ -213,7 +213,7 @@ function CompactVariant({
           </div>
 
           {/* Footer */}
-          <div className="px-3 py-2 border-t border-white/40 dark:border-qd-border bg-white/30 dark:bg-qd-bg/30 rounded-b-lg flex items-center justify-between">
+          <div className="px-3 py-2 border-t border-qd-border-soft dark:border-qd-border bg-qd-bg rounded-b-lg flex items-center justify-between">
             <div className="text-[10px] text-gray-500 dark:text-gray-500">
               {disabled
                 ? 'Cannot be changed after session starts'

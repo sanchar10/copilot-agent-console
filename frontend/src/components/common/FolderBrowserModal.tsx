@@ -163,12 +163,12 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath, sho
         </div>
 
         {/* Directory listing */}
-        <div className="border border-white/40 dark:border-qd-border rounded-lg overflow-hidden h-72 overflow-y-auto">
+        <div className="border border-qd-border-soft dark:border-qd-border rounded-lg overflow-hidden h-72 overflow-y-auto">
           {/* Go up button */}
           {parentPath !== null && (
             <button
               onClick={handleGoUp}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-50/60 dark:hover:bg-blue-900/30 text-blue-600 border-b border-white/40 dark:border-qd-border transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-50/60 dark:hover:bg-blue-900/30 text-blue-600 border-b border-qd-border-soft dark:border-qd-border transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
@@ -202,7 +202,7 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath, sho
               disabled={entry.accessible === false}
               className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
                 entry.accessible === false
-                  ? 'text-gray-400 cursor-not-allowed bg-white/30 dark:bg-qd-bg/30'
+                  ? 'text-gray-400 cursor-not-allowed bg-qd-bg'
                   : 'text-qd-text-dim hover:bg-blue-50/60 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-400'
               }`}
               title={entry.accessible === false ? 'Permission denied' : entry.path}

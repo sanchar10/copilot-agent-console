@@ -85,7 +85,7 @@ export function ConfirmModal({
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white/80 dark:bg-qd-bg-elev/80 backdrop-blur-xl border border-white/30 dark:border-qd-border rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+        <div className="relative bg-qd-bg-elev backdrop-blur-xl border border-qd-border-soft dark:border-qd-border rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
           <div className="flex items-start gap-4">
             {/* Icon */}
             <div className={`flex-shrink-0 w-10 h-10 rounded-full ${styles.iconBg} flex items-center justify-center`}>
@@ -107,7 +107,7 @@ export function ConfirmModal({
           <div className="mt-6 flex justify-end gap-3">
             <button
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-qd-text-dim bg-white/50 dark:bg-qd-panel backdrop-blur border border-white/40 dark:border-gray-600 rounded-lg hover:bg-white/70 dark:hover:bg-qd-panel-deep focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-qd-text-dim bg-qd-bg-elev dark:bg-qd-panel backdrop-blur border border-qd-border rounded-lg hover:bg-qd-bg-elev dark:hover:bg-qd-panel-deep focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
               aria-label={cancelLabel}
             >
               {cancelLabel}

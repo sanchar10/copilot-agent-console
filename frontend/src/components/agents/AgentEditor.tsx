@@ -215,7 +215,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
             </button>
             <button
               onClick={() => closeTab(tabId.agentDetail(agentId))}
-              className="px-4 py-2 text-sm font-medium text-qd-text-dim border border-gray-300/60 dark:border-gray-600/60 hover:bg-gray-50/60 dark:hover:bg-gray-800/30 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-qd-text-dim border border-qd-border hover:bg-qd-panel rounded-lg transition-colors"
             >
               Close
             </button>
@@ -225,7 +225,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
         {/* Form */}
         <div className="space-y-6">
           {/* Basic Info */}
-          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4 relative z-40">
+          <section className="bg-qd-bg-elev backdrop-blur rounded-xl border border-qd-border-soft dark:border-qd-border p-5 space-y-4 relative z-40">
             <h2 className="font-semibold text-qd-text-dim">Basic Info</h2>
             <div className="grid grid-cols-[1fr_80px] gap-4">
               <div>
@@ -235,7 +235,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="My Agent"
-                  className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
+                  className="w-full px-3 py-2 border border-qd-border-soft bg-qd-bg-elev rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
                 />
               </div>
               <div>
@@ -250,7 +250,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What does this agent do?"
-                className="w-full px-3 py-2 border border-white/40 bg-white/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
+                className="w-full px-3 py-2 border border-qd-border-soft bg-qd-bg-elev rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-transparent dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
               />
             </div>
             <div>
@@ -309,7 +309,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           />
 
           {/* Tools */}
-          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4 relative z-30">
+          <section className="bg-qd-bg-elev backdrop-blur rounded-xl border border-qd-border-soft dark:border-qd-border p-5 space-y-4 relative z-30">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-qd-text-dim">Tools</h2>
               <span className="text-xs text-qd-text-muted">
@@ -373,7 +373,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           </section>
 
           {/* MCP Servers */}
-          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4 relative z-20">
+          <section className="bg-qd-bg-elev backdrop-blur rounded-xl border border-qd-border-soft dark:border-qd-border p-5 space-y-4 relative z-20">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-qd-text-dim">MCP Servers</h2>
               <span className="text-xs text-qd-text-muted">
@@ -411,7 +411,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           </section>
 
           {/* Sub-Agents (Agent Teams) */}
-          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4 relative z-10">
+          <section className="bg-qd-bg-elev backdrop-blur rounded-xl border border-qd-border-soft dark:border-qd-border p-5 space-y-4 relative z-10">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-qd-text-dim">👥 Sub-Agents</h2>
               <span className="text-xs text-qd-text-muted">
@@ -463,7 +463,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
           </section>
 
           {/* Starter Prompts */}
-          <section className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-xl border border-white/40 dark:border-qd-border p-5 space-y-4">
+          <section className="bg-qd-bg-elev backdrop-blur rounded-xl border border-qd-border-soft dark:border-qd-border p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-qd-text-dim">💡 Starter Prompts</h2>
               <span className="text-xs text-qd-text-muted">
@@ -485,7 +485,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                       setStarterPrompts(updated);
                     }}
                     placeholder="Title (e.g. Task Tracker)"
-                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-white/40 dark:border-qd-border bg-white/60 dark:bg-qd-bg/60 text-qd-text"
+                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-qd-border-soft dark:border-qd-border bg-qd-bg text-qd-text"
                   />
                   <textarea
                     value={sp.prompt}
@@ -496,7 +496,7 @@ export function AgentEditor({ agentId }: AgentEditorProps) {
                     }}
                     placeholder="Full prompt text..."
                     rows={2}
-                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-white/40 dark:border-qd-border bg-white/60 dark:bg-qd-bg/60 text-qd-text resize-none"
+                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-qd-border-soft dark:border-qd-border bg-qd-bg text-qd-text resize-none"
                   />
                 </div>
                 <button

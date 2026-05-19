@@ -405,7 +405,7 @@ export function Sidebar() {
           <p className="text-sm text-qd-text-dim">
             Workflows require the <strong>Agent Framework</strong> package. Install it by running:
           </p>
-          <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-3 text-sm font-mono text-qd-text overflow-x-auto select-all">
+          <pre className="bg-qd-panel-deep dark:bg-gray-800 rounded-lg px-4 py-3 text-sm font-mono text-qd-text overflow-x-auto select-all">
             {workflowInstallModal?.command}
           </pre>
           <p className="text-xs text-qd-text-muted">

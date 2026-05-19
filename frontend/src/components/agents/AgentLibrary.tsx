@@ -101,7 +101,7 @@ function AgentCard({ agent, membership }: { agent: Agent; membership: TeamMember
   return (
     <button
       onClick={() => handleClick(agent)}
-      className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all group relative"
+      className="bg-qd-bg-elev backdrop-blur border border-qd-border-soft dark:border-qd-border rounded-xl p-5 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all group relative"
     >
       <div className="flex items-start justify-between">
         <div className="text-3xl mb-3">{agent.icon}</div>
@@ -156,7 +156,7 @@ function AgentRow({ agent, membership }: { agent: Agent; membership: TeamMembers
   return (
     <button
       onClick={() => handleClick(agent)}
-      className="w-full flex items-center gap-3 px-4 py-2.5 bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-lg text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-sm transition-all group"
+      className="w-full flex items-center gap-3 px-4 py-2.5 bg-qd-bg-elev backdrop-blur border border-qd-border-soft dark:border-qd-border rounded-lg text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-sm transition-all group"
     >
       <span className="text-xl flex-shrink-0 w-8 text-center">{agent.icon}</span>
       <div className="flex-1 min-w-0">
@@ -328,7 +328,7 @@ export function AgentLibrary() {
                     className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                       filter === f.key
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 dark:bg-qd-bg-elev text-qd-text-dim hover:bg-gray-200 dark:hover:bg-qd-panel-deep'
+                        : 'bg-qd-panel-deep dark:bg-qd-bg-elev text-qd-text-dim hover:bg-gray-200 dark:hover:bg-qd-panel-deep'
                     }`}
                   >
                     {f.icon ? `${f.icon} ` : ''}{f.label}
@@ -353,7 +353,7 @@ export function AgentLibrary() {
                   <button
                     onClick={() => setView('grid')}
                     title="Grid view"
-                    className={`p-1.5 ${view === 'grid' ? 'bg-blue-600 text-white' : 'bg-qd-bg-elev text-gray-500 hover:bg-gray-100 dark:hover:bg-qd-panel-deep'}`}
+                    className={`p-1.5 ${view === 'grid' ? 'bg-blue-600 text-white' : 'bg-qd-bg-elev text-gray-500 hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep'}`}
                   >
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
                       <rect x="1" y="1" width="6" height="6" rx="1" /><rect x="9" y="1" width="6" height="6" rx="1" />
@@ -363,7 +363,7 @@ export function AgentLibrary() {
                   <button
                     onClick={() => setView('list')}
                     title="List view"
-                    className={`p-1.5 ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-qd-bg-elev text-gray-500 hover:bg-gray-100 dark:hover:bg-qd-panel-deep'}`}
+                    className={`p-1.5 ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-qd-bg-elev text-gray-500 hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep'}`}
                   >
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
                       <rect x="1" y="1.5" width="14" height="3" rx="0.5" /><rect x="1" y="6.5" width="14" height="3" rx="0.5" />

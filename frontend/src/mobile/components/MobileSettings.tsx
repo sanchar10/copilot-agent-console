@@ -206,7 +206,7 @@ export function MobileSettings({ onConnectionChange }: Props) {
                 value={baseUrl}
                 onChange={(e) => setBaseUrl(e.target.value)}
                 placeholder="https://your-tunnel-url.devtunnels.ms"
-                className="w-full px-3 py-2 text-sm rounded-lg border border-qd-border bg-gray-50 dark:bg-qd-bg text-qd-text placeholder-gray-400"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-qd-border bg-qd-panel dark:bg-qd-bg text-qd-text placeholder-gray-400"
               />
             </div>
             <div>
@@ -218,7 +218,7 @@ export function MobileSettings({ onConnectionChange }: Props) {
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 placeholder="Paste your API token"
-                className="w-full px-3 py-2 text-sm rounded-lg border border-qd-border bg-gray-50 dark:bg-qd-bg text-qd-text placeholder-gray-400"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-qd-border bg-qd-panel dark:bg-qd-bg text-qd-text placeholder-gray-400"
               />
             </div>
 
@@ -317,7 +317,7 @@ export function MobileSettings({ onConnectionChange }: Props) {
         <section className="bg-qd-bg-elev rounded-xl p-4 shadow-sm border border-gray-100 dark:border-qd-border">
           <h2 className="text-sm font-semibold text-qd-text mb-2">How to connect</h2>
           <ol className="text-xs text-qd-text-dim space-y-2 list-decimal list-inside">
-            <li>On your desktop, start Copilot Console with <code className="bg-gray-100 dark:bg-qd-bg px-1 py-0.5 rounded">--expose</code></li>
+            <li>On your desktop, start Copilot Console with <code className="bg-qd-panel-deep dark:bg-qd-bg px-1 py-0.5 rounded">--expose</code></li>
             <li>Open Settings in the desktop UI → Mobile Companion section</li>
             <li>Tap <strong>📷 Scan QR Code</strong> above and scan the code from your desktop</li>
             <li>Or manually enter the <strong>Server URL</strong> and <strong>API Token</strong> shown on desktop</li>

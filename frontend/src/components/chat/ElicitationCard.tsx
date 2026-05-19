@@ -84,7 +84,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
               className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
                 value === opt.const
                   ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300'
-                  : 'border-qd-border text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel'
+                  : 'border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
               }`}
             >
               {opt.title}
@@ -176,7 +176,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
                 className={`px-2 py-1 text-xs rounded border transition-colors ${
                   checked
                     ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300'
-                    : 'border-qd-border text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel'
+                    : 'border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
                 }`}
               >
                 {checked ? '☑' : '☐'} {opt.label}
@@ -306,7 +306,7 @@ export function ElicitationCard({ sessionId, data }: ElicitationCardProps) {
           type="button"
           onClick={() => handleAction('decline')}
           disabled={submitting}
-          className="px-3 py-1.5 text-xs rounded-md border border-qd-border text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel transition-colors disabled:opacity-50"
+          className="px-3 py-1.5 text-xs rounded-md border border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel transition-colors disabled:opacity-50"
         >
           Decline
         </button>
@@ -341,7 +341,7 @@ export function ResolvedElicitationCard({ resolved, schema }: ResolvedCardProps)
 
   if (resolved.action !== 'accept') {
     return (
-      <div className="my-2 ml-11 border-l-3 border-gray-400 dark:border-gray-600 bg-gray-100/80 dark:bg-gray-800/50 rounded-r-lg px-3 py-2">
+      <div className="my-2 ml-11 border-l-3 border-gray-400 dark:border-gray-600 bg-qd-panel rounded-r-lg px-3 py-2">
         <span className="text-xs text-qd-text-muted">
           {resolved.action === 'decline' ? '↩ Declined' : '✕ Cancelled'}
           {resolved.message && ` — "${resolved.message}"`}

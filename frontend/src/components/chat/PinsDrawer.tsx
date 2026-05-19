@@ -69,10 +69,10 @@ export function PinsDrawer({ sessionId, pins, onClose, onAsk, focusPinId, onFocu
   };
 
   return (
-    <aside data-pins-drawer className="w-96 border-l border-qd-border-soft bg-white/90 dark:bg-[#1f1f2e]/90 backdrop-blur p-3 overflow-y-auto">
+    <aside data-pins-drawer className="w-96 border-l border-qd-border bg-qd-bg backdrop-blur p-3 overflow-y-auto">
       <div className="flex items-center justify-between gap-2">
         <div className="font-semibold text-sm text-qd-text flex items-center gap-1.5"><PinnedIcon size={16} /> Pins ({pins.length})</div>
-        <button type="button" className="text-xs px-2 py-1 rounded border border-qd-border-soft text-qd-text-dim hover:border-gray-300 dark:hover:border-gray-500" onClick={onClose} title="Close">Close</button>
+        <button type="button" className="text-xs px-2 py-1 rounded border border-qd-border text-qd-text-dim hover:bg-qd-panel" onClick={onClose} title="Close">Close</button>
       </div>
 
       {sortedPins.length === 0 ? (
@@ -86,7 +86,7 @@ export function PinsDrawer({ sessionId, pins, onClose, onAsk, focusPinId, onFocu
             const title = p.title || p.excerpt || p.sdk_message_id;
 
             return (
-              <div key={p.id} className="rounded-lg border border-qd-border-soft bg-white/70 dark:bg-qd-bg-elev/70 p-3">
+              <div key={p.id} className="rounded-lg border border-qd-border bg-qd-bg-elev p-3 shadow-qd-sm">
                 <div className="flex items-start justify-between gap-2">
                   <button
                     type="button" className="flex-1 text-left"
@@ -117,7 +117,7 @@ export function PinsDrawer({ sessionId, pins, onClose, onAsk, focusPinId, onFocu
                 <div className="mt-2">
                   <textarea
                     ref={(el) => { textareaRefs.current[p.id] = el; }}
-                    className="w-full text-sm rounded-md border border-qd-border-soft bg-white/60 dark:bg-[#1f1f2e]/60 px-2 py-1.5 text-qd-text-dim placeholder-gray-400 dark:placeholder-gray-500 resize-y overflow-y-auto"
+                    className="w-full text-sm rounded-md border border-qd-border-soft bg-qd-bg px-2 py-1.5 text-qd-text-dim placeholder-qd-text-muted resize-y overflow-y-auto"
                     rows={1} style={{ minHeight: '1.75rem', maxHeight: '18.75rem' }}
                     placeholder="Add a note (optional)" value={note}
                     onChange={(e) => { setDraftNotes((prev) => ({ ...prev, [p.id]: e.target.value })); autoResizeTextarea(e.target); }}

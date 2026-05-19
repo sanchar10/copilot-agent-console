@@ -125,13 +125,13 @@ export function Dropdown({
         className={isCompact
           ? `px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors ${
               !disabled
-                ? 'bg-qd-panel text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel cursor-pointer border border-qd-border'
-                : 'bg-gray-100 dark:bg-qd-bg-elev text-qd-text-muted cursor-default border border-gray-200/60 dark:border-gray-700/60'
+                ? 'bg-qd-panel text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel cursor-pointer border border-qd-border'
+                : 'bg-qd-panel-deep dark:bg-qd-bg-elev text-qd-text-muted cursor-default border border-gray-200/60 dark:border-gray-700/60'
             }`
           : `w-full px-3 py-2 border rounded-lg text-sm flex items-center justify-between transition-colors ${
               !disabled
                 ? 'border-qd-border bg-qd-bg text-qd-text hover:border-gray-300 dark:hover:border-gray-500 cursor-pointer'
-                : 'border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-qd-bg text-qd-text-muted cursor-default'
+                : 'border-gray-200/60 dark:border-gray-700/60 bg-qd-panel dark:bg-qd-bg text-qd-text-muted cursor-default'
             }`
         }
       >
@@ -172,7 +172,7 @@ export function Dropdown({
                     ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                     : isHighlighted
                     ? 'bg-qd-panel-deep text-qd-text'
-                    : 'text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel'
+                    : 'text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
                 }`}
               >
                 {option.label}

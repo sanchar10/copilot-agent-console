@@ -290,7 +290,7 @@ export function MCPServersTab({ isOpen }: MCPServersTabProps) {
               return (
                 <li
                   key={server.name}
-                  className="flex items-center justify-between gap-3 px-3 py-2 rounded-md bg-white/40 dark:bg-qd-bg/60 border border-white/30 dark:border-gray-700"
+                  className="flex items-center justify-between gap-3 px-3 py-2 rounded-md bg-qd-bg border border-qd-border-soft"
                 >
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-sm font-medium text-qd-text truncate">

@@ -13,7 +13,7 @@ const STATUS_CONFIG: Record<TaskRunStatus, { label: string; color: string; bg: s
   completed: { label: 'Completed', color: 'text-emerald-700', bg: 'bg-emerald-100', darkColor: 'dark:text-emerald-400', darkBg: 'dark:bg-emerald-900/30' },
   failed: { label: 'Failed', color: 'text-red-700', bg: 'bg-red-100', darkColor: 'dark:text-red-400', darkBg: 'dark:bg-red-900/30' },
   timed_out: { label: 'Timed Out', color: 'text-orange-700', bg: 'bg-orange-100', darkColor: 'dark:text-orange-400', darkBg: 'dark:bg-orange-900/30' },
-  aborted: { label: 'Aborted', color: 'text-gray-700', bg: 'bg-gray-100', darkColor: 'dark:text-gray-400', darkBg: 'dark:bg-gray-800' },
+  aborted: { label: 'Aborted', color: 'text-gray-700', bg: 'bg-qd-panel-deep', darkColor: 'dark:text-gray-400', darkBg: 'dark:bg-gray-800' },
 };
 
 function formatDuration(seconds: number | null): string {
@@ -112,7 +112,7 @@ export function TaskRunDetail({ runId }: { runId: string }) {
         </div>
 
         {/* Metadata */}
-        <div className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5 mb-6 space-y-2">
+        <div className="bg-qd-bg-elev backdrop-blur border border-qd-border-soft dark:border-qd-border rounded-xl p-5 mb-6 space-y-2">
           <MetaRow label="Prompt" value={run.prompt} />
           <MetaRow label="Working Dir" value={run.cwd} />
           <MetaRow label="Started" value={run.started_at ? formatDateTime(run.started_at) : null} />
@@ -135,11 +135,11 @@ export function TaskRunDetail({ runId }: { runId: string }) {
         )}
 
         {/* Output */}
-        <div className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5">
+        <div className="bg-qd-bg-elev backdrop-blur border border-qd-border-soft dark:border-qd-border rounded-xl p-5">
           <h3 className="text-sm font-semibold text-qd-text-dim mb-3">Output</h3>
           {run.output ? (
             <div className="prose prose-sm max-w-none dark:prose-invert">
-              <pre className="whitespace-pre-wrap text-sm text-qd-text bg-white/40 dark:bg-qd-bg/40 p-4 rounded-lg overflow-x-auto">
+              <pre className="whitespace-pre-wrap text-sm text-qd-text bg-qd-bg p-4 rounded-lg overflow-x-auto">
                 {run.output}
               </pre>
             </div>

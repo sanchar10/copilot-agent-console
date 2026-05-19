@@ -20,7 +20,7 @@ const STATUS_CONFIG: Record<TaskRunStatus, { label: string; color: string; bg: s
   completed: { label: 'Completed', color: 'text-emerald-700', bg: 'bg-emerald-100', darkColor: 'dark:text-emerald-400', darkBg: 'dark:bg-emerald-900/30' },
   failed: { label: 'Failed', color: 'text-red-700', bg: 'bg-red-100', darkColor: 'dark:text-red-400', darkBg: 'dark:bg-red-900/30' },
   timed_out: { label: 'Timed Out', color: 'text-orange-700', bg: 'bg-orange-100', darkColor: 'dark:text-orange-400', darkBg: 'dark:bg-orange-900/30' },
-  aborted: { label: 'Aborted', color: 'text-gray-700', bg: 'bg-gray-100', darkColor: 'dark:text-gray-400', darkBg: 'dark:bg-gray-800' },
+  aborted: { label: 'Aborted', color: 'text-gray-700', bg: 'bg-qd-panel-deep', darkColor: 'dark:text-gray-400', darkBg: 'dark:bg-gray-800' },
 };
 
 function StatusBadge({ status }: { status: TaskRunStatus }) {
@@ -77,7 +77,7 @@ function TaskRunCard({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-4 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all"
+      className="w-full bg-qd-bg-elev backdrop-blur border border-qd-border-soft dark:border-qd-border rounded-xl p-4 text-left hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
@@ -97,7 +97,7 @@ function TaskRunCard({
         <p className="text-xs text-red-600 dark:text-red-400 mt-2 line-clamp-2">{run.error}</p>
       )}
 
-      <div className="mt-3 pt-2 border-t border-white/40 dark:border-qd-border flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="mt-3 pt-2 border-t border-qd-border-soft dark:border-qd-border flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
         {run.status === 'running' && (
           <button
             onClick={onAbort}
@@ -286,14 +286,14 @@ export function TaskBoard({ automationId, automationName }: { automationId?: str
         )}
 
         {/* Filter Tabs */}
-        <div className="flex gap-1 mb-6 bg-white/40 dark:bg-qd-bg-elev/40 backdrop-blur p-1 rounded-lg w-fit">
+        <div className="flex gap-1 mb-6 bg-qd-bg-elev backdrop-blur p-1 rounded-lg w-fit">
           {['all', 'running', 'completed', 'failed'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 filter === f
-                  ? 'bg-white/70 dark:bg-qd-panel text-qd-text shadow-sm'
+                  ? 'bg-qd-bg-elev dark:bg-qd-panel text-qd-text shadow-sm'
                   : 'text-qd-text-muted hover:text-gray-700 dark:hover:text-gray-200'
               }`}
             >

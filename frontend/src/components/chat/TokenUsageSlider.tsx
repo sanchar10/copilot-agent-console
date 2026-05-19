@@ -19,11 +19,11 @@ export function TokenUsageSlider({
     const hasCount = loadedMessageCount !== undefined && loadedMessageCount > 0;
     return (
       <div
-        className="flex items-center gap-2 px-3 py-1.5 bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-lg border border-gray-200/60 dark:border-gray-700 w-56"
+        className="flex items-center gap-2 px-3 py-1.5 bg-qd-bg-elev backdrop-blur rounded-lg border border-gray-200/60 dark:border-gray-700 w-56"
         title={hasCount ? `Session Messages: ${loadedMessageCount!.toLocaleString()}` : undefined}
       >
         <span className="text-xs font-medium text-gray-400">Tokens</span>
-        <div className="flex-1 h-2 bg-white/60 dark:bg-gray-700 rounded-full" />
+        <div className="flex-1 h-2 bg-qd-bg-elev dark:bg-gray-700 rounded-full" />
         <span className="text-xs text-gray-400 w-8 text-right">-</span>
       </div>
     );
@@ -36,11 +36,11 @@ export function TokenUsageSlider({
 
   return (
     <div 
-      className="flex items-center gap-2 px-3 py-1.5 bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur rounded-lg border border-gray-200/60 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors w-56"
+      className="flex items-center gap-2 px-3 py-1.5 bg-qd-bg-elev backdrop-blur rounded-lg border border-gray-200/60 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors w-56"
       title={`Token usage: ${currentTokens.toLocaleString()} / ${tokenLimit.toLocaleString()}\nContext Messages: ${messagesLength || 0}`}
     >
       <span className="text-xs font-medium text-qd-text-dim">Tokens</span>
-      <div className="flex-1 h-2 bg-white/60 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-qd-bg-elev dark:bg-gray-700 rounded-full overflow-hidden">
         <div 
           className={`h-full ${barColor} transition-all duration-300 ease-out`}
           style={{ width: `${Math.min(percentage, 100)}%` }}

@@ -94,7 +94,7 @@ export function AskUserCard({ sessionId, data }: AskUserCardProps) {
               className={`w-full text-left px-3 py-1.5 text-sm rounded-md border transition-colors ${
                 selected === choice && !useFreeform
                   ? 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300'
-                  : 'border-qd-border text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel'
+                  : 'border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
               }`}
             >
               {selected === choice && !useFreeform ? '◉' : '○'} {choice}
@@ -108,7 +108,7 @@ export function AskUserCard({ sessionId, data }: AskUserCardProps) {
               className={`w-full text-left px-3 py-1.5 text-sm rounded-md border transition-colors ${
                 useFreeform
                   ? 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300'
-                  : 'border-qd-border text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel'
+                  : 'border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
               }`}
             >
               {useFreeform ? '◉' : '○'} Other (type your answer)

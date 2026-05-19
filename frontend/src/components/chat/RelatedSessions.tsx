@@ -69,8 +69,8 @@ export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onS
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-1 bg-white/95 dark:bg-qd-bg-elev/95 backdrop-blur-xl border border-qd-border-soft rounded-lg shadow-lg z-50 min-w-[280px] max-w-[320px] max-h-[300px] overflow-y-auto">
-          <div className="px-3 py-2 border-b border-white/40 dark:border-gray-700">
+        <div className="absolute top-full right-0 mt-1 bg-qd-bg-elev backdrop-blur-xl border border-qd-border-soft rounded-lg shadow-lg z-50 min-w-[280px] max-w-[320px] max-h-[300px] overflow-y-auto">
+          <div className="px-3 py-2 border-b border-qd-border-soft">
             <span className="text-xs font-medium text-qd-text-muted">Sessions using same project folder</span>
           </div>
           <ul>
@@ -83,7 +83,7 @@ export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onS
                       onSessionClick(session.session_id);
                       setIsOpen(false);
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-white/40 dark:hover:bg-gray-700/40 flex items-center gap-2 transition-colors"
+                    className="w-full text-left px-3 py-2 hover:bg-qd-panel flex items-center gap-2 transition-colors"
                   >
                     {/* Open tab indicator */}
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isTabOpen ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`} />

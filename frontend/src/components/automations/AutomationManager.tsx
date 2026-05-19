@@ -45,7 +45,7 @@ function humanizeCron(cron: string): string {
 function StatusBadge({ enabled }: { enabled: boolean }) {
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-      enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+      enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-qd-panel-deep text-gray-500 dark:bg-gray-800 dark:text-gray-400'
     }`}>
       {enabled ? 'Active' : 'Paused'}
     </span>
@@ -111,7 +111,7 @@ function AutomationDialog({
   return (
     <>
       <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-        <form onSubmit={handleSubmit} className="bg-white/80 dark:bg-qd-bg/95 backdrop-blur-xl border border-white/30 dark:border-qd-border rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="bg-qd-bg backdrop-blur-xl border border-qd-border-soft dark:border-qd-border rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
           <h2 className="text-lg font-semibold dark:text-gray-100">{isEdit ? 'Edit Automation' : 'New Automation'}</h2>
 
           {!isEdit && (
@@ -180,7 +180,7 @@ function AutomationDialog({
               <button
                 type="button"
                 onClick={() => setShowFolderPicker(true)}
-                className="px-3 py-2 border border-white/40 dark:border-gray-600 rounded-lg text-sm text-qd-text-dim hover:bg-white/40 dark:hover:bg-qd-panel transition-colors shrink-0"
+                className="px-3 py-2 border border-qd-border rounded-lg text-sm text-qd-text-dim hover:bg-qd-bg-elev dark:hover:bg-qd-panel transition-colors shrink-0"
                 title="Browse folders"
               >
                 📁
@@ -245,7 +245,7 @@ function AutomationCard({
   return (
     <div
       onClick={onEdit}
-      className="bg-white/50 dark:bg-qd-bg-elev/50 backdrop-blur border border-white/40 dark:border-qd-border rounded-xl p-5 hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all cursor-pointer"
+      className="bg-qd-bg-elev backdrop-blur border border-qd-border-soft dark:border-qd-border rounded-xl p-5 hover:border-blue-300/60 dark:hover:border-blue-500/40 hover:shadow-md transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between mb-3">
         <div>
@@ -271,7 +271,7 @@ function AutomationCard({
         </p>
       )}
 
-      <div className="flex items-center gap-2 pt-2 border-t border-white/40 dark:border-qd-border" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-2 pt-2 border-t border-qd-border-soft dark:border-qd-border" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onToggle}
           className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
@@ -290,7 +290,7 @@ function AutomationCard({
         </button>
         <button
           onClick={onViewRuns}
-          className="text-xs px-3 py-1.5 rounded-lg bg-white/40 text-gray-600 hover:bg-white/60 dark:bg-qd-bg/40 dark:text-gray-400 dark:hover:bg-qd-panel transition-colors"
+          className="text-xs px-3 py-1.5 rounded-lg bg-qd-bg-elev text-gray-600 hover:bg-qd-bg dark:text-gray-400 dark:hover:bg-qd-panel transition-colors"
         >
           📋 Runs
         </button>

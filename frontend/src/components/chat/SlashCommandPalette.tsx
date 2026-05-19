@@ -142,7 +142,7 @@ export function SlashCommandPalette({ query, onSelect, onDismiss, agentItems, on
                 className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
                   idx === selectedIndex
                     ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-800 dark:text-blue-100'
-                    : 'text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel-deep'
+                    : 'text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep'
                 }`}
               >
                 <span className="text-base flex-shrink-0">{item.isDefault ? '✨' : '🤖'}</span>
@@ -175,7 +175,7 @@ export function SlashCommandPalette({ query, onSelect, onDismiss, agentItems, on
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
                 idx === selectedIndex
                   ? 'bg-blue-50 dark:bg-blue-500/20 text-blue-800 dark:text-blue-100'
-                  : 'text-qd-text-dim hover:bg-gray-100 dark:hover:bg-qd-panel-deep'
+                  : 'text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep'
               }`}
             >
               <span className="text-base flex-shrink-0">{cmd.icon}</span>
