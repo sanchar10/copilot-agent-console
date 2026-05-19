@@ -253,7 +253,7 @@ export function Header({
                 className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-qd-md flex items-center gap-1.5 transition-colors min-w-0 max-w-[200px] bg-qd-accent-soft text-qd-accent-text border border-qd-accent-border ${
                   !onCwdChange
                     ? 'cursor-default'
-                    : 'hover:bg-qd-panel-deep'
+                    : 'hover:bg-qd-accent-soft-hover'
                 }`}
                 title={`${cwd}\nClick to change folder`}
                 disabled={!onCwdChange}
@@ -354,7 +354,7 @@ function OpenWithDropdown({ cwd }: { cwd: string }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="h-[30px] w-[30px] flex items-center justify-center text-xs rounded-qd-md bg-qd-accent-soft text-qd-accent-text border border-qd-accent-border hover:bg-qd-panel-deep transition-colors"
+        className="h-[30px] w-[30px] flex items-center justify-center text-xs rounded-qd-md bg-qd-accent-soft text-qd-accent-text border border-qd-accent-border hover:bg-qd-accent-soft-hover transition-colors"
         title="Open folder with…"
       >
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

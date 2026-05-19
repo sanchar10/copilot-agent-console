@@ -27,6 +27,7 @@ export default {
           'text-inv':   'var(--text-inv)',
           accent:       'var(--accent)',
           'accent-soft':'var(--accent-soft)',
+          'accent-soft-hover':'var(--accent-soft-hover)',
           'accent-text':'var(--accent-text)',
           'accent-border':'var(--accent-border)',
           'agent-mark': 'var(--agent-mark)',
