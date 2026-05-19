@@ -151,7 +151,7 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
     <div className="flex gap-3">
       {/* Avatar */}
       <div className="flex-shrink-0 w-[26px] h-[26px] rounded-qd-sm flex items-center justify-center bg-qd-bg-elev border border-qd-border text-qd-agent-mark text-sm font-medium">
-        <span className="text-sm leading-none">🤖</span>
+        <span className="text-sm leading-none">◆</span>
       </div>
 
       {/* Message content */}
