@@ -2,10 +2,108 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   Quiet Doc — design tokens (OKLCH).
+   Theming via [data-theme="light|dark"] on <html>.
+   The legacy `.dark` class is also kept in sync (see useTheme.ts)
+   so existing Tailwind `dark:` utilities keep working during the
+   visual transition.
+   ============================================================ */
+
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Type */
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+  /* Spacing scale (4-base) */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 40px;
+
+  /* Radii */
+  --r-sm: 5px; --r-md: 7px; --r-lg: 10px; --r-xl: 14px;
+
+  /* Motion */
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --t-fast: 120ms;
+  --t-med:  200ms;
+}
+
+/* ---- Light theme (default) ---------------------------------- */
+:root,
+[data-theme="light"] {
+  --bg:          oklch(0.985 0.003 250);
+  --bg-elev:     oklch(1.000 0.000 0);
+  --panel:       oklch(0.962 0.005 250);
+  --panel-deep:  oklch(0.935 0.006 250);
+  --border:      oklch(0.86  0.006 250);
+  --border-soft: oklch(0.90  0.005 250);
+
+  --text:       oklch(0.22 0.01  250);
+  --text-dim:   oklch(0.48 0.008 250);
+  --text-muted: oklch(0.62 0.006 250);
+  --text-inv:   var(--bg);
+
+  --accent:        oklch(0.55 0.13 268);
+  --accent-soft:   oklch(0.94 0.04 268);
+  --accent-soft-hover: oklch(0.88 0.06 268);
+  --accent-text:   oklch(0.42 0.14 268);
+  --accent-border: oklch(0.88 0.05 268);
+
+  --agent-mark: oklch(0.62 0.10 158);
+
+  --status-running: oklch(0.62 0.16 145);
+  --status-active:  var(--accent);
+  --status-error:   oklch(0.58 0.18 25);
+  --status-new:     oklch(0.62 0.13 250);
+  --status-idle:    transparent;
+
+  --shadow-sm:   0 1px 0 rgba(0,0,0,0.02);
+  --shadow-md:   0 4px 14px -8px rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.02);
+  --shadow-pop:  0 10px 32px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+/* ---- Dark theme --------------------------------------------- */
+[data-theme="dark"] {
+  --bg:          oklch(0.180 0.030 265);
+  --bg-elev:     oklch(0.230 0.035 265);
+  --panel:       oklch(0.250 0.038 262);
+  --panel-deep:  oklch(0.290 0.042 260);
+  --border:      oklch(0.36  0.045 262);
+  --border-soft: oklch(0.305 0.038 263);
+
+  --text:       oklch(0.96 0.012 250);
+  --text-dim:   oklch(0.80 0.020 255);
+  --text-muted: oklch(0.62 0.025 258);
+  --text-inv:   var(--bg);
+
+  --accent:        oklch(0.74 0.13 268);
+  --accent-soft:   oklch(0.30 0.07 268);
+  --accent-soft-hover: oklch(0.38 0.09 268);
+  --accent-text:   oklch(0.80 0.10 268);
+  --accent-border: oklch(0.38 0.08 268);
+
+  --agent-mark: oklch(0.74 0.12 158);
+
+  --status-running: oklch(0.74 0.16 145);
+  --status-active:  var(--accent);
+  --status-error:   oklch(0.72 0.18 25);
+  --status-new:     oklch(0.74 0.13 250);
+  --status-idle:    transparent;
+
+  --shadow-sm:  0 1px 0 rgba(0,0,0,0.2);
+  --shadow-md:  0 6px 18px -10px rgba(0,0,0,0.5);
+  --shadow-pop: 0 16px 40px -12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+
+:root {
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
+  letter-spacing: -0.005em;
 }
 
 html, body {
@@ -16,13 +114,19 @@ html, body {
 
 body {
   min-width: 320px;
-  background-color: #fafafa;
-  color: #0f172a;
+  background-color: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 html.dark body {
-  background-color: #1e1e2e;
-  color: #e2e8f0;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1200px 800px at 15% -10%, oklch(0.32 0.085 270 / 0.35), transparent 60%),
+    radial-gradient(1000px 700px at 110% 110%, oklch(0.28 0.090 230 / 0.30), transparent 55%);
+  background-attachment: fixed;
+  color: var(--text);
 }
 
 #root {
@@ -30,103 +134,65 @@ html.dark body {
   overflow: hidden;
 }
 
-/* Custom scrollbar for chat (vertical) */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 8px;
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-text);
 }
 
+/* ============================================================
+   Scrollbars — token-driven
+   ============================================================ */
+
+.overflow-y-auto::-webkit-scrollbar { width: 8px; }
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: transparent;
   border-radius: 4px;
 }
-
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
+  background: var(--border);
   border-radius: 4px;
 }
-
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #b0b0b0;
+  background: var(--text-muted);
 }
 
-html.dark .overflow-y-auto::-webkit-scrollbar-track {
-  background: #2a2a3c;
-}
-
-html.dark .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #4a4a5e;
-}
-
-html.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #5a5a70;
-}
-
-/* Custom scrollbar (horizontal) — tab bar, code blocks, tables */
-.overflow-x-auto::-webkit-scrollbar {
-  height: 6px;
-}
-
+.overflow-x-auto::-webkit-scrollbar { height: 6px; }
 .overflow-x-auto::-webkit-scrollbar-track {
-  background: #f5f5f5;
-  border-radius: 3px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
-  border-radius: 3px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background: #b0b0b0;
-}
-
-html.dark .overflow-x-auto::-webkit-scrollbar-track {
-  background: #2a2a3c;
-}
-
-html.dark .overflow-x-auto::-webkit-scrollbar-thumb {
-  background: #4a4a5e;
-}
-
-html.dark .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background: #5a5a70;
-}
-
-/* Universal custom scrollbar — catches SyntaxHighlighter divs, pre, code, etc. */
-*::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
-
-*::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 3px;
 }
-
-*::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: var(--border);
   border-radius: 3px;
 }
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
 
+*::-webkit-scrollbar { height: 6px; width: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
 *::-webkit-scrollbar-thumb:hover {
-  background: #b0b0b0;
+  background: var(--text-muted);
 }
 
-html.dark *::-webkit-scrollbar-thumb {
-  background: #4a4a5e;
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
-html.dark *::-webkit-scrollbar-thumb:hover {
-  background: #5a5a70;
-}
-
-/* Dark scrollbar for textareas */
 html.dark textarea {
   color-scheme: dark;
-  scrollbar-color: #4a4a5e #2a2a3c;
+  scrollbar-color: var(--border) var(--bg-elev);
 }
 
-/* Mermaid fullscreen: constrain SVG to fit within the modal viewport */
+/* ============================================================
+   Mermaid helpers (unchanged)
+   ============================================================ */
+
 .mermaid-fullscreen svg {
   width: auto !important;
   height: auto !important;
@@ -135,7 +201,6 @@ html.dark textarea {
   display: block !important;
 }
 
-/* Mermaid in workflow pane: scale SVG to fit both width and height */
 .mermaid-fit-pane svg {
   width: auto !important;
   height: auto !important;
@@ -145,35 +210,34 @@ html.dark textarea {
   margin: auto;
 }
 
-/* Hide scrollbar while keeping scroll functionality */
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
+.scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.dark-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.dark-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+.dark-scrollbar::-webkit-scrollbar { width: 6px; }
+.dark-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .dark-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.12);
   border-radius: 3px;
 }
-
 .dark-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.2);
 }
 
-/* Search result highlight flash */
+/* ============================================================
+   Search flash (re-tinted with accent)
+   ============================================================ */
+
 @keyframes search-flash {
-  0%   { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.6); background-color: rgba(59, 130, 246, 0.08); }
-  70%  { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); background-color: rgba(59, 130, 246, 0.04); }
+  0%   {
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 60%, transparent);
+    background-color: color-mix(in oklch, var(--accent) 8%, transparent);
+  }
+  70%  {
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 30%, transparent);
+    background-color: color-mix(in oklch, var(--accent) 4%, transparent);
+  }
   100% { box-shadow: none; background-color: transparent; }
 }
 .search-highlight {
@@ -181,4 +245,66 @@ html.dark textarea {
   border-radius: 8px;
 }
 
+/* ============================================================
+   Focus visibility — token-driven
+   ============================================================ */
 
+:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--accent) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Quiet Doc reusable component classes
+   Used by Sidebar/TabBar/Header/Composer/Thread etc.
+   ============================================================ */
+
+@keyframes qd-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px color-mix(in oklch, var(--status-running) 22%, transparent); }
+  50%      { box-shadow: 0 0 0 5px color-mix(in oklch, var(--status-running) 12%, transparent); }
+}
+.qd-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.qd-status-dot[data-status="running"] {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--status-running) 22%, transparent);
+  animation: qd-pulse 1.8s ease-out infinite;
+}
+.qd-status-dot[data-status="active"] {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 18%, transparent);
+}
+
+.qd-composer:focus-within {
+  border-color: color-mix(in oklch, var(--accent) 50%, var(--border));
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 10%, transparent);
+}
+
+@keyframes qd-popover-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.qd-popover-in {
+  animation: qd-popover-in 140ms var(--ease);
+}
+
+@keyframes qd-slide-in {
+  from { opacity: 0; transform: translateY(-4px); max-height: 0; }
+  to   { opacity: 1; transform: translateY(0); max-height: 600px; }
+}
+.qd-slide-in {
+  animation: qd-slide-in 200ms var(--ease);
+}
+
+.qd-kbd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--panel);
+  line-height: 1;
+}

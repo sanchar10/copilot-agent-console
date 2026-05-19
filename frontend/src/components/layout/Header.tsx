@@ -147,7 +147,7 @@ export function Header({
   };
 
   return (
-    <header className="h-14 border-b border-gray-100 dark:border-[#3a3a4e] bg-white dark:bg-[#252536] shadow-sm dark:shadow-black/20 flex items-center px-6 relative z-20">
+    <header className="h-14 border-b border-qd-border-soft bg-qd-bg-elev flex items-center px-6 relative z-20">
       {sessionName ? (
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Session Name - fixed, not scrollable */}
@@ -159,12 +159,12 @@ export function Header({
                 onChange={(e) => setEditName(e.target.value)}
                 onKeyDown={handleNameKeyDown}
                 onBlur={handleNameSave}
-                className="font-medium text-gray-900 dark:text-gray-100 px-2 py-0.5 border border-blue-300 dark:border-blue-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-[200px] dark:bg-[#2a2a3c]"
+                className="font-semibold text-qd-text bg-qd-bg px-2 py-0.5 border border-qd-accent-border rounded-qd-sm focus:outline-none focus:ring-1 focus:ring-qd-accent w-[200px]"
                 autoFocus
               />
             ) : (
               <h2 
-                className={`font-medium text-gray-900 dark:text-gray-100 w-[200px] truncate ${onNameChange ? 'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400' : ''}`}
+                className={`font-semibold tracking-[-0.01em] text-qd-text w-[200px] truncate ${onNameChange ? 'cursor-pointer hover:text-qd-accent-text' : ''}`}
                 onClick={handleNameClick}
                 title={sessionName || (onNameChange ? 'Click to edit session name' : undefined)}
               >
@@ -174,7 +174,7 @@ export function Header({
           </div>
 
           {/* Separator */}
-          <div className="h-5 w-[2px] bg-gray-300 dark:bg-gray-600 mx-0.5 flex-shrink-0" />
+          <div className="h-5 w-px bg-qd-border mx-0.5 flex-shrink-0" />
 
           {/* Controls area */}
           <div className="flex items-center gap-3 flex-1 min-w-0 [&>*]:flex-shrink-0">
@@ -250,10 +250,10 @@ export function Header({
             {cwd && (
               <button
                 onClick={() => onCwdChange && setShowFolderBrowser(true)}
-                className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors duration-150 min-w-0 max-w-[200px] bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/35 ${
+                className={`h-[30px] px-2.5 py-1 text-xs font-medium rounded-qd-md flex items-center gap-1.5 transition-colors min-w-0 max-w-[200px] bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/35 ${
                   !onCwdChange
                     ? 'cursor-default'
-                    : 'hover:bg-blue-100 dark:hover:bg-blue-900/50'
+                    : 'hover:bg-blue-100 dark:hover:bg-blue-800/40 cursor-pointer'
                 }`}
                 title={`${cwd}\nClick to change folder`}
                 disabled={!onCwdChange}
@@ -309,7 +309,7 @@ export function Header({
           )}
         </div>
       ) : (
-        <h2 className="text-gray-500 dark:text-gray-400">Select or create a session</h2>
+        <h2 className="text-qd-text-muted">Select or create a session</h2>
       )}
     </header>
   );
@@ -354,7 +354,7 @@ function OpenWithDropdown({ cwd }: { cwd: string }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="h-[30px] w-[30px] flex items-center justify-center text-xs rounded-md bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/35 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+        className="h-[30px] w-[30px] flex items-center justify-center text-xs rounded-qd-md bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/35 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors"
         title="Open folder with…"
       >
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -362,12 +362,12 @@ function OpenWithDropdown({ cwd }: { cwd: string }) {
         </svg>
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-40 bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+        <div className="absolute top-full left-0 mt-1 w-40 bg-qd-bg-elev backdrop-blur-xl border border-qd-border rounded-qd-lg shadow-qd-pop qd-popover-in z-50 py-1">
           {OPEN_WITH_OPTIONS.map((opt) => (
             <button
               key={opt.id}
               onClick={() => handleOpen(opt.id)}
-              className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 flex items-center gap-2"
+              className="w-full text-left px-3 py-1.5 text-xs text-qd-text-dim hover:bg-qd-panel hover:text-qd-text flex items-center gap-2"
             >
               <span className="w-5 text-center font-mono text-[10px]">{opt.icon}</span>
               {opt.label}

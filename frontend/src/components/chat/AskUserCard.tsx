@@ -79,7 +79,7 @@ export function AskUserCard({ sessionId, data }: AskUserCardProps) {
         <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">Agent is asking</span>
       </div>
 
-      <div className="text-sm text-gray-700 dark:text-gray-300 mb-3 prose prose-sm max-w-none dark:prose-invert">
+      <div className="text-sm text-qd-text-dim mb-3 prose prose-sm max-w-none dark:prose-invert">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.question}</ReactMarkdown>
       </div>
 
@@ -94,7 +94,7 @@ export function AskUserCard({ sessionId, data }: AskUserCardProps) {
               className={`w-full text-left px-3 py-1.5 text-sm rounded-md border transition-colors ${
                 selected === choice && !useFreeform
                   ? 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300'
-                  : 'border-gray-200 dark:border-[#3a3a4e] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+                  : 'border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
               }`}
             >
               {selected === choice && !useFreeform ? '◉' : '○'} {choice}
@@ -108,7 +108,7 @@ export function AskUserCard({ sessionId, data }: AskUserCardProps) {
               className={`w-full text-left px-3 py-1.5 text-sm rounded-md border transition-colors ${
                 useFreeform
                   ? 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-600 text-amber-700 dark:text-amber-300'
-                  : 'border-gray-200 dark:border-[#3a3a4e] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+                  : 'border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
               }`}
             >
               {useFreeform ? '◉' : '○'} Other (type your answer)
@@ -127,7 +127,7 @@ export function AskUserCard({ sessionId, data }: AskUserCardProps) {
             onKeyDown={e => { if (e.key === 'Enter' && canSubmit) handleSubmit(); }}
             placeholder="Type your answer..."
             autoFocus
-            className="w-full px-3 py-1.5 text-sm rounded-md border border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#1e1e2e] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+            className="w-full px-3 py-1.5 text-sm rounded-md border border-qd-border bg-qd-bg text-qd-text focus:outline-none focus:ring-2 focus:ring-amber-500/40"
           />
         </div>
       )}
@@ -137,7 +137,7 @@ export function AskUserCard({ sessionId, data }: AskUserCardProps) {
           type="button"
           onClick={handleSkip}
           disabled={submitting}
-          className="px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
+          className="px-3 py-1.5 text-xs text-qd-text-muted hover:text-gray-700 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
         >
           Skip
         </button>

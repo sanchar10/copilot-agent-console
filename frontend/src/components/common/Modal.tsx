@@ -47,7 +47,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md', t
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/20 dark:bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
@@ -57,14 +57,14 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md', t
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-[#3a3a4e] rounded-2xl shadow-2xl ${SIZE_CLASS[size]} w-full mx-4 max-h-[90vh] flex flex-col`}
+        className={`relative bg-qd-bg-elev border border-qd-border rounded-qd-xl shadow-qd-pop qd-popover-in ${SIZE_CLASS[size]} w-full mx-4 max-h-[90vh] flex flex-col`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/30 dark:border-[#3a3a4e]">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-qd-border-soft">
+          <h2 className="text-lg font-semibold tracking-[-0.01em] text-qd-text">{title}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+            className="text-qd-text-muted hover:text-qd-text transition-colors"
             aria-label="Close dialog"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md', t
 
         {/* Tabs (non-scrolling slot between header and body) */}
         {tabs && (
-          <div className="px-6 pt-1 border-b border-gray-200 dark:border-[#3a3a4e]">
+          <div className="px-6 pt-1 border-b border-qd-border-soft">
             {tabs}
           </div>
         )}
@@ -87,7 +87,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md', t
 
         {/* Footer */}
         {footer && (
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/30 dark:border-[#3a3a4e] bg-white/30 dark:bg-[#252536]/30">
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-qd-border-soft bg-qd-bg-elev">
             {footer}
           </div>
         )}

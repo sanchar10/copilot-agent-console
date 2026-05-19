@@ -46,7 +46,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
   required: boolean;
 }) {
   const label = getFieldLabel(fieldKey, prop);
-  const baseInputClass = "w-full px-3 py-1.5 text-sm rounded-md border border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#1e1e2e] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/40";
+  const baseInputClass = "w-full px-3 py-1.5 text-sm rounded-md border border-qd-border bg-qd-bg text-qd-text focus:outline-none focus:ring-2 focus:ring-blue-500/40";
 
   // String with enum → dropdown
   if (prop.type === 'string' && prop.enum) {
@@ -54,7 +54,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
     const dropdownOptions = prop.enum!.map((v, i) => ({ value: v, label: names[i] || v }));
     return (
       <div>
-        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+        <label className="block text-xs font-medium text-qd-text-dim mb-1">
           {label}{required && <span className="text-red-400 ml-0.5">*</span>}
         </label>
         {prop.description && <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">{prop.description}</p>}
@@ -71,7 +71,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
   if (prop.type === 'string' && prop.oneOf) {
     return (
       <div>
-        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+        <label className="block text-xs font-medium text-qd-text-dim mb-1">
           {label}{required && <span className="text-red-400 ml-0.5">*</span>}
         </label>
         {prop.description && <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">{prop.description}</p>}
@@ -84,7 +84,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
               className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
                 value === opt.const
                   ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300'
-                  : 'border-gray-200 dark:border-[#3a3a4e] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+                  : 'border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
               }`}
             >
               {opt.title}
@@ -100,7 +100,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
     return (
       <div className="flex items-center justify-between">
         <div>
-          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+          <label className="text-xs font-medium text-qd-text-dim">
             {label}{required && <span className="text-red-400 ml-0.5">*</span>}
           </label>
           {prop.description && <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">{prop.description}</p>}
@@ -126,7 +126,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
   if (prop.type === 'number' || prop.type === 'integer') {
     return (
       <div>
-        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+        <label className="block text-xs font-medium text-qd-text-dim mb-1">
           {label}{required && <span className="text-red-400 ml-0.5">*</span>}
         </label>
         {prop.description && <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">{prop.description}</p>}
@@ -156,7 +156,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
 
     return (
       <div>
-        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+        <label className="block text-xs font-medium text-qd-text-dim mb-1">
           {label}{required && <span className="text-red-400 ml-0.5">*</span>}
         </label>
         {prop.description && <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">{prop.description}</p>}
@@ -176,7 +176,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
                 className={`px-2 py-1 text-xs rounded border transition-colors ${
                   checked
                     ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300'
-                    : 'border-gray-200 dark:border-[#3a3a4e] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a]'
+                    : 'border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel'
                 }`}
               >
                 {checked ? '☑' : '☐'} {opt.label}
@@ -191,7 +191,7 @@ function FormField({ fieldKey, prop, value, onChange, required }: {
   // Default: string text input
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+      <label className="block text-xs font-medium text-qd-text-dim mb-1">
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       {prop.description && <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">{prop.description}</p>}
@@ -271,7 +271,7 @@ export function ElicitationCard({ sessionId, data }: ElicitationCardProps) {
       </div>
 
       {data.message && (
-        <div className="text-sm text-gray-700 dark:text-gray-300 mb-3 prose prose-sm max-w-none dark:prose-invert">
+        <div className="text-sm text-qd-text-dim mb-3 prose prose-sm max-w-none dark:prose-invert">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.message}</ReactMarkdown>
         </div>
       )}
@@ -298,7 +298,7 @@ export function ElicitationCard({ sessionId, data }: ElicitationCardProps) {
           type="button"
           onClick={() => handleAction('cancel')}
           disabled={submitting}
-          className="px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
+          className="px-3 py-1.5 text-xs text-qd-text-muted hover:text-gray-700 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
         >
           Cancel
         </button>
@@ -306,7 +306,7 @@ export function ElicitationCard({ sessionId, data }: ElicitationCardProps) {
           type="button"
           onClick={() => handleAction('decline')}
           disabled={submitting}
-          className="px-3 py-1.5 text-xs rounded-md border border-gray-200 dark:border-[#3a3a4e] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#32324a] transition-colors disabled:opacity-50"
+          className="px-3 py-1.5 text-xs rounded-md border border-qd-border text-qd-text-dim hover:bg-qd-panel-deep dark:hover:bg-qd-panel transition-colors disabled:opacity-50"
         >
           Decline
         </button>
@@ -341,8 +341,8 @@ export function ResolvedElicitationCard({ resolved, schema }: ResolvedCardProps)
 
   if (resolved.action !== 'accept') {
     return (
-      <div className="my-2 ml-11 border-l-3 border-gray-400 dark:border-gray-600 bg-gray-100/80 dark:bg-gray-800/50 rounded-r-lg px-3 py-2">
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+      <div className="my-2 ml-11 border-l-3 border-gray-400 dark:border-gray-600 bg-qd-panel rounded-r-lg px-3 py-2">
+        <span className="text-xs text-qd-text-muted">
           {resolved.action === 'decline' ? '↩ Declined' : '✕ Cancelled'}
           {resolved.message && ` — "${resolved.message}"`}
         </span>

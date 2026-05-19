@@ -47,6 +47,17 @@ vi.mock('../../stores/viewedStore', () => ({
 }));
 
 
+vi.mock('../../stores/viewedStore', () => ({
+  useViewedStore: Object.assign(
+    (selector?: (s: { activeAgentIds: Set<string>; markViewed: () => void }) => unknown) => {
+      const state = { activeAgentIds: new Set<string>(), markViewed: () => {} };
+      return selector ? selector(state) : state;
+    },
+    { getState: () => ({ activeAgentIds: new Set<string>(), markViewed: () => {} }) },
+  ),
+}));
+
+
 vi.mock('../../api/sessions', () => ({
   getSession: vi.fn(),
   disconnectSession: vi.fn(),

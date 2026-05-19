@@ -107,7 +107,7 @@ export function SettingsModal() {
               className={`px-3 py-2 text-sm font-medium transition-colors relative whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  : 'text-qd-text-muted hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               {tab.label}
@@ -211,7 +211,7 @@ function GeneralTab({
     <div className="space-y-4">
       {/* Theme */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-sm font-medium text-qd-text-dim mb-1">
           Theme
         </label>
         <div className="flex gap-2">
@@ -221,7 +221,7 @@ function GeneralTab({
             className={`flex-1 px-3 py-2 rounded-md text-sm font-medium border transition-colors ${
               theme === 'light'
                 ? 'bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-400'
-                : 'bg-white/50 border-white/40 text-gray-600 hover:bg-gray-50 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-400 dark:hover:bg-[#32324a]'
+                : 'bg-qd-bg-elev border-qd-border-soft text-gray-600 hover:bg-qd-panel dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
             }`}
           >
             ☀️ Light
@@ -232,7 +232,7 @@ function GeneralTab({
             className={`flex-1 px-3 py-2 rounded-md text-sm font-medium border transition-colors ${
               theme === 'dark'
                 ? 'bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-400'
-                : 'bg-white/50 border-white/40 text-gray-600 hover:bg-gray-50 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-400 dark:hover:bg-[#32324a]'
+                : 'bg-qd-bg-elev border-qd-border-soft text-gray-600 hover:bg-qd-panel dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
             }`}
           >
             🌙 Dark
@@ -241,8 +241,8 @@ function GeneralTab({
       </div>
 
       {/* Default Model */}
-      <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <div className="border-t border-qd-border pt-4">
+        <label className="block text-sm font-medium text-qd-text-dim mb-2">
           Default Model
         </label>
         <ModelSelector
@@ -253,14 +253,14 @@ function GeneralTab({
           onReasoningEffortChange={onEffortChange}
           variant="full"
         />
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-qd-text-muted mt-1">
           This model will be used for all new sessions.
         </p>
       </div>
 
       {/* Default Working Directory */}
-      <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <div className="border-t border-qd-border pt-4">
+        <label className="block text-sm font-medium text-qd-text-dim mb-1">
           Default Working Directory
         </label>
         <div className="flex gap-2">
@@ -268,37 +268,37 @@ function GeneralTab({
             type="text"
             value={selectedCwd}
             onChange={(e) => onCwdChange(e.target.value)}
-            className="flex-1 px-3 py-2 border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+            className="flex-1 px-3 py-2 border border-qd-border-soft bg-qd-bg-elev rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
             placeholder="e.g., C:\Users\you\projects"
           />
           <button
             type="button"
             onClick={onBrowseFolders}
-            className="px-3 py-2 border border-white/40 bg-white/50 rounded-md text-sm text-gray-600 hover:bg-gray-100 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-400 dark:hover:bg-[#32324a] transition-colors"
+            className="px-3 py-2 border border-qd-border-soft bg-qd-bg-elev rounded-md text-sm text-gray-600 hover:bg-qd-panel-deep dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel transition-colors"
             title="Browse folders"
             aria-label="Browse folders"
           >
             📁
           </button>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-qd-text-muted mt-1">
           New sessions will start in this directory.
         </p>
       </div>
 
       {/* Version Info */}
-      <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4">
+      <div className="border-t border-qd-border pt-4">
         <div className="grid grid-cols-2 gap-2 text-sm">
-          <span className="text-gray-500 dark:text-gray-400">Copilot SDK Version</span>
-          <span className="text-gray-700 dark:text-gray-300 font-mono text-xs">
+          <span className="text-qd-text-muted">Copilot SDK Version</span>
+          <span className="text-qd-text-dim font-mono text-xs">
             {versionInfo ? (versionInfo.sdk_version ?? '—') : '…'}
           </span>
-          <span className="text-gray-500 dark:text-gray-400">CLI (in use) Version</span>
-          <span className="text-gray-700 dark:text-gray-300 font-mono text-xs">
+          <span className="text-qd-text-muted">CLI (in use) Version</span>
+          <span className="text-qd-text-dim font-mono text-xs">
             {versionInfo ? (versionInfo.cli_version ?? '—') : '…'}
           </span>
-          <span className="text-gray-500 dark:text-gray-400">CLI Source</span>
-          <span className="text-gray-700 dark:text-gray-300 font-mono text-xs">
+          <span className="text-qd-text-muted">CLI Source</span>
+          <span className="text-qd-text-dim font-mono text-xs">
             {versionInfo ? (versionInfo.cli_source ?? '—') : '…'}
           </span>
         </div>
@@ -387,33 +387,33 @@ function MobileTab({ isOpen }: { isOpen: boolean }) {
       {/* QR Code / Tunnel Status */}
       {qrValue ? (
         <div className="flex flex-col items-center py-2">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          <p className="text-xs text-qd-text-muted mb-3">
             Scan with your phone to connect:
           </p>
           <div className="bg-white p-3 rounded-lg shadow-sm">
             <QRCodeSVG value={qrValue} size={180} />
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center max-w-xs break-all">
+          <p className="text-xs text-qd-text-muted mt-3 text-center max-w-xs break-all">
             {tunnelUrl}/mobile
           </p>
         </div>
       ) : (
-        <div className="bg-gray-50 dark:bg-[#1e1e2e] rounded-lg p-4 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="bg-qd-panel dark:bg-qd-bg rounded-lg p-4 text-center">
+          <p className="text-sm text-qd-text-muted">
             {devtunnelInstalled === false ? (
               <>
                 <span className="block mb-2">devtunnel CLI is not installed.</span>
-                <code className="bg-gray-100 dark:bg-[#32324a] px-2 py-1 rounded text-xs font-mono select-all">{devtunnelInstallCmd}</code>
+                <code className="bg-qd-panel-deep px-2 py-1 rounded text-xs font-mono select-all">{devtunnelInstallCmd}</code>
               </>
             ) : devtunnelInstalled && !devtunnelLoggedIn ? (
               <>
                 <span className="block mb-2">devtunnel is installed but not logged in.</span>
-                <code className="bg-gray-100 dark:bg-[#32324a] px-2 py-1 rounded text-xs font-mono">devtunnel user login</code>
+                <code className="bg-qd-panel-deep px-2 py-1 rounded text-xs font-mono">devtunnel user login</code>
               </>
             ) : exposeMode ? (
               'Waiting for tunnel to connect...'
             ) : (
-              <>Run <code className="bg-gray-100 dark:bg-[#32324a] px-1.5 py-0.5 rounded text-xs font-mono">copilot-console --expose</code> to enable mobile access</>
+              <>Run <code className="bg-qd-panel-deep px-1.5 py-0.5 rounded text-xs font-mono">copilot-console --expose</code> to enable mobile access</>
             )}
           </p>
         </div>
@@ -421,7 +421,7 @@ function MobileTab({ isOpen }: { isOpen: boolean }) {
 
       {/* Tunnel URL */}
       <div>
-        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+        <label className="block text-xs font-medium text-qd-text-dim mb-1">
           Tunnel URL
         </label>
         <input
@@ -429,7 +429,7 @@ function MobileTab({ isOpen }: { isOpen: boolean }) {
           value={tunnelUrl}
           onChange={(e) => setTunnelUrl(e.target.value)}
           placeholder="https://your-id.devtunnels.ms"
-          className="w-full px-3 py-1.5 text-sm border border-white/40 bg-white/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-100"
+          className="w-full px-3 py-1.5 text-sm border border-qd-border-soft bg-qd-bg-elev rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:bg-qd-bg dark:border-gray-600 dark:text-gray-100"
         />
         {exposeMode && tunnelUrl && (
           <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">
@@ -440,11 +440,11 @@ function MobileTab({ isOpen }: { isOpen: boolean }) {
 
       {/* API Token */}
       <div>
-        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+        <label className="block text-xs font-medium text-qd-text-dim mb-1">
           API Token
         </label>
         <div className="flex items-center gap-2">
-          <code className="flex-1 text-xs bg-gray-100 dark:bg-[#1e1e2e] px-2 py-1.5 rounded font-mono overflow-hidden text-ellipsis whitespace-nowrap min-h-[28px] leading-[20px]">
+          <code className="flex-1 text-xs bg-qd-panel-deep dark:bg-qd-bg px-2 py-1.5 rounded font-mono overflow-hidden text-ellipsis whitespace-nowrap min-h-[28px] leading-[20px]">
             {apiToken
               ? (showToken ? apiToken : '••••••••••••••••')
               : 'Loading...'}
@@ -536,10 +536,10 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
 
   const desktopToggle = (
     <div className="mb-4">
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+      <label className="text-sm font-medium text-qd-text-dim mb-1 block">
         Desktop Notifications
       </label>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+      <p className="text-xs text-qd-text-muted mb-2">
         Show browser notifications when agent completes or needs input (30s delay, only if unread).
       </p>
       <div className="flex gap-1">
@@ -563,7 +563,7 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
             className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
               desktopNotifications === opt
                 ? 'bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-400'
-                : 'bg-white/50 border-white/40 text-gray-600 hover:bg-gray-50 dark:bg-[#1e1e2e] dark:border-gray-600 dark:text-gray-400 dark:hover:bg-[#32324a]'
+                : 'bg-qd-bg-elev border-qd-border-soft text-gray-600 hover:bg-qd-panel dark:bg-qd-bg dark:border-gray-600 dark:text-gray-400 dark:hover:bg-qd-panel'
             }`}
           >
             {opt === 'all' ? 'All responses' : opt === 'input_only' ? 'Input needed only' : 'Off'}
@@ -577,13 +577,13 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
     <div className="mb-4">
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="text-sm font-medium text-qd-text-dim">
             CLI Notifications
           </label>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-xs text-qd-text-muted mt-0.5">
             Receive mobile notifications when Copilot completes a response in CLI session.
             <span className="block mt-1">
-              Toggle within CLI: <code className="bg-gray-100 dark:bg-[#1e1e2e] px-1 rounded text-xs">!cli-notify on|off</code>
+              Toggle within CLI: <code className="bg-qd-panel-deep dark:bg-qd-bg px-1 rounded text-xs">!cli-notify on|off</code>
             </span>
           </p>
         </div>
@@ -619,9 +619,9 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
       <div className="space-y-4">
         {desktopToggle}
         {cliToggle}
-        <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4 flex items-center justify-center py-8">
+        <div className="border-t border-qd-border pt-4 flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent" />
-          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">Loading subscriptions…</span>
+          <span className="ml-2 text-sm text-qd-text-muted">Loading subscriptions…</span>
         </div>
       </div>
     );
@@ -632,12 +632,12 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
       <div className="space-y-4">
         {desktopToggle}
         {cliToggle}
-        <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4">
-          <div className="bg-gray-50 dark:bg-[#1e1e2e] rounded-lg p-6 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="border-t border-qd-border pt-4">
+          <div className="bg-qd-panel dark:bg-qd-bg rounded-lg p-6 text-center">
+            <p className="text-sm text-qd-text-muted">
               No devices registered.
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+            <p className="text-xs text-qd-text-muted mt-2">
               Open the mobile companion to register for push notifications.
             </p>
           </div>
@@ -650,8 +650,8 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
     <div className="space-y-4">
       {desktopToggle}
       {cliToggle}
-      <div className="border-t border-gray-200 dark:border-[#3a3a4e] pt-4 space-y-2">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+      <div className="border-t border-qd-border pt-4 space-y-2">
+        <p className="text-xs text-qd-text-muted mb-3">
           Devices registered for push notifications:
         </p>
         {subscriptions.map((sub) => {
@@ -659,9 +659,9 @@ function NotificationsTab({ isOpen }: { isOpen: boolean }) {
           return (
             <div
               key={sub.endpoint}
-              className="flex items-center gap-2 px-3 py-2 rounded-md bg-gray-50 dark:bg-[#1e1e2e] border border-gray-200 dark:border-[#3a3a4e]"
+              className="flex items-center gap-2 px-3 py-2 rounded-md bg-qd-panel dark:bg-qd-bg border border-qd-border"
             >
-              <span className="text-xs text-gray-600 dark:text-gray-400 flex-1 font-mono truncate" title={sub.endpoint}>
+              <span className="text-xs text-qd-text-dim flex-1 font-mono truncate" title={sub.endpoint}>
                 {truncated}
               </span>
               <button
@@ -823,7 +823,7 @@ function AuthenticationTab() {
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-gray-500 dark:text-gray-400">
+      <p className="text-xs text-qd-text-muted">
         Manage authentication providers for Copilot sessions.
       </p>
 
@@ -831,7 +831,7 @@ function AuthenticationTab() {
       <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${
         authStatus.authenticated
           ? 'bg-emerald-50 dark:bg-emerald-900/15 border-emerald-200 dark:border-emerald-800'
-          : 'bg-gray-50 dark:bg-[#1e1e2e] border-gray-200 dark:border-[#3a3a4e]'
+          : 'bg-qd-panel dark:bg-qd-bg border-qd-border'
       }`}>
         {authStatus.authenticated ? (
           <span className="text-lg">🔒</span>
@@ -839,11 +839,11 @@ function AuthenticationTab() {
           <span className="text-lg">🔐</span>
         )}
         <div className="flex-1 min-w-0">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-qd-text-dim">
             GitHub Copilot{authStatus.authenticated && authStatus.username ? ` (${authStatus.username})` : ''}
           </span>
           {!authStatus.authenticated && (
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+            <span className="text-xs text-qd-text-muted ml-2">
               — Not connected
             </span>
           )}
@@ -878,11 +878,11 @@ function AuthenticationTab() {
               Waiting for authorization…
             </span>
           </div>
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+          <p className="text-sm text-qd-text-dim mb-2">
             Open the link below and enter the code:
           </p>
-          <div className="bg-white dark:bg-[#1e1e2e] rounded-md px-4 py-3 text-center mb-3">
-            <span className="text-2xl font-mono font-bold tracking-widest text-gray-900 dark:text-gray-100">
+          <div className="bg-qd-bg rounded-md px-4 py-3 text-center mb-3">
+            <span className="text-2xl font-mono font-bold tracking-widest text-qd-text">
               {deviceCode.userCode}
             </span>
           </div>
@@ -902,7 +902,7 @@ function AuthenticationTab() {
 
       {/* Connecting but no device code yet */}
       {connecting && !deviceCode && (
-        <div className="flex items-center gap-2 py-3 text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-2 py-3 text-sm text-qd-text-muted">
           <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent" />
           Starting login flow…
         </div>

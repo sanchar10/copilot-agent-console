@@ -150,32 +150,32 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
   return (
     <div className="flex gap-3">
       {/* Avatar */}
-      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium bg-emerald-600">
-        <span className="text-sm leading-none">🤖</span>
+      <div className="flex-shrink-0 w-[26px] h-[26px] rounded-qd-sm flex items-center justify-center bg-qd-bg-elev border border-qd-border text-qd-agent-mark text-sm font-medium">
+        <span className="text-sm leading-none">◆</span>
       </div>
 
       {/* Message content */}
       <div className="flex-1 min-w-0">
         {/* Label */}
-        <div className="text-sm font-medium mb-1 text-emerald-600">
+        <div className="text-[12px] font-medium mb-1 text-qd-text tracking-[-0.005em]">
           Copilot
-          <span className="ml-2 inline-block w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+          <span className="ml-2 inline-block w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--status-running)' }} />
         </div>
 
         {/* Message body — hidden when there's nothing to show (e.g., during an
             ask_user pause where the only step is filtered out). Avatar+label
             above stay visible so the streaming indicator still conveys activity. */}
         {(visibleSteps.length > 0 || content.length > 0) && (
-        <div onClick={handleCitationClick} className="rounded-lg px-4 py-3 bg-white dark:bg-[#2a2a3c] border border-gray-200 dark:border-gray-700">
+        <div onClick={handleCitationClick} className="rounded-qd-lg px-4 py-3 bg-qd-bg-elev border border-qd-border">
           {visibleSteps.length > 0 && (
             <div className="mb-2 text-sm">
-              <div className="text-gray-600 dark:text-gray-400 font-medium mb-2">
+              <div className="text-qd-text-dim font-medium mb-2">
                 Steps ({visibleSteps.length})
               </div>
-              <div ref={stepsRef} onScroll={handleStepsScroll} className="text-gray-700 dark:text-gray-300 max-h-[300px] overflow-y-auto pr-1">
+              <div ref={stepsRef} onScroll={handleStepsScroll} className="text-qd-text-dim max-h-[300px] overflow-y-auto pr-1">
                 {visibleSteps.map((s, idx) => (
                   <div key={idx}>
-                    {idx > 0 && <hr className="border-gray-200 dark:border-gray-700/50 mx-3 my-1.5" />}
+                    {idx > 0 && <hr className="border-qd-border-soft mx-3 my-1.5" />}
                     <div className="border-l-2 border-emerald-300 pl-3 py-1">
                       <div className="font-medium">{s.title}</div>
                       {s.detail && <pre className="mt-1 whitespace-pre-wrap break-words text-xs">{s.detail}</pre>}
@@ -202,3 +202,4 @@ export function StreamingMessage({ content, steps }: StreamingMessageProps) {
     </div>
   );
 }
+

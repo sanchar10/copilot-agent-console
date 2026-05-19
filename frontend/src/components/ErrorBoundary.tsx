@@ -22,7 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="h-screen flex flex-col items-center justify-center gap-4 bg-[#fafafa] dark:bg-[#1e1e2e] text-gray-700 dark:text-gray-300">
+        <div className="h-screen flex flex-col items-center justify-center gap-4 bg-[#fafafa] dark:bg-qd-bg text-qd-text-dim">
           <p className="text-lg font-medium">Something went wrong.</p>
           <button
             onClick={() => window.location.reload()}

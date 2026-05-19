@@ -136,19 +136,19 @@ export function SessionItem({ session }: SessionItemProps) {
     <>
       <div
         onClick={handleClick}
-        className={`group relative flex items-center gap-3 px-3 py-2 cursor-pointer transition-all rounded-lg ${
+        className={`group relative flex items-center gap-3 px-2.5 py-1.5 cursor-pointer transition-colors rounded-qd-sm mb-px ${
           isActive
-            ? 'bg-blue-50 border border-blue-200 shadow-sm dark:bg-blue-900/30 dark:border-blue-700'
+            ? 'bg-qd-panel-deep text-qd-text'
             : isOpen
-            ? 'bg-gray-50 border border-gray-200 dark:bg-[#2a2a3c] dark:border-gray-700'
-            : 'border border-transparent hover:bg-gray-50 hover:border-gray-200 dark:hover:bg-[#32324a] dark:hover:border-gray-700'
+            ? 'bg-qd-panel text-qd-text'
+            : 'text-qd-text-dim hover:bg-qd-panel hover:text-qd-text'
         }`}
       >
         <div className="flex-1 min-w-0 pr-4">
-          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+          <p className={`text-[13px] leading-tight tracking-[-0.005em] truncate ${isActive ? 'font-medium text-qd-text' : ''}`}>
             {session.session_name}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-[11px] font-mono text-qd-text-muted mt-0.5">
             {formatSmartDate(session.updated_at)}
           </p>
         </div>
@@ -158,31 +158,32 @@ export function SessionItem({ session }: SessionItemProps) {
           <div className="absolute right-2 top-1/2 -translate-y-1/2 group-hover:opacity-0 transition-opacity">
             {isRunning ? (
               <div title="Agent is processing...">
-                <svg className="w-4 h-4 text-emerald-500 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
+                <span
+                  className="qd-status-dot"
+                  data-status="running"
+                  style={{ background: 'var(--status-running)' }}
+                />
               </div>
             ) : (
               <div title="New messages">
-                <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse" />
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
               </div>
             )}
           </div>
         )}
 
-        {/* Hover actions — overlayed on right side with solid background */}
-        <div className={`absolute right-0 top-0 bottom-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity rounded-r-lg px-1 ${
+        {/* Hover actions */}
+        <div className={`absolute right-0 top-0 bottom-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity rounded-r-qd-sm px-1 ${
           isActive
-            ? 'bg-blue-50 dark:bg-[#1a2744]'
+            ? 'bg-qd-panel-deep'
             : isOpen
-            ? 'bg-gray-100 dark:bg-[#33334a]'
-            : 'bg-gray-50 dark:bg-[#32324a]'
+            ? 'bg-qd-panel'
+            : 'bg-qd-panel'
         }`}>
           <button
             ref={infoButtonRef}
             onClick={handleInfoClick}
-            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-[#32324a] rounded transition-all"
+            className="p-1.5 text-qd-text-muted hover:text-qd-accent-text hover:bg-qd-panel-deep rounded transition-all"
             title="Session info"
             aria-label="Session info"
           >
@@ -192,7 +193,7 @@ export function SessionItem({ session }: SessionItemProps) {
           </button>
           <button
             onClick={handleDeleteClick}
-            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-[#32324a] rounded transition-all"
+            className="p-1.5 text-qd-text-muted hover:text-red-500 hover:bg-qd-panel-deep rounded transition-all"
             title="Delete session"
             aria-label="Delete session"
           >
@@ -208,19 +209,19 @@ export function SessionItem({ session }: SessionItemProps) {
         <div 
           ref={infoRef}
           style={{ top: popoverPosition.top, left: popoverPosition.left }}
-          className="fixed z-[9999] bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-[#3a3a4e] rounded-lg shadow-xl p-3 w-[320px] text-sm"
+          className="fixed z-[9999] bg-qd-bg-elev border border-qd-border rounded-qd-md shadow-qd-pop qd-popover-in p-3 w-[320px] text-sm"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="space-y-2">
             <div>
-              <span className="text-gray-500 dark:text-gray-400 text-xs">Session ID</span>
+              <span className="text-qd-text-muted text-[11px] font-mono uppercase tracking-wider">Session ID</span>
               <div className="flex items-center gap-2">
-                <code className="text-gray-700 dark:text-gray-300 text-xs bg-gray-100 dark:bg-[#1e1e2e] px-2 py-1 rounded break-all">
+                <code className="text-qd-text text-xs bg-qd-panel-deep px-2 py-1 rounded-qd-sm break-all font-mono">
                   {session.session_id}
                 </code>
                 <button
                   onClick={handleCopyId}
-                  className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 shrink-0"
+                  className="p-1 text-qd-text-muted hover:text-qd-accent-text shrink-0"
                   title="Copy ID"
                   aria-label="Copy session ID"
                 >
@@ -232,28 +233,28 @@ export function SessionItem({ session }: SessionItemProps) {
             </div>
 
             <div>
-              <span className="text-gray-500 dark:text-gray-400 text-xs">Session Name</span>
-              <p className="text-gray-700 dark:text-gray-300 break-words">{session.session_name}</p>
+              <span className="text-qd-text-muted text-[11px] font-mono uppercase tracking-wider">Session Name</span>
+              <p className="text-qd-text-dim break-words">{session.session_name}</p>
             </div>
 
             <div>
-              <span className="text-gray-500 dark:text-gray-400 text-xs">Model</span>
-              <p className="text-gray-700 dark:text-gray-300">{session.model || '(not set)'}</p>
+              <span className="text-qd-text-muted text-[11px] font-mono uppercase tracking-wider">Model</span>
+              <p className="text-qd-text-dim">{session.model || '(not set)'}</p>
             </div>
 
             <div>
-              <span className="text-gray-500 dark:text-gray-400 text-xs">Working Directory</span>
-              <p className="text-gray-700 dark:text-gray-300 break-all">{session.cwd || '(not adopted)'}</p>
+              <span className="text-qd-text-muted text-[11px] font-mono uppercase tracking-wider">Working Directory</span>
+              <p className="text-qd-text-dim break-all">{session.cwd || '(not adopted)'}</p>
             </div>
 
             <div>
-              <span className="text-gray-500 dark:text-gray-400 text-xs">Created</span>
-              <p className="text-gray-700 dark:text-gray-300">{formatDateTime(session.created_at)}</p>
+              <span className="text-qd-text-muted text-[11px] font-mono uppercase tracking-wider">Created</span>
+              <p className="text-qd-text-dim">{formatDateTime(session.created_at)}</p>
             </div>
 
             <div>
-              <span className="text-gray-500 dark:text-gray-400 text-xs">Last Updated</span>
-              <p className="text-gray-700 dark:text-gray-300">{formatDateTime(session.updated_at)}</p>
+              <span className="text-qd-text-muted text-[11px] font-mono uppercase tracking-wider">Last Updated</span>
+              <p className="text-qd-text-dim">{formatDateTime(session.updated_at)}</p>
             </div>
           </div>
         </div>,
@@ -276,3 +277,4 @@ export function SessionItem({ session }: SessionItemProps) {
     </>
   );
 }
+

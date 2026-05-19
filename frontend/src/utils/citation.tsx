@@ -371,7 +371,7 @@ export function createCitationMarkdownComponents(opts: FactoryOptions = {}): Com
           return <FileCitationCode path={text}>{children}</FileCitationCode>;
         }
         return (
-          <code className="bg-gray-100 dark:bg-[#1e1e2e] text-pink-600 dark:text-pink-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
+          <code className="bg-qd-panel-deep dark:bg-qd-bg text-pink-600 dark:text-pink-400 px-1.5 py-0.5 rounded text-[0.9rem] font-mono">
             {children}
           </code>
         );
@@ -389,25 +389,25 @@ export function createCitationMarkdownComponents(opts: FactoryOptions = {}): Com
     table({ children }) {
       return (
         <div className="overflow-x-auto my-3">
-          <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
+          <table className="min-w-full border-collapse border border-qd-border">
             {children}
           </table>
         </div>
       );
     },
     thead({ children }) {
-      return <thead className="bg-gray-100 dark:bg-[#2a2a3c]">{children}</thead>;
+      return <thead className="bg-qd-panel-deep dark:bg-qd-bg-elev">{children}</thead>;
     },
     th({ children }) {
       return (
-        <th className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-left font-semibold text-sm">
+        <th className="border border-qd-border px-3 py-2 text-left font-semibold text-sm">
           {children}
         </th>
       );
     },
     td({ children }) {
       return (
-        <td className="border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm">
+        <td className="border border-qd-border px-3 py-2 text-sm">
           {processChildrenForCitations(children, 'td')}
         </td>
       );
@@ -446,7 +446,7 @@ export function createCitationMarkdownComponents(opts: FactoryOptions = {}): Com
     },
     blockquote({ children }) {
       return (
-        <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 my-3">
+        <blockquote className="border-l-4 border-qd-border pl-4 italic text-qd-text-dim my-3">
           {children}
         </blockquote>
       );
@@ -464,7 +464,7 @@ export function createCitationMarkdownComponents(opts: FactoryOptions = {}): Com
       return <p className="my-2">{processChildrenForCitations(children)}</p>;
     },
     hr() {
-      return <hr className="my-4 border-gray-300 dark:border-gray-600" />;
+      return <hr className="my-4 border-qd-border" />;
     },
   };
 }

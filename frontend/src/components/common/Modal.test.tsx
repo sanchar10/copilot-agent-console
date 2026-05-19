@@ -43,7 +43,7 @@ describe('Modal', () => {
       </Modal>,
     );
     // The backdrop is the first child div with the bg-black class
-    const backdrop = document.querySelector('.bg-black\\/20');
+    const backdrop = document.querySelector('.bg-black\\/30');
     expect(backdrop).not.toBeNull();
     fireEvent.click(backdrop!);
     expect(onClose).toHaveBeenCalledOnce();

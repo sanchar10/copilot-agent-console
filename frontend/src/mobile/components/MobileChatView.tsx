@@ -422,14 +422,14 @@ export function MobileChatView() {
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col bg-[#fafafa] dark:bg-[#1e1e2e]">
-        <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#252536] border-b border-gray-200 dark:border-[#3a3a4e]">
-          <button onClick={() => navigate('/mobile')} className="p-2 -ml-1 text-gray-600 dark:text-gray-400">
+      <div className="h-full flex flex-col bg-[#fafafa] dark:bg-qd-bg">
+        <div className="flex items-center gap-2 px-3 py-2 bg-qd-bg border-b border-qd-border">
+          <button onClick={() => navigate('/mobile')} className="p-2 -ml-1 text-qd-text-dim">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Loading...</h2>
+          <h2 className="text-sm font-semibold text-qd-text">Loading...</h2>
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
@@ -440,19 +440,19 @@ export function MobileChatView() {
 
   if (error || !session) {
     return (
-      <div className="h-full flex flex-col bg-[#fafafa] dark:bg-[#1e1e2e]">
-        <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#252536] border-b border-gray-200 dark:border-[#3a3a4e]">
-          <button onClick={() => navigate('/mobile')} className="p-2 -ml-1 text-gray-600 dark:text-gray-400">
+      <div className="h-full flex flex-col bg-[#fafafa] dark:bg-qd-bg">
+        <div className="flex items-center gap-2 px-3 py-2 bg-qd-bg border-b border-qd-border">
+          <button onClick={() => navigate('/mobile')} className="p-2 -ml-1 text-qd-text-dim">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Error</h2>
+          <h2 className="text-sm font-semibold text-qd-text">Error</h2>
         </div>
         <div className="flex-1 flex items-center justify-center p-6 text-center">
           <div>
             <p className="text-4xl mb-3">⚠️</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{error || 'Could not load session'}</p>
+            <p className="text-sm text-qd-text-dim mb-4">{error || 'Could not load session'}</p>
             <button onClick={() => navigate('/mobile')} className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg">
               Back to Sessions
             </button>
@@ -463,22 +463,22 @@ export function MobileChatView() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-[#fafafa] dark:bg-[#1e1e2e]">
+    <div className="h-full flex flex-col bg-[#fafafa] dark:bg-qd-bg">
       {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#252536] border-b border-gray-200 dark:border-[#3a3a4e]">
+      <div className="flex items-center gap-2 px-3 py-2 bg-qd-bg border-b border-qd-border">
         <button
           onClick={() => navigate('/mobile')}
-          className="p-2 -ml-1 text-gray-600 dark:text-gray-400"
+          className="p-2 -ml-1 text-qd-text-dim"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <div className="flex-1 min-w-0">
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+          <h2 className="text-sm font-semibold text-qd-text truncate">
             {session?.session_name || 'Session'}
           </h2>
-          <div className="text-xs text-gray-400 dark:text-gray-500">
+          <div className="text-xs text-qd-text-muted">
             {session?.model}
             {streamingState.isStreaming && ' · Agent running...'}
           </div>
@@ -501,11 +501,11 @@ export function MobileChatView() {
           ))}
           {streamingState.isStreaming && streamingState.content && (
             <div className="flex justify-start">
-              <div className="max-w-[85%] bg-white dark:bg-[#2a2a3c] rounded-2xl rounded-bl-md px-3 py-2 shadow-sm border border-gray-100 dark:border-[#3a3a4e]">
+              <div className="max-w-[85%] bg-qd-bg-elev rounded-2xl rounded-bl-md px-3 py-2 shadow-sm border border-gray-100 dark:border-qd-border">
                 {streamingState.steps.length > 0 && (
                   <StepsAccordion steps={streamingState.steps} defaultOpen />
                 )}
-                <pre className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap font-sans break-words">
+                <pre className="text-sm text-qd-text whitespace-pre-wrap font-sans break-words">
                   {streamingState.content.trimStart()}
                 </pre>
               </div>
@@ -549,7 +549,7 @@ export function MobileChatView() {
         </div>
         <button
           onClick={scrollToBottom}
-          className={`sticky bottom-2 left-1/2 -translate-x-1/2 bg-black/20 dark:bg-white/20 backdrop-blur-sm text-gray-800 dark:text-gray-100 w-10 h-10 rounded-full shadow-lg flex items-center justify-center z-10 transition-opacity duration-200 ${showScrollButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          className={`sticky bottom-2 left-1/2 -translate-x-1/2 bg-black/20 dark:bg-qd-bg-elev backdrop-blur-sm text-qd-text w-10 h-10 rounded-full shadow-lg flex items-center justify-center z-10 transition-opacity duration-200 ${showScrollButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           aria-label="Scroll to bottom"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
@@ -562,12 +562,12 @@ export function MobileChatView() {
         const isActivating = sending && !sessionActivatedRef.current;
         const isThinking = streamingState.isStreaming && !hasPendingInput && !isActivating;
         const inputBg = isActivating
-          ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+          ? 'bg-qd-panel-deep dark:bg-gray-800 border-qd-border'
           : isThinking
             ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/40'
             : hasPendingInput
-              ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-              : 'bg-white dark:bg-[#252536] border-gray-200 dark:border-[#3a3a4e]';
+              ? 'bg-qd-panel-deep dark:bg-gray-800 border-qd-border'
+              : 'bg-qd-bg border-qd-border';
         const placeholder = isActivating
           ? 'Activating session…'
           : hasPendingInput
@@ -587,7 +587,7 @@ export function MobileChatView() {
                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Activating session…</span>
+                  <span className="text-sm text-qd-text-muted">Activating session…</span>
                 </div>
               ) : isThinking ? (
                 <div className="flex-1 flex items-center gap-0 relative">
@@ -603,7 +603,7 @@ export function MobileChatView() {
                     }}
                     placeholder={input ? placeholder : ''}
                     rows={1}
-                    className="flex-1 resize-none rounded-xl border border-amber-200 dark:border-amber-700/40 bg-white/60 dark:bg-[#2a2a3c]/60 px-3 py-2.5 text-base text-gray-900 dark:text-gray-100 placeholder-amber-400 dark:placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    className="flex-1 resize-none rounded-xl border border-amber-200 dark:border-amber-700/40 bg-qd-bg-elev px-3 py-2.5 text-base text-qd-text placeholder-amber-400 dark:placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-amber-400"
                     style={{ maxHeight: '120px' }}
                   />
                   {!input && (
@@ -631,7 +631,7 @@ export function MobileChatView() {
                   disabled={hasPendingInput}
                   placeholder={placeholder}
                   rows={1}
-                  className={`flex-1 resize-none rounded-xl border px-3 py-2.5 text-base focus:outline-none focus:ring-2 ${hasPendingInput ? 'border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 placeholder-gray-400 cursor-not-allowed' : 'border-gray-200 dark:border-[#3a3a4e] bg-gray-50 dark:bg-[#2a2a3c] text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-blue-500'}`}
+                  className={`flex-1 resize-none rounded-xl border px-3 py-2.5 text-base focus:outline-none focus:ring-2 ${hasPendingInput ? 'border-qd-border bg-qd-panel-deep dark:bg-gray-800 text-qd-text-muted placeholder-gray-400 cursor-not-allowed' : 'border-qd-border bg-qd-panel text-qd-text placeholder-gray-400 focus:ring-blue-500'}`}
                   style={{ maxHeight: '120px' }}
                 />
               )}
@@ -659,7 +659,7 @@ function MobileMessageBubble({ message }: { message: Message }) {
       <div className={`max-w-[85%] rounded-2xl px-3 py-2 shadow-sm ${
         isUser
           ? 'bg-blue-600 text-white rounded-br-md'
-          : 'bg-white dark:bg-[#2a2a3c] text-gray-800 dark:text-gray-200 rounded-bl-md border border-gray-100 dark:border-[#3a3a4e]'
+          : 'bg-qd-bg-elev text-qd-text rounded-bl-md border border-gray-100 dark:border-qd-border'
       }`}>
         {message.steps && message.steps.length > 0 && !isUser && (
           <StepsAccordion steps={message.steps} />
@@ -678,10 +678,10 @@ function StepsAccordion({ steps, defaultOpen = false }: { steps: ChatStep[]; def
   if (parsed.length === 0) return null;
 
   return (
-    <div className="mb-2 border-b border-gray-200 dark:border-[#3a3a4e] pb-1.5">
+    <div className="mb-2 border-b border-qd-border pb-1.5">
       <button
         onClick={() => setOpen(!open)}
-        className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1"
+        className="text-xs text-qd-text-muted flex items-center gap-1"
       >
         <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -711,7 +711,7 @@ function StepsAccordion({ steps, defaultOpen = false }: { steps: ChatStep[]; def
               );
             }
             return (
-              <div key={i} className="text-xs text-gray-500 dark:text-gray-400 pl-3 truncate">
+              <div key={i} className="text-xs text-qd-text-muted pl-3 truncate">
                 ✓ {p.title}
               </div>
             );

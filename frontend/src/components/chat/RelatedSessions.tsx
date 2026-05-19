@@ -69,9 +69,9 @@ export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onS
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-1 bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[280px] max-w-[320px] max-h-[300px] overflow-y-auto">
-          <div className="px-3 py-2 border-b border-white/40 dark:border-gray-700">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Sessions using same project folder</span>
+        <div className="absolute top-full right-0 mt-1 bg-qd-bg-elev backdrop-blur-xl border border-qd-border-soft rounded-lg shadow-lg z-50 min-w-[280px] max-w-[320px] max-h-[300px] overflow-y-auto">
+          <div className="px-3 py-2 border-b border-qd-border-soft">
+            <span className="text-xs font-medium text-qd-text-muted">Sessions using same project folder</span>
           </div>
           <ul>
             {related.map(session => {
@@ -83,12 +83,12 @@ export function RelatedSessions({ sessions, currentSessionId, cwd, openTabs, onS
                       onSessionClick(session.session_id);
                       setIsOpen(false);
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-white/40 dark:hover:bg-gray-700/40 flex items-center gap-2 transition-colors"
+                    className="w-full text-left px-3 py-2 hover:bg-qd-panel flex items-center gap-2 transition-colors"
                   >
                     {/* Open tab indicator */}
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isTabOpen ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 dark:text-gray-100 truncate">{session.session_name}</p>
+                      <p className="text-sm text-qd-text truncate">{session.session_name}</p>
                     </div>
                     <span className="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">
                       {formatRelativeTime(session.updated_at)}

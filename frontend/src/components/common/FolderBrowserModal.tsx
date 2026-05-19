@@ -130,10 +130,10 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath, sho
             }}
             placeholder={error || "Type or paste a path, then press Enter"}
             title={error || undefined}
-            className={`w-full pl-3 pr-9 py-2 text-xs font-mono rounded-lg border bg-white dark:bg-[#2a2a3c] focus:outline-none focus:ring-2 ${
+            className={`w-full pl-3 pr-9 py-2 text-xs font-mono rounded-lg border bg-qd-bg-elev focus:outline-none focus:ring-2 ${
               error
                 ? 'border-red-400 dark:border-red-600 text-red-700 dark:text-red-400 placeholder-red-400 focus:ring-red-500/40'
-                : 'border-gray-200 dark:border-[#3a3a4e] text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-blue-500/40'
+                : 'border-qd-border text-qd-text placeholder-gray-400 focus:ring-blue-500/40'
             }`}
           />
           <button
@@ -149,7 +149,7 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath, sho
 
         {/* Project name field — always rendered to prevent layout shift */}
         <div className={`flex items-center gap-2 px-1 ${showProjectName && currentPath ? 'visible' : 'invisible'}`}>
-          <label className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 whitespace-nowrap">Folder Name</label>
+          <label className="text-xs text-qd-text-muted flex-shrink-0 whitespace-nowrap">Folder Name</label>
           <input
             type="text"
             value={projectName}
@@ -157,18 +157,18 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath, sho
             onKeyDown={(e) => { if (e.key === 'Enter') handleSelect(); }}
             placeholder="Project name"
             maxLength={30}
-            className="flex-1 min-w-0 px-2 py-1 text-xs rounded-md border border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#2a2a3c] text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+            className="flex-1 min-w-0 px-2 py-1 text-xs rounded-md border border-qd-border bg-qd-bg-elev text-qd-text placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
             tabIndex={showProjectName && currentPath ? 0 : -1}
           />
         </div>
 
         {/* Directory listing */}
-        <div className="border border-white/40 dark:border-[#3a3a4e] rounded-lg overflow-hidden h-72 overflow-y-auto">
+        <div className="border border-qd-border-soft dark:border-qd-border rounded-lg overflow-hidden h-72 overflow-y-auto">
           {/* Go up button */}
           {parentPath !== null && (
             <button
               onClick={handleGoUp}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-50/60 dark:hover:bg-blue-900/30 text-blue-600 border-b border-white/40 dark:border-[#3a3a4e] transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-50/60 dark:hover:bg-blue-900/30 text-blue-600 border-b border-qd-border-soft dark:border-qd-border transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
@@ -202,8 +202,8 @@ export function FolderBrowserModal({ isOpen, onClose, onSelect, initialPath, sho
               disabled={entry.accessible === false}
               className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
                 entry.accessible === false
-                  ? 'text-gray-400 cursor-not-allowed bg-white/30 dark:bg-[#252536]/30'
-                  : 'text-gray-700 dark:text-gray-200 hover:bg-blue-50/60 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-400'
+                  ? 'text-gray-400 cursor-not-allowed bg-qd-bg'
+                  : 'text-qd-text-dim hover:bg-blue-50/60 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-400'
               }`}
               title={entry.accessible === false ? 'Permission denied' : entry.path}
             >

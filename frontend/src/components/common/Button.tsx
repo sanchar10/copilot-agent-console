@@ -9,12 +9,12 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = '', variant = 'primary', size = 'md', disabled, children, ...props }, ref) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center font-medium rounded-qd-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variants = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-      secondary: 'bg-white/50 dark:bg-[#32324a] backdrop-blur border border-white/40 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-white/70 dark:hover:bg-[#3a3a4e] focus:ring-blue-500',
-      ghost: 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-white/40 dark:hover:bg-[#32324a] focus:ring-gray-500',
+      primary: 'bg-qd-text text-qd-text-inv hover:opacity-90 focus:ring-qd-accent',
+      secondary: 'bg-qd-bg-elev border border-qd-border text-qd-text-dim hover:bg-qd-panel hover:text-qd-text focus:ring-qd-accent',
+      ghost: 'bg-transparent text-qd-text-dim hover:bg-qd-panel hover:text-qd-text focus:ring-qd-accent',
       danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     };
 

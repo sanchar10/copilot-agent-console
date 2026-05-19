@@ -296,7 +296,7 @@ export function MCPSelector({
           flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md
           transition-colors duration-150
           ${disabled 
-            ? 'bg-gray-100/80 dark:bg-gray-800/80 text-gray-400 border border-gray-200/60 dark:border-gray-700/60 cursor-not-allowed' 
+            ? 'bg-qd-panel text-gray-400 border border-gray-200/60 dark:border-gray-700/60 cursor-not-allowed' 
             : 'bg-blue-50 dark:bg-blue-900/[0.18] text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/35 hover:bg-blue-100 dark:hover:bg-blue-800/40 cursor-pointer'
           }
         `}
@@ -340,9 +340,9 @@ export function MCPSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-72 bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
-          <div className="p-2 border-b border-white/40 dark:border-gray-700">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">MCP Servers</span>
+        <div className="absolute top-full left-0 mt-1 w-72 bg-qd-bg-elev backdrop-blur-xl border border-qd-border-soft rounded-lg shadow-lg z-50">
+          <div className="p-2 border-b border-qd-border-soft">
+            <span className="text-xs font-medium text-qd-text-muted">MCP Servers</span>
           </div>
 
           <div className="max-h-64 overflow-y-auto py-1">
@@ -352,18 +352,18 @@ export function MCPSelector({
               ).length;
               return (
                 <div key={group.key}>
-                  <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-gray-50/80 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700/50 sticky top-0">
+                  <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-qd-panel border-b border-gray-100 dark:border-gray-700/50 sticky top-0">
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+                        <span className="text-[11px] font-semibold text-qd-text-dim uppercase tracking-wide">
                           {group.label}
                         </span>
-                        <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                        <span className="text-[10px] text-qd-text-muted">
                           ({enabledInSection}/{group.servers.length})
                         </span>
                       </div>
                       <span
-                        className="text-[9px] font-mono text-gray-400 dark:text-gray-500 truncate max-w-[220px]"
+                        className="text-[9px] font-mono text-qd-text-muted truncate max-w-[220px]"
                         title={group.path}
                       >
                         {group.path}
@@ -401,7 +401,7 @@ export function MCPSelector({
                   return (
                     <div
                       key={server.name}
-                      className={`flex items-start gap-2 px-3 py-2 ${readOnly ? 'opacity-60' : 'hover:bg-white/40 dark:hover:bg-gray-700/40'}`}
+                      className={`flex items-start gap-2 px-3 py-2 ${readOnly ? 'opacity-60' : 'hover:bg-qd-panel'}`}
                     >
                       <input
                         type="checkbox"
@@ -412,7 +412,7 @@ export function MCPSelector({
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                          <span className="text-sm font-medium text-qd-text truncate">
                             {server.name}
                           </span>
                           {badge && (

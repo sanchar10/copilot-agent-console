@@ -12,6 +12,9 @@ function getInitialTheme(): Theme {
 }
 
 function applyTheme(theme: Theme) {
+  // Set both attributes so legacy Tailwind `dark:` utilities AND Quiet Doc
+  // token selectors (`[data-theme]`) update together.
+  document.documentElement.setAttribute('data-theme', theme);
   if (theme === 'dark') {
     document.documentElement.classList.add('dark');
   } else {

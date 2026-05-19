@@ -210,9 +210,9 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       <div className="absolute inset-0 bg-black/20 dark:bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Search panel */}
-      <div className="relative bg-white/95 dark:bg-[#2a2a3c]/95 backdrop-blur-xl border border-gray-200 dark:border-[#3a3a4e] rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[60vh] flex flex-col">
+      <div className="relative bg-qd-bg-elev backdrop-blur-xl border border-qd-border rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[60vh] flex flex-col">
         {/* Search input */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 dark:border-[#3a3a4e]">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-qd-border">
           <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -222,7 +222,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             placeholder="Search across all sessions..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none"
+            className="flex-1 bg-transparent text-sm text-qd-text placeholder-gray-400 focus:outline-none"
           />
           {loading && (
             <svg className="w-4 h-4 text-gray-400 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -230,8 +230,8 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
           )}
-          <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-gray-400 bg-gray-100 dark:bg-[#1e1e2e] rounded border border-gray-200 dark:border-[#3a3a4e]">ESC</kbd>
-          <button onClick={onClose} className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#3a3a4e] transition-colors" title="Close (Esc)">
+          <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-gray-400 bg-qd-panel-deep dark:bg-qd-bg rounded border border-qd-border">ESC</kbd>
+          <button onClick={onClose} className="p-1 rounded-md text-qd-text-muted hover:text-qd-text-dim dark:hover:text-gray-200 hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep transition-colors" title="Close (Esc)">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -266,23 +266,23 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               if (result.snippets.length === 0) {
                 const idx = globalIdx++;
                 return (
-                  <div key={result.session_id} className="border-b border-gray-100 dark:border-[#3a3a4e]/50 last:border-b-0">
+                  <div key={result.session_id} className="border-b border-gray-100 dark:border-qd-border/50 last:border-b-0">
                     <button
                       data-search-idx={idx}
                       className={`w-full text-left px-4 py-2.5 flex items-center gap-2 transition-colors ${
                         selectedIndex === idx
                           ? 'bg-blue-50 dark:bg-blue-900/20'
-                          : 'hover:bg-gray-50 dark:hover:bg-[#32324a]'
+                          : 'hover:bg-qd-panel dark:hover:bg-qd-panel'
                       }`}
                       onClick={() => handleSelect(result)}
                     >
                       <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex-1">{result.session_name}</span>
+                      <span className="text-sm font-medium text-qd-text truncate flex-1">{result.session_name}</span>
                       {badge && (
                         <span
-                          className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-[#3a3a4e] text-gray-500 dark:text-gray-400 flex-shrink-0"
+                          className="text-[10px] px-1.5 py-0.5 rounded bg-qd-panel-deep text-qd-text-muted flex-shrink-0"
                           title={badge.label}
                         >
                           {badge.icon} {badge.label}
@@ -296,15 +296,15 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               // Session with snippets
               const snippetIndices = result.snippets.map(() => globalIdx++);
               return (
-                <div key={result.session_id} className="border-b border-gray-100 dark:border-[#3a3a4e]/50 last:border-b-0">
+                <div key={result.session_id} className="border-b border-gray-100 dark:border-qd-border/50 last:border-b-0">
                   <div className="px-4 pt-2.5 pb-1 flex items-center gap-2">
                     <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex-1">{result.session_name}</span>
+                    <span className="text-sm font-medium text-qd-text truncate flex-1">{result.session_name}</span>
                     {badge && (
                       <span
-                        className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-[#3a3a4e] text-gray-500 dark:text-gray-400 flex-shrink-0"
+                        className="text-[10px] px-1.5 py-0.5 rounded bg-qd-panel-deep text-qd-text-muted flex-shrink-0"
                         title={badge.label}
                       >
                         {badge.icon} {badge.label}
@@ -319,7 +319,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       className={`w-full text-left px-4 py-1.5 pl-10 flex items-start gap-2 transition-colors ${
                         selectedIndex === snippetIndices[si]
                           ? 'bg-blue-50 dark:bg-blue-900/20'
-                          : 'hover:bg-gray-50 dark:hover:bg-[#32324a]'
+                          : 'hover:bg-qd-panel dark:hover:bg-qd-panel'
                       }`}
                       onClick={() => handleSelect(result, snippet)}
                     >
@@ -330,7 +330,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       }`}>
                         {snippet.message_role === 'user' ? 'You' : 'AI'}
                       </span>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 flex-1">{snippet.content}</span>
+                      <span className="text-xs text-qd-text-dim line-clamp-2 flex-1">{snippet.content}</span>
                     </button>
                   ))}
                 </div>
@@ -341,17 +341,17 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
         {/* Footer hint */}
         {results.length > 0 && (
-          <div className="px-4 py-2 border-t border-gray-100 dark:border-[#3a3a4e]/50 flex items-center gap-3 text-[10px] text-gray-400">
-            <span><kbd className="px-1 py-0.5 bg-gray-100 dark:bg-[#1e1e2e] rounded text-[10px] border border-gray-200 dark:border-[#3a3a4e]">↑↓</kbd> navigate</span>
-            <span><kbd className="px-1 py-0.5 bg-gray-100 dark:bg-[#1e1e2e] rounded text-[10px] border border-gray-200 dark:border-[#3a3a4e]">↵</kbd> open</span>
-            <span><kbd className="px-1 py-0.5 bg-gray-100 dark:bg-[#1e1e2e] rounded text-[10px] border border-gray-200 dark:border-[#3a3a4e]">esc</kbd> close</span>
+          <div className="px-4 py-2 border-t border-gray-100 dark:border-qd-border/50 flex items-center gap-3 text-[10px] text-gray-400">
+            <span><kbd className="px-1 py-0.5 bg-qd-panel-deep dark:bg-qd-bg rounded text-[10px] border border-qd-border">↑↓</kbd> navigate</span>
+            <span><kbd className="px-1 py-0.5 bg-qd-panel-deep dark:bg-qd-bg rounded text-[10px] border border-qd-border">↵</kbd> open</span>
+            <span><kbd className="px-1 py-0.5 bg-qd-panel-deep dark:bg-qd-bg rounded text-[10px] border border-qd-border">esc</kbd> close</span>
             <div className="ml-auto flex items-center gap-1">
               <button
                 onClick={() => setFilterMode('chats')}
                 className={`px-2 py-0.5 rounded text-[10px] transition-colors ${
                   filterMode === 'chats'
                     ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-medium'
-                    : 'hover:bg-gray-100 dark:hover:bg-[#3a3a4e]'
+                    : 'hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep'
                 }`}
                 title="Show only chat sessions"
               >
@@ -363,7 +363,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 className={`px-2 py-0.5 rounded text-[10px] transition-colors ${
                   filterMode === 'all'
                     ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-medium'
-                    : 'hover:bg-gray-100 dark:hover:bg-[#3a3a4e]'
+                    : 'hover:bg-qd-panel-deep dark:hover:bg-qd-panel-deep'
                 }`}
                 title="Include workflow, automation, and help sessions"
               >

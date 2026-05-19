@@ -222,13 +222,13 @@ export function MobileSessionList({ onNotification }: Props) {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-4 pt-4 pb-2 bg-white dark:bg-[#252536] border-b border-gray-200 dark:border-[#3a3a4e]">
+      <div className="px-4 pt-4 pb-2 bg-qd-bg border-b border-qd-border">
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Sessions</h1>
+          <h1 className="text-lg font-semibold text-qd-text">Sessions</h1>
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="text-gray-500 dark:text-gray-400 p-2"
+            className="text-qd-text-muted p-2"
           >
             <svg className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -263,7 +263,7 @@ export function MobileSessionList({ onNotification }: Props) {
           </div>
         )}
         {sessions.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
+          <div className="flex items-center justify-center h-full text-qd-text-muted">
             <p>No sessions yet</p>
           </div>
         ) : (
@@ -275,7 +275,7 @@ export function MobileSessionList({ onNotification }: Props) {
                 <button
                   key={session.session_id}
                   onClick={() => handleSessionClick(session.session_id)}
-                  className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-[#2a2a3c] active:bg-gray-100 dark:active:bg-[#32324a] transition-colors"
+                  className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-qd-panel dark:hover:bg-qd-bg-elev active:bg-qd-panel-deep dark:active:bg-qd-panel transition-colors"
                 >
                   {/* Status indicator — mutually exclusive: spinner > blue dot > empty (same as desktop) */}
                   <div className="w-3 flex-shrink-0 flex items-center justify-center">
@@ -292,11 +292,11 @@ export function MobileSessionList({ onNotification }: Props) {
                   {/* Session info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className={`text-sm truncate ${unread && !isActive ? 'font-semibold text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}>
+                      <span className={`text-sm truncate ${unread && !isActive ? 'font-semibold text-qd-text' : 'text-qd-text-dim'}`}>
                         {session.session_name}
                       </span>
                     </div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                    <div className="text-xs text-qd-text-muted mt-0.5">
                       {session.model} · {formatRelativeTime(session.updated_at)}
                     </div>
                   </div>

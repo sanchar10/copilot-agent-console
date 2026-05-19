@@ -62,11 +62,11 @@ export function Layout({ children }: LayoutProps) {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-[#fafafa] dark:bg-[#1e1e2e]">
+    <div className="flex flex-col h-screen bg-qd-bg text-qd-text">
       <BannerHost />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden bg-qd-bg">
           {children}
         </main>
       </div>

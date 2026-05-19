@@ -274,7 +274,7 @@ export function WorkflowRunView({ workflowId, runId }: WorkflowRunViewProps) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Status bar */}
-      <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-[#3a3a4e] bg-white dark:bg-[#252536]">
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-qd-border bg-qd-bg">
         <div className="flex items-center gap-2">
           <span className={`font-semibold ${statusColor}`}>
             {run?.status?.toUpperCase() || 'LOADING'}
@@ -288,12 +288,12 @@ export function WorkflowRunView({ workflowId, runId }: WorkflowRunViewProps) {
         </div>
         <div className="flex-1" />
         {run?.started_at && (
-          <span className="text-xs text-gray-400 dark:text-gray-500">
+          <span className="text-xs text-qd-text-muted">
             Started {formatDateTime(run.started_at)}
           </span>
         )}
         {run?.duration_seconds != null && (
-          <span className="text-xs text-gray-400 dark:text-gray-500">
+          <span className="text-xs text-qd-text-muted">
             {run.duration_seconds.toFixed(1)}s
           </span>
         )}
@@ -302,8 +302,8 @@ export function WorkflowRunView({ workflowId, runId }: WorkflowRunViewProps) {
       {/* Main content: Events (left) + Mermaid (right) */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left pane: Events feed */}
-        <div className="w-3/5 border-r border-gray-200 dark:border-[#3a3a4e] flex flex-col overflow-hidden">
-          <div className="px-3 py-2 bg-gray-50 dark:bg-[#2a2a3c] border-b border-gray-200 dark:border-[#3a3a4e] text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <div className="w-3/5 border-r border-qd-border flex flex-col overflow-hidden">
+          <div className="px-3 py-2 bg-qd-panel border-b border-qd-border text-xs font-medium text-qd-text-muted uppercase tracking-wider">
             Events ({visibleEvents.length})
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -313,7 +313,7 @@ export function WorkflowRunView({ workflowId, runId }: WorkflowRunViewProps) {
               </div>
             )}
             {visibleEvents.length === 0 && !error && (
-              <div className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">
+              <div className="text-sm text-qd-text-muted text-center py-8">
                 {connected ? 'Waiting for events...' : 'No events yet'}
               </div>
             )}
@@ -346,7 +346,7 @@ export function WorkflowRunView({ workflowId, runId }: WorkflowRunViewProps) {
             {mermaid ? (
               <MermaidDiagram code={mermaid} className="h-full" />
             ) : (
-              <div className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">
+              <div className="text-sm text-qd-text-muted text-center py-8">
                 Loading diagram...
               </div>
             )}
@@ -462,7 +462,7 @@ function EventCard({ event, onSubmit, isSubmitted, submittedAnswer }: {
     const isStart = type === 'superstep_started';
     const iter = event.iteration;
     return (
-      <div className="px-2 py-1 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+      <div className="px-2 py-1 text-xs text-qd-text-muted flex items-center gap-2">
         <span>{isStart ? '▸' : '◂'}</span>
         <span>Superstep {iter != null ? `#${iter}` : ''} {isStart ? 'started' : 'completed'}</span>
       </div>
@@ -481,34 +481,34 @@ function EventCard({ event, onSubmit, isSubmitted, submittedAnswer }: {
   const sessionId = event.session_id;
 
   return (
-    <div className="px-3 py-2 bg-white/50 dark:bg-[#2a2a3c]/50 border border-white/40 dark:border-[#3a3a4e] rounded-lg text-sm">
+    <div className="px-3 py-2 bg-qd-bg-elev border border-qd-border-soft dark:border-qd-border rounded-lg text-sm">
       <div className="flex items-center gap-2">
         <span>{icon}</span>
-        <span className="font-medium text-gray-700 dark:text-gray-300">{label}</span>
+        <span className="font-medium text-qd-text-dim">{label}</span>
         {nodeId && (
           <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs rounded font-mono">
             {nodeId}
           </span>
         )}
         {event.iteration != null && (
-          <span className="text-xs text-gray-400 dark:text-gray-500">step {event.iteration}</span>
+          <span className="text-xs text-qd-text-muted">step {event.iteration}</span>
         )}
         {sessionId && (
           <OpenWorkflowSessionButton sessionId={sessionId} label={nodeId || 'agent'} />
         )}
       </div>
       {event.state && (
-        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <div className="mt-1 text-xs text-qd-text-muted">
           State: <span className="font-medium">{event.state}</span>
         </div>
       )}
       {event.data != null && (
-        <div className="mt-1 text-gray-600 dark:text-gray-400 text-xs whitespace-pre-wrap font-mono bg-gray-50 dark:bg-[#1e1e2e] rounded p-2 max-h-32 overflow-y-auto">
+        <div className="mt-1 text-qd-text-dim text-xs whitespace-pre-wrap font-mono bg-qd-panel dark:bg-qd-bg rounded p-2 max-h-32 overflow-y-auto">
           {typeof event.data === 'string' ? event.data : JSON.stringify(event.data, null, 2)}
         </div>
       )}
       {event.output && (
-        <div className="mt-1 text-gray-600 dark:text-gray-400 text-xs whitespace-pre-wrap">
+        <div className="mt-1 text-qd-text-dim text-xs whitespace-pre-wrap">
           {typeof event.output === 'string' ? event.output : JSON.stringify(event.output, null, 2)}
         </div>
       )}
@@ -620,7 +620,7 @@ export function HumanInputRow({ event, onSubmit, isSubmitted, submittedAnswer }:
       data-kind={requestType || 'unknown'}
       className={`px-3 py-3 rounded-lg border ${
         isSubmitted
-          ? 'bg-gray-50 dark:bg-[#2a2a3c] border-gray-200 dark:border-[#3a3a4e] opacity-70'
+          ? 'bg-qd-panel border-qd-border opacity-70'
           : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
       }`}
     >
@@ -633,12 +633,12 @@ export function HumanInputRow({ event, onSubmit, isSubmitted, submittedAnswer }:
         )}
       </div>
       {message && (
-        <div className="text-sm text-gray-700 dark:text-gray-200 mb-3 whitespace-pre-wrap">
+        <div className="text-sm text-qd-text-dim mb-3 whitespace-pre-wrap">
           {message}
         </div>
       )}
       {!message && fallbackBody && (
-        <div className="text-xs font-mono whitespace-pre-wrap text-gray-600 dark:text-gray-300 mb-3">
+        <div className="text-xs font-mono whitespace-pre-wrap text-qd-text-dim mb-3">
           {fallbackBody}
         </div>
       )}
@@ -684,17 +684,17 @@ export function HumanInputRow({ event, onSubmit, isSubmitted, submittedAnswer }:
       {isSubmitted && (
         <div
           data-testid={`hitl-answer-${requestId}`}
-          className="text-xs text-gray-600 dark:text-gray-300"
+          className="text-xs text-qd-text-dim"
         >
           {formattedAnswer !== null ? (
             <>
-              <span className="text-gray-500 dark:text-gray-400">↩ Response: </span>
+              <span className="text-qd-text-muted">↩ Response: </span>
               <span className="font-mono whitespace-pre-wrap break-words max-h-32 overflow-y-auto inline-block align-top">
                 {formattedAnswer}
               </span>
             </>
           ) : (
-            <span className="text-gray-500 dark:text-gray-400">↩ Response submitted</span>
+            <span className="text-qd-text-muted">↩ Response submitted</span>
           )}
         </div>
       )}
@@ -795,7 +795,7 @@ function FreeTextSubmit({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         disabled={disabled}
-        className="flex-1 px-2 py-1 bg-white dark:bg-[#1e1e2e] border border-gray-300 dark:border-[#3a3a4e] rounded text-sm disabled:opacity-50"
+        className="flex-1 px-2 py-1 bg-qd-bg border border-qd-border rounded text-sm disabled:opacity-50"
         placeholder="Type your answer..."
       />
       <button
@@ -825,7 +825,7 @@ function UserInputInput({
         onChange={(e) => setText(e.target.value)}
         disabled={disabled}
         rows={3}
-        className="w-full px-2 py-1 bg-white dark:bg-[#1e1e2e] border border-gray-300 dark:border-[#3a3a4e] rounded text-sm font-mono disabled:opacity-50"
+        className="w-full px-2 py-1 bg-qd-bg border border-qd-border rounded text-sm font-mono disabled:opacity-50"
         placeholder="Provide input..."
       />
       <div className="flex items-center gap-2">
@@ -838,7 +838,7 @@ function UserInputInput({
           Send
         </button>
         {timeoutSeconds != null && (
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-qd-text-muted">
             Timeout: {timeoutSeconds}s
           </span>
         )}
@@ -894,7 +894,7 @@ function ExternalSchemaForm({
     >
       {fields.map((field) => (
         <label key={field} className="block">
-          <span className="text-xs font-medium text-gray-600 dark:text-gray-300 block mb-0.5">
+          <span className="text-xs font-medium text-qd-text-dim block mb-0.5">
             {field}
           </span>
           <input
@@ -904,7 +904,7 @@ function ExternalSchemaForm({
               setValues((prev) => ({ ...prev, [field]: e.target.value }))
             }
             disabled={disabled}
-            className="w-full px-2 py-1 bg-white dark:bg-[#1e1e2e] border border-gray-300 dark:border-[#3a3a4e] rounded text-sm disabled:opacity-50"
+            className="w-full px-2 py-1 bg-qd-bg border border-qd-border rounded text-sm disabled:opacity-50"
           />
         </label>
       ))}
@@ -938,7 +938,7 @@ function ExternalRawJson({
         }}
         disabled={disabled}
         rows={4}
-        className="w-full px-2 py-1 bg-white dark:bg-[#1e1e2e] border border-gray-300 dark:border-[#3a3a4e] rounded text-sm font-mono disabled:opacity-50"
+        className="w-full px-2 py-1 bg-qd-bg border border-qd-border rounded text-sm font-mono disabled:opacity-50"
         placeholder='{"value": "..."} or any JSON'
       />
       {parseError && (
