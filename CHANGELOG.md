@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.9.3
+
+### Release Summary
+
+UI overhaul: "Quiet Doc"–style visual upgrade across all surfaces. OKLCH-based design tokens, Geist typography, iridescent midnight-blue dark mode, contrast and consistency polish. No functional changes — all 419 frontend tests pass unchanged.
+
+### 🎨 UI
+
+- **Quiet Doc design system** — `frontend/src/index.css` introduces OKLCH design tokens for both themes, surfaced as `qd.*` Tailwind colors (`bg-qd-bg`, `text-qd-text-muted`, `border-qd-border`, etc.) via `tailwind.config.js`. Geist Sans + Geist Mono fonts. Dual `[data-theme]` + `.dark` class strategy keeps existing `dark:` utilities working.
+- **Reskin pass across 42 files** — Layout, Sidebar, Header, TabBar, ChatPane, InputBox, MessageBubble, StreamingMessage, Modal, Toast, Pins drawer, MCP/Tools selectors, automation cards, workflow cards, settings rows, and more — all moved off ad-hoc `bg-white/*` + `dark:bg-[#xxxx]` patterns onto the token system.
+- **Contrast fixes** — dark-mode dropdown lists, Pins bubbles, Token viewer, MCP rows, Automation/Runs/Workflow cards no longer render with washed-out light backgrounds; light-mode Copilot bubble and Pins drawer borders are now visible. Tokens tuned: dark `--bg-elev` raised, borders strengthened, text-dim/muted contrast boosted.
+- **Iridescent midnight-blue dark mode** — chroma raised to 0.030–0.045 at hues 260–265 (was 0.005/270), plus a two-stop radial gradient on `html.dark body` (cool indigo top-left + cyan-blue bottom-right, `background-attachment: fixed`) for subtle shimmer.
+- **Tab status dot** — TabBar previously rendered a colored dot for `active`/`idle` states that collided with the sidebar's pending-view indicator. Now ONLY shows a dot when `isRunning` (agent actively processing) via `useViewedStore`.
+- **Header pill consistency** — folder badge and "Open with" button now use the exact same `bg-blue-50/100` (light) and `bg-blue-900/[0.18]` → `bg-blue-800/40` (dark) palette as the MCP and Tools selectors. Base and hover colors are pixel-identical across all chat-header pills.
+- **Streaming avatar matches final** — streaming bubble showed 🤖 while the completed agent bubble showed ◆, causing a visible swap when streaming ended. Unified to ◆ in both places.
+
 ## v0.9.2
 
 ### Release Summary
