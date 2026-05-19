@@ -63,16 +63,16 @@
 
 /* ---- Dark theme --------------------------------------------- */
 [data-theme="dark"] {
-  --bg:          oklch(0.165 0.005 270);
-  --bg-elev:     oklch(0.215 0.006 270);
-  --panel:       oklch(0.235 0.006 270);
-  --panel-deep:  oklch(0.275 0.007 270);
-  --border:      oklch(0.34  0.008 270);
-  --border-soft: oklch(0.285 0.007 270);
+  --bg:          oklch(0.180 0.030 265);
+  --bg-elev:     oklch(0.230 0.035 265);
+  --panel:       oklch(0.250 0.038 262);
+  --panel-deep:  oklch(0.290 0.042 260);
+  --border:      oklch(0.36  0.045 262);
+  --border-soft: oklch(0.305 0.038 263);
 
-  --text:       oklch(0.95 0.005 270);
-  --text-dim:   oklch(0.78 0.008 270);
-  --text-muted: oklch(0.60 0.008 270);
+  --text:       oklch(0.96 0.012 250);
+  --text-dim:   oklch(0.80 0.020 255);
+  --text-muted: oklch(0.62 0.025 258);
   --text-inv:   var(--bg);
 
   --accent:        oklch(0.74 0.13 268);
@@ -120,6 +120,10 @@ body {
 
 html.dark body {
   background-color: var(--bg);
+  background-image:
+    radial-gradient(1200px 800px at 15% -10%, oklch(0.32 0.085 270 / 0.35), transparent 60%),
+    radial-gradient(1000px 700px at 110% 110%, oklch(0.28 0.090 230 / 0.30), transparent 55%);
+  background-attachment: fixed;
   color: var(--text);
 }
 
